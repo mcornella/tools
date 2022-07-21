@@ -1,7 +1,7 @@
 use crate::prelude::*;
-use rome_formatter::{write, Buffer, Comments, CstFormatContext};
+use rome_formatter::{write, Buffer, CstFormatContext};
+use rome_js_syntax::JsBlockStatement;
 use rome_js_syntax::{JsAnyStatement, JsEmptyStatement};
-use rome_js_syntax::{JsBlockStatement, JsLanguage};
 
 use rome_js_syntax::JsBlockStatementFields;
 use rome_js_syntax::JsSyntaxKind;
@@ -18,7 +18,7 @@ impl FormatNodeRule<JsBlockStatement> for FormatJsBlockStatement {
             r_curly_token,
         } = node.as_fields();
 
-        if is_non_collapsable_empty_block(node, &f.context().comments()) {
+        if is_non_collapsable_empty_block(node, f.context()) {
             for stmt in statements
                 .iter()
                 .filter_map(|stmt| JsEmptyStatement::cast(stmt.into_syntax()))
@@ -51,10 +51,7 @@ impl FormatNodeRule<JsBlockStatement> for FormatJsBlockStatement {
 // * empty block that is the 'cons' or 'alt' of an if statement: two lines `{\n}`
 // * non empty block: put each stmt on its own line: `{\nstmt1;\nstmt2;\n}`
 // * non empty block with comments (trailing comments on {, or leading comments on })
-fn is_non_collapsable_empty_block(
-    block: &JsBlockStatement,
-    suppressions: &Comments<JsLanguage>,
-) -> bool {
+fn is_non_collapsable_empty_block(block: &JsBlockStatement, context: &JsFormatContext) -> bool {
     if block
         .l_curly_token()
         .map_or_else(|_| false, |token| token.has_trailing_comments())
@@ -93,7 +90,7 @@ fn is_non_collapsable_empty_block(
         && block.statements().iter().any(|s| {
             !matches!(s, JsAnyStatement::JsEmptyStatement(_))
                 || s.syntax().has_comments_direct()
-                || suppressions.is_suppressed(s.syntax())
+                || context.is_suppressed(s.syntax())
         })
     {
         return false;

@@ -33,10 +33,7 @@ impl FormatNodeRule<JsxExpressionChild> for FormatJsxExpressionChild {
                 && !str_token.has_trailing_comments()
                 && !l_curly_token.has_trailing_comments()
                 && !r_curly_token.has_leading_non_whitespace_trivia();
-            let is_suppressed = f
-                .context()
-                .comments()
-                .is_suppressed(string_literal.syntax());
+            let is_suppressed = f.context().is_suppressed(string_literal.syntax());
 
             if has_space_text && no_trivia && !is_suppressed {
                 return write![

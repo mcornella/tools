@@ -56,7 +56,9 @@ pub use builders::{
     soft_line_break, soft_line_break_or_space, soft_line_indent_or_space, space_token, token,
     BestFitting,
 };
-pub use comments::{CommentKind, CommentStyle, Comments, SourceComment};
+pub use comments::{
+    CommentKind, CommentPosition, CommentStyle, Comments, DecoratedComment, SourceComment,
+};
 pub use format_element::{normalize_newlines, FormatElement, Token, Verbatim, LINE_TERMINATORS};
 pub use group_id::GroupId;
 use indexmap::IndexSet;
@@ -217,7 +219,7 @@ pub trait CstFormatContext: FormatContext {
     /// Returns a ref counted [Comments].
     ///
     /// The use of a [Rc] is necessary to achieve that [Comments] has a lifetime that is independent of the [crate::Formatter].
-    /// Having independent lifetimes is necessary to support the use case where a (formattable object)[Format]
+    /// Having independent lifetimes is necessary to support the use case where a [formattable object](Format)
     /// iterates over all comments and writes them into the [crate::Formatter] (mutably borrowing the [crate::Formatter] and in turn this context).
     ///
     /// ```block
@@ -231,8 +233,37 @@ pub trait CstFormatContext: FormatContext {
     /// ```
     fn comments(&self) -> Rc<Comments<Self::Language>>;
 
-    /// Consumes `self` and returns a new context with the provided extracted (`comments`)[Comments].
+    /// Consumes `self` and returns a new context with the provided extracted [`comments`](Comments).
     fn with_comments(self, comments: Rc<Comments<Self::Language>>) -> Self;
+
+    /// Returns `true` if the passed `node` has a leading suppression comment.
+    ///
+    /// Suppression comments only apply if they at the start of a node and they suppress the most
+    /// outer node.
+    ///
+    /// # Examples
+    ///
+    /// ```javascript
+    /// // rome-ignore format: Reason
+    /// console.log("Test");
+    /// ```
+    ///
+    /// Returns `true` for the expression statement but `false` for the call expression because the
+    /// call expression is nested inside of the expression statement.
+    fn is_suppressed(&self, node: &SyntaxNode<Self::Language>) -> bool {
+        let comments = self.comments();
+        let style = self.comment_style();
+
+        comments.mark_suppression_checked(node);
+
+        for comment in comments.leading_comments(node) {
+            if style.is_suppression(comment.piece().text()) {
+                return true;
+            }
+        }
+
+        false
+    }
 }
 
 #[derive(Debug, Default, Eq, PartialEq)]

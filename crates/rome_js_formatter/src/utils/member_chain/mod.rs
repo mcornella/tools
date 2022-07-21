@@ -5,10 +5,9 @@ mod simple_argument;
 use crate::prelude::*;
 use crate::utils::member_chain::flatten_item::FlattenItem;
 use crate::utils::member_chain::groups::{Groups, HeadGroup};
-use rome_formatter::{format_args, write, Buffer, Comments, CstFormatContext, PreambleBuffer};
+use rome_formatter::{format_args, write, Buffer, CstFormatContext, PreambleBuffer};
 use rome_js_syntax::{
-    JsCallExpression, JsComputedMemberExpression, JsExpressionStatement, JsLanguage,
-    JsStaticMemberExpression,
+    JsCallExpression, JsComputedMemberExpression, JsExpressionStatement, JsStaticMemberExpression,
 };
 use rome_js_syntax::{JsSyntaxKind, JsSyntaxNode};
 use rome_rowan::{AstNode, SyntaxResult};
@@ -133,7 +132,7 @@ fn get_call_expression_groups(
         JsExpressionStatement::can_cast(parent.kind())
     });
 
-    flatten_call_expression(&mut flattened_items, syntax_node, &f.context().comments())?;
+    flatten_call_expression(&mut flattened_items, syntax_node, f.context())?;
 
     // Count the number of CallExpression in the chain,
     // will be used later to decide on how to format it
@@ -325,9 +324,9 @@ fn write_groups(
 fn flatten_call_expression(
     queue: &mut Vec<FlattenItem>,
     node: &JsSyntaxNode,
-    comments: &Comments<JsLanguage>,
+    context: &JsFormatContext,
 ) -> SyntaxResult<()> {
-    if comments.is_suppressed(node) {
+    if context.is_suppressed(node) {
         queue.push(FlattenItem::Node(node.clone()))
     }
 
@@ -335,14 +334,14 @@ fn flatten_call_expression(
         JsSyntaxKind::JS_CALL_EXPRESSION => {
             let call_expression = JsCallExpression::cast(node.clone()).unwrap();
             let callee = call_expression.callee()?;
-            flatten_call_expression(queue, callee.syntax(), comments)?;
+            flatten_call_expression(queue, callee.syntax(), context)?;
 
             queue.push(FlattenItem::CallExpression(call_expression));
         }
         JsSyntaxKind::JS_STATIC_MEMBER_EXPRESSION => {
             let static_member = JsStaticMemberExpression::cast(node.clone()).unwrap();
             let object = static_member.object()?;
-            flatten_call_expression(queue, object.syntax(), comments)?;
+            flatten_call_expression(queue, object.syntax(), context)?;
 
             queue.push(FlattenItem::StaticMember(static_member));
         }
@@ -350,7 +349,7 @@ fn flatten_call_expression(
         JsSyntaxKind::JS_COMPUTED_MEMBER_EXPRESSION => {
             let computed_expression = JsComputedMemberExpression::cast(node.clone()).unwrap();
             let object = computed_expression.object()?;
-            flatten_call_expression(queue, object.syntax(), comments)?;
+            flatten_call_expression(queue, object.syntax(), context)?;
 
             queue.push(FlattenItem::ComputedMember(computed_expression));
         }

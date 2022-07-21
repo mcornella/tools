@@ -1,11 +1,13 @@
-use crate::CstFormatContext;
+use crate::{CstFormatContext, TextSize};
+use rome_rowan::syntax::SyntaxTriviaPieceSkipped;
+
 use rome_rowan::{
-    Direction, Language, SyntaxElement, SyntaxKind, SyntaxNode, SyntaxTriviaPieceComments,
-    WalkEvent,
+    Direction, Language, SyntaxElement, SyntaxKind, SyntaxNode, SyntaxToken,
+    SyntaxTriviaPieceComments, WalkEvent,
 };
 #[cfg(debug_assertions)]
 use std::cell::RefCell;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
 pub enum CommentKind {
@@ -114,10 +116,112 @@ impl CommentKind {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct SkippedTokenTrivia<L: Language> {
+    lines_before: u32,
+    piece: SyntaxTriviaPieceSkipped<L>,
+}
+
+#[derive(Debug, Clone)]
+pub enum DanglingTrivia<L: Language> {
+    Comment(SourceComment<L>),
+    SkippedToken(SkippedTokenTrivia<L>),
+}
+
+#[derive(Debug, Clone)]
+pub struct DecoratedComment<L: Language> {
+    preceding: Option<SyntaxNode<L>>,
+    following: Option<SyntaxNode<L>>,
+    lines_before: u32,
+    trailing_token_comment: bool,
+    comment: SyntaxTriviaPieceComments<L>,
+    kind: CommentKind,
+}
+
+impl<L: Language> DecoratedComment<L> {
+    /// The node that fully encloses the comment (the comment's start and end position are fully in the
+    /// node's bounds).
+    pub fn enclosing_node(&self) -> SyntaxNode<L> {
+        // SAFETY: Guaranteed by the fact that comments are extracted from a root node.
+        self.comment
+            .as_piece()
+            .token()
+            .parent()
+            .expect("Expected token to have a parent node.")
+    }
+
+    pub fn token(&self) -> SyntaxToken<L> {
+        self.comment.as_piece().token()
+    }
+
+    /// The node directly preceding the comment or [None] if the comment is preceded by a token or is the first
+    /// token in the program.
+    pub fn preceding_node(&self) -> Option<&SyntaxNode<L>> {
+        self.preceding.as_ref()
+    }
+
+    fn take_preceding_node(&mut self) -> Option<SyntaxNode<L>> {
+        self.preceding.take()
+    }
+
+    /// The node directly following the comment or [None] if the comment is followed by a token or is the last token in the program.
+    pub fn following_node(&self) -> Option<&SyntaxNode<L>> {
+        self.following.as_ref()
+    }
+
+    fn take_following_node(&mut self) -> Option<SyntaxNode<L>> {
+        self.following.take()
+    }
+
+    /// The number of lines between this comment and the **previous** token, comment or skipped trivia.
+    pub fn lines_before(&self) -> u32 {
+        self.lines_before
+    }
+
+    /// `true` if the comment is part of the tokens [trailing trivia](SyntaxToken::trailing_trivia)
+    pub fn is_trailing_token_trivia(&self) -> bool {
+        self.trailing_token_comment
+    }
+
+    /// Returns the [kind](CommentKind) of the comment.
+    pub fn kind(&self) -> CommentKind {
+        self.kind
+    }
+}
+
+impl<L: Language> From<DecoratedComment<L>> for SourceComment<L> {
+    fn from(decorated: DecoratedComment<L>) -> Self {
+        Self {
+            lines_before: decorated.lines_before,
+            piece: decorated.comment,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub enum CommentPosition<L: Language> {
+    /// Overrides the positioning of the comment to be a leading node comment.
+    Leading {
+        node: SyntaxNode<L>,
+        comment: DecoratedComment<L>,
+    },
+    /// Overrides the positioning of the comment to be a trailing node comment.
+    Trailing {
+        node: SyntaxNode<L>,
+        comment: DecoratedComment<L>,
+    },
+
+    /// Uses the default positioning rules for the comment.
+    /// TODO document rules
+    Default(DecoratedComment<L>),
+}
+
 /// Defines how to format comments for a specific [Language].
 pub trait CommentStyle<L: Language> {
     /// Returns `true` if a comment with the given `text` is a `rome-ignore format:` suppression comment.
     fn is_suppression(&self, text: &str) -> bool;
+
+    fn comment_position(&self, comment: DecoratedComment<L>) -> CommentPosition<L>;
 
     /// Returns the (kind)[CommentKind] of the comment
     fn get_comment_kind(&self, comment: &SyntaxTriviaPieceComments<L>) -> CommentKind;
@@ -139,10 +243,16 @@ pub trait CommentStyle<L: Language> {
 /// * whether a node should be formatted as is because it has a leading suppression comment.
 /// * a node's leading and trailing comments
 /// * the dangling comments of a token
-#[derive(Debug, Default, Clone)]
+#[derive(Clone, Default)]
 pub struct Comments<L: Language> {
-    /// Stores the nodes that have at least one leading suppression comment.
-    suppressed_nodes: HashSet<SyntaxNode<L>>,
+    /// Stores all leading node comments by node
+    leading_comments: AppendOnlyMultiMap<SyntaxNode<L>, SourceComment<L>>,
+
+    /// Stores the trailing node comments by node
+    trailing_comments: AppendOnlyMultiMap<SyntaxNode<L>, SourceComment<L>>,
+
+    /// Stores the dangling trivia by token
+    dangling_trivia: AppendOnlyMultiMap<SyntaxToken<L>, DanglingTrivia<L>>,
 
     /// Stores all nodes for which [Comments::is_suppressed] has been called.
     /// This index of nodes that have been checked if they have a suppression comments is used to
@@ -162,71 +272,88 @@ impl<L: Language> Comments<L> {
     where
         Context: CstFormatContext<Language = L>,
     {
-        let mut suppressed_nodes = HashSet::new();
-        let mut current_node = None;
+        let mut builder = CommentsBuilderVisitor::new(context);
 
         for event in root.preorder_with_tokens(Direction::Next) {
             match event {
                 WalkEvent::Enter(SyntaxElement::Node(node)) => {
-                    // Lists cannot have a suppression comment attached, it must
-                    // belong to either the entire parent node or one of the children
-                    if node.kind().is_root() || node.kind().is_list() {
-                        continue;
-                    }
+                    builder.visit_node(WalkEvent::Enter(node))
+                }
 
-                    if current_node.is_none() {
-                        current_node = Some(node);
-                    }
-                }
                 WalkEvent::Leave(SyntaxElement::Node(node)) => {
-                    if current_node == Some(node) {
-                        current_node = None;
-                    }
+                    builder.visit_node(WalkEvent::Leave(node))
                 }
-                WalkEvent::Enter(SyntaxElement::Token(token)) => {
-                    if let Some(current_node) = current_node.take() {
-                        for comment in token
-                            .leading_trivia()
-                            .pieces()
-                            .filter_map(|piece| piece.as_comments())
-                        {
-                            if context.comment_style().is_suppression(comment.text()) {
-                                suppressed_nodes.insert(current_node);
-                                break;
-                            }
-                        }
-                    }
-                }
+
+                WalkEvent::Enter(SyntaxElement::Token(token)) => builder.visit_token(token),
                 WalkEvent::Leave(SyntaxElement::Token(_)) => {
-                    // Token already handled as part of the enter event.
+                    // Handled as part of enter
                 }
             }
         }
 
-        Self {
-            suppressed_nodes,
-            #[cfg(debug_assertions)]
-            checked_suppressions: RefCell::default(),
-        }
+        builder.finish()
     }
 
-    /// Returns `true` if the passed `node` has a leading suppression comment.
-    ///
-    /// Suppression comments only apply if they are at the start of a node and they suppress the most
-    /// outer node.
-    ///
-    /// # Examples
-    ///
-    /// ```javascript
-    /// // rome-ignore format: Reason
-    /// console.log("Test");
-    /// ```
-    ///
-    /// Returns `true` for the expression statement but `false` for the call expression because the
-    /// call expression is nested inside of the expression statement.
-    pub fn is_suppressed(&self, node: &SyntaxNode<L>) -> bool {
-        self.mark_suppression_checked(node);
-        self.suppressed_nodes.contains(node)
+    /// Returns `true` if the given [node] has
+    /// * any leading comments
+    /// * any trailing comments
+    /// * if any direct child token has any dangling trivia (either a skipped token trivia or a comment)
+    pub fn has_trivia(&self, node: &SyntaxNode<L>) -> bool {
+        self.has_leading_comments(node)
+            || self.has_trailing_comments(node)
+            || self.has_node_dangling_trivia(node)
+    }
+
+    /// Returns `true` if the given `node` has any leading or trailing comments.
+    #[inline]
+    pub fn has_comments(&self, node: &SyntaxNode<L>) -> bool {
+        self.has_leading_comments(node) || self.has_trailing_comments(node)
+    }
+
+    /// Returns `true` if the given [node] has any leading comments.
+    /// By default, a comment is a node's leading comment if:
+    /// * the previous sibling is a token
+    /// * there's a line break before the commend ending before this comment and the comment.
+    #[inline]
+    pub fn has_leading_comments(&self, node: &SyntaxNode<L>) -> bool {
+        self.leading_comments(node).is_empty()
+    }
+
+    /// Returns `true` if the given [node] has any trailing comments.
+    /// By default, a comment is a node's trailing comment if:
+    /// * the next sibling is a token
+    /// * there's **no** line break between the node and this comment.
+    #[inline]
+    pub fn has_trailing_comments(&self, node: &SyntaxNode<L>) -> bool {
+        self.trailing_comments(node).is_empty()
+    }
+
+    /// Returns `true` if any direct child token of [node] has any dangling trivia.
+    pub fn has_node_dangling_trivia(&self, node: &SyntaxNode<L>) -> bool {
+        node.tokens().any(|token| self.has_dangling_trivia(&token))
+    }
+
+    /// Returns the [node]'s leading comments.
+    #[inline]
+    pub fn leading_comments(&self, node: &SyntaxNode<L>) -> &[SourceComment<L>] {
+        self.leading_comments.get(node)
+    }
+
+    /// Returns the [node]'s trailing comments.
+    #[inline]
+    pub fn trailing_comments(&self, node: &SyntaxNode<L>) -> &[SourceComment<L>] {
+        self.trailing_comments.get(node)
+    }
+
+    /// Skipped token trivia or comment trivia that
+    #[inline]
+    pub fn dangling_trivia(&self, token: &SyntaxToken<L>) -> &[DanglingTrivia<L>] {
+        self.dangling_trivia.get(token)
+    }
+
+    #[inline]
+    pub fn has_dangling_trivia(&self, token: &SyntaxToken<L>) -> bool {
+        self.dangling_trivia(token).is_empty()
     }
 
     /// Marks that it isn't necessary for the given node to check if it has been suppressed or not.
@@ -261,7 +388,7 @@ impl<L: Language> Comments<L> {
                         panic!(r#"
 The following node has been formatted without checking if it has suppression comments.
 Ensure that the formatter calls into the node's formatting rule by using `node.format()` or
-manually test if the node has a suppression comment using `f.context().comments().is_suppressed(node.syntax())`
+manually test if the node has a suppression comment using `f.context().is_suppressed(node.syntax())`
 if using the node's format rule isn't an option."
 
 Node:
@@ -273,5 +400,473 @@ Node:
                 let _ = root;
             }
         }
+    }
+}
+
+impl<L: Language> std::fmt::Debug for Comments<L> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut debug_comments: Vec<DebugComment<'_, L>> = Vec::new();
+
+        for node in self.leading_comments.keys() {
+            debug_comments.extend(
+                self.leading_comments
+                    .get(node)
+                    .iter()
+                    .map(|comment| DebugComment::Leading { node, comment }),
+            );
+        }
+
+        for node in self.trailing_comments.keys() {
+            debug_comments.extend(
+                self.trailing_comments
+                    .get(node)
+                    .iter()
+                    .map(|comment| DebugComment::Trailing { node, comment }),
+            );
+        }
+
+        for token in self.dangling_trivia.keys() {
+            debug_comments.extend(
+                self.dangling_trivia
+                    .get(token)
+                    .iter()
+                    .map(|trivia| DebugComment::Dangling { token, trivia }),
+            );
+        }
+
+        debug_comments.sort_unstable_by_key(|comment| comment.start());
+
+        f.debug_list().entries(debug_comments).finish()
+    }
+}
+
+/// Helper for printing a comment of [Comments]
+enum DebugComment<'a, L: Language> {
+    Leading {
+        comment: &'a SourceComment<L>,
+        node: &'a SyntaxNode<L>,
+    },
+    Trailing {
+        comment: &'a SourceComment<L>,
+        node: &'a SyntaxNode<L>,
+    },
+    Dangling {
+        trivia: &'a DanglingTrivia<L>,
+        token: &'a SyntaxToken<L>,
+    },
+}
+
+impl<L: Language> DebugComment<'_, L> {
+    fn start(&self) -> TextSize {
+        match self {
+            DebugComment::Leading { comment, .. } | DebugComment::Trailing { comment, .. } => {
+                comment.piece.text_range().start()
+            }
+            DebugComment::Dangling { trivia, .. } => match trivia {
+                DanglingTrivia::Comment(comment) => comment.piece.text_range().start(),
+                DanglingTrivia::SkippedToken(skipped) => skipped.piece.text_range().start(),
+            },
+        }
+    }
+}
+
+impl<L: Language> std::fmt::Debug for DebugComment<'_, L> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            DebugComment::Leading { node, comment } => f
+                .debug_struct("Leading")
+                .field("node", node)
+                .field("comment", comment)
+                .finish(),
+            DebugComment::Trailing { node, comment } => f
+                .debug_struct("Trailing")
+                .field("node", node)
+                .field("comment", comment)
+                .finish(),
+            DebugComment::Dangling { trivia, token } => f
+                .debug_struct("Dangling")
+                .field("token", token)
+                .field("trivia", trivia)
+                .finish(),
+        }
+    }
+}
+
+#[derive(Debug)]
+struct CommentsBuilderVisitor<'a, Context: CstFormatContext> {
+    context: &'a Context,
+    node_comments: NodeCommentsBuilder<Context::Language>,
+    dangling_trivia: DanglingTriviaBuilder<Context::Language>,
+    preceding_node: Option<SyntaxNode<Context::Language>>,
+    following_node: Option<SyntaxNode<Context::Language>>,
+    trailing_comments: Vec<DecoratedComment<Context::Language>>,
+}
+
+impl<'a, Context> CommentsBuilderVisitor<'a, Context>
+where
+    Context: CstFormatContext,
+{
+    pub fn new(context: &'a Context) -> Self {
+        Self {
+            context,
+            node_comments: Default::default(),
+            dangling_trivia: Default::default(),
+            preceding_node: None,
+            following_node: None,
+            trailing_comments: Default::default(),
+        }
+    }
+
+    fn visit_node(&mut self, event: WalkEvent<SyntaxNode<Context::Language>>) {
+        match event {
+            WalkEvent::Enter(node) => {
+                // Lists cannot have comments attached. They either belong to the entire parent or the
+                // the first child.
+                if node.kind().is_list() {
+                    return;
+                }
+
+                self.handle_trailing_comments(Some(&node));
+
+                // Associate comments with the most outer node
+                if self.following_node.is_none() {
+                    self.following_node = Some(node);
+                }
+            }
+
+            WalkEvent::Leave(node) => {
+                if !node.kind().is_list() {
+                    self.following_node = None;
+                    self.preceding_node = Some(node);
+                }
+            }
+        }
+    }
+
+    fn visit_token(&mut self, token: SyntaxToken<Context::Language>) {
+        // Handle the trailing trivia of the previous token (if any)
+        self.handle_trailing_comments(None);
+
+        // Extract the leading trivia of the current token and schedule the trailing trivia for later.
+        self.extract_trivia(token);
+
+        // Set following to `None`, not known yet what the following node will be.
+        self.following_node = None;
+    }
+
+    fn extract_trivia(&mut self, token: SyntaxToken<Context::Language>) {
+        debug_assert!(self.trailing_comments.is_empty());
+
+        let mut lines_before = 0;
+        let mut has_skipped = false;
+
+        for leading in token.leading_trivia().pieces() {
+            if leading.is_newline() {
+                lines_before += 1;
+            } else if let Some(skipped) = leading.as_skipped() {
+                self.dangling_trivia.insert_trivia(
+                    token.clone(),
+                    DanglingTrivia::SkippedToken(SkippedTokenTrivia {
+                        lines_before,
+                        piece: skipped,
+                    }),
+                );
+                lines_before = 0;
+                has_skipped = true;
+            } else if let Some(comment) = leading.as_comments() {
+                if has_skipped {
+                    self.dangling_trivia.insert_trivia(
+                        token.clone(),
+                        DanglingTrivia::Comment(SourceComment {
+                            lines_before,
+                            piece: comment,
+                        }),
+                    );
+                } else {
+                    let comment = DecoratedComment {
+                        preceding: self.preceding_node.clone(),
+                        following: self.following_node.clone(),
+                        lines_before,
+                        trailing_token_comment: false,
+                        kind: self.context.comment_style().get_comment_kind(&comment),
+                        comment,
+                    };
+
+                    self.handle_comment(comment);
+                }
+                lines_before = 0;
+            }
+        }
+
+        // Any comment following now is preceded by 'token' and not a node.
+        self.preceding_node = None;
+
+        self.trailing_comments.extend(
+            token
+                .trailing_trivia()
+                .pieces()
+                .filter_map(|piece| piece.as_comments())
+                .map(|comment| DecoratedComment {
+                    // Always `None` because the comment is directly preceded by a token
+                    preceding: None,
+                    // Not known yet, gets set inside of `visit_node`
+                    following: None,
+                    lines_before: 0,
+                    trailing_token_comment: true,
+                    kind: self.context.comment_style().get_comment_kind(&comment),
+                    comment,
+                })
+                .rev(),
+        );
+    }
+
+    /// Processes the trailing comments of the previous token
+    fn handle_trailing_comments(&mut self, following: Option<&SyntaxNode<Context::Language>>) {
+        while let Some(mut trailing_comment) = self.trailing_comments.pop() {
+            trailing_comment.following = following.cloned();
+
+            self.handle_comment(trailing_comment);
+        }
+    }
+
+    fn handle_comment(&mut self, comment: DecoratedComment<Context::Language>) {
+        match self.context.comment_style().comment_position(comment) {
+            CommentPosition::Leading { node, comment } => {
+                self.node_comments
+                    .insert_leading_comment(node, comment.into());
+            }
+            CommentPosition::Trailing { node, comment } => {
+                self.node_comments
+                    .insert_trailing_comment(node, comment.into());
+            }
+            CommentPosition::Default(mut comment) => {
+                if comment.is_trailing_token_trivia() {
+                    match (comment.take_preceding_node(), comment.take_following_node()) {
+                        (Some(preceding), Some(following)) => {
+                            if self
+                                .context
+                                .comment_style()
+                                .is_suppression(comment.comment.text())
+                            {
+                                self.node_comments
+                                    .insert_leading_comment(following, comment.into());
+                            } else {
+                                self.node_comments
+                                    .insert_trailing_comment(preceding, comment.into());
+                            }
+                        }
+                        (Some(preceding), None) => {
+                            self.node_comments
+                                .insert_trailing_comment(preceding, comment.into());
+                        }
+                        (None, Some(following)) => {
+                            self.node_comments
+                                .insert_leading_comment(following, comment.into());
+                        }
+                        (None, None) => {
+                            self.dangling_trivia.insert_trivia(
+                                comment.token(),
+                                DanglingTrivia::Comment(comment.into()),
+                            );
+                        }
+                    }
+                } else {
+                    match (comment.take_following_node(), comment.take_preceding_node()) {
+                        (Some(following), _) => {
+                            self.node_comments
+                                .insert_leading_comment(following, comment.into());
+                        }
+                        (None, Some(preceding)) => {
+                            self.node_comments
+                                .insert_trailing_comment(preceding, comment.into());
+                        }
+                        (None, None) => {
+                            self.dangling_trivia.insert_trivia(
+                                comment.token(),
+                                DanglingTrivia::Comment(comment.into()),
+                            );
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fn finish(self) -> Comments<Context::Language> {
+        debug_assert!(self.trailing_comments.is_empty());
+
+        let (leading_comments, trailing_comments) = self.node_comments.finish();
+        let dangling_trivia = self.dangling_trivia.finish();
+
+        Comments {
+            leading_comments,
+            trailing_comments,
+            dangling_trivia,
+
+            #[cfg(debug_assertions)]
+            checked_suppressions: RefCell::default(),
+        }
+    }
+}
+
+// TODO necessary?
+#[derive(Debug)]
+struct NodeCommentsBuilder<L: Language> {
+    leading_comments: AppendOnlyMultiMap<SyntaxNode<L>, SourceComment<L>>,
+    trailing_comments: AppendOnlyMultiMap<SyntaxNode<L>, SourceComment<L>>,
+}
+
+impl<L: Language> NodeCommentsBuilder<L> {
+    fn insert_leading_comment(&mut self, node: SyntaxNode<L>, comment: SourceComment<L>) {
+        self.leading_comments.append(node, comment);
+    }
+
+    fn insert_trailing_comment(&mut self, node: SyntaxNode<L>, comment: SourceComment<L>) {
+        self.trailing_comments.append(node, comment);
+    }
+
+    fn finish(
+        self,
+    ) -> (
+        AppendOnlyMultiMap<SyntaxNode<L>, SourceComment<L>>,
+        AppendOnlyMultiMap<SyntaxNode<L>, SourceComment<L>>,
+    ) {
+        (self.leading_comments, self.trailing_comments)
+    }
+}
+
+impl<L: Language> Default for NodeCommentsBuilder<L> {
+    fn default() -> Self {
+        Self {
+            leading_comments: AppendOnlyMultiMap::new(),
+            trailing_comments: AppendOnlyMultiMap::new(),
+        }
+    }
+}
+
+#[derive(Debug)]
+struct DanglingTriviaBuilder<L: Language> {
+    trivia: AppendOnlyMultiMap<SyntaxToken<L>, DanglingTrivia<L>>,
+}
+
+impl<L: Language> DanglingTriviaBuilder<L> {
+    fn insert_trivia(&mut self, token: SyntaxToken<L>, trivia: DanglingTrivia<L>) {
+        self.trivia.append(token, trivia)
+    }
+
+    fn finish(self) -> AppendOnlyMultiMap<SyntaxToken<L>, DanglingTrivia<L>> {
+        self.trivia
+    }
+}
+
+impl<L: Language> Default for DanglingTriviaBuilder<L> {
+    fn default() -> Self {
+        Self {
+            trivia: AppendOnlyMultiMap::new(),
+        }
+    }
+}
+
+/// Multimap implementation that uses a shared vector to store the values for each key.
+///
+/// The map uses a single vector to store the values of all keys together with a map
+/// that stores the the value range for each key. The upside of using a single vector for all
+/// values is that it avoids allocating a new vector for every element. The downside is that the values
+/// for a key must all be appended in order.
+#[derive(Clone)]
+struct AppendOnlyMultiMap<K, V> {
+    index: HashMap<K, ValueRange>,
+    values: Vec<V>,
+}
+
+impl<K: std::hash::Hash + Eq, V> AppendOnlyMultiMap<K, V> {
+    pub fn new() -> Self {
+        Self {
+            index: HashMap::new(),
+            values: Vec::new(),
+        }
+    }
+
+    /// Appends the `value` to the `key`'s values.
+    ///
+    /// # Panics
+    /// If `key` is already present in the map but other keys have been inserted since it was initially inserted.
+    pub fn append(&mut self, key: K, value: V) {
+        if let Some(range) = self.index.get_mut(&key) {
+            assert_eq!(self.values.len(), range.end());
+
+            self.values.push(value);
+            range.increment_end();
+        } else {
+            let range = ValueRange::single(self.values.len());
+            self.values.push(value);
+            self.index.insert(key, range);
+        }
+    }
+
+    /// Returns an iterator over all the keys
+    pub fn keys(&self) -> impl Iterator<Item = &K> {
+        self.index.keys()
+    }
+
+    /// Returns a slice of the values associated with `key`.
+    pub fn get(&self, key: &K) -> &[V] {
+        if let Some(range) = self.index.get(key) {
+            &self.values[range.start()..range.end()]
+        } else {
+            &[]
+        }
+    }
+}
+
+impl<K, V> Default for AppendOnlyMultiMap<K, V> {
+    fn default() -> Self {
+        Self {
+            values: Vec::new(),
+            index: HashMap::new(),
+        }
+    }
+}
+
+impl<K, V> std::fmt::Debug for AppendOnlyMultiMap<K, V>
+where
+    K: std::fmt::Debug,
+    V: std::fmt::Debug,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut builder = f.debug_map();
+
+        for (key, range) in &self.index {
+            builder.entry(&key, &&self.values[range.start()..range.end()]);
+        }
+
+        builder.finish()
+    }
+}
+
+#[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
+struct ValueRange {
+    start: u32,
+    end: u32,
+}
+
+impl ValueRange {
+    fn single(position: usize) -> Self {
+        Self {
+            start: position as u32,
+            end: (position + 1) as u32,
+        }
+    }
+
+    fn start(&self) -> usize {
+        self.start as usize
+    }
+
+    fn end(&self) -> usize {
+        self.end as usize
+    }
+
+    fn increment_end(&mut self) {
+        self.end += 1;
     }
 }

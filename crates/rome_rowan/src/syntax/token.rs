@@ -247,7 +247,7 @@ impl<L: Language> SyntaxToken<L> {
         }
     }
 
-    /// Returns the token leading trivia.
+    /// Looking backward in the text, the trivia preceding the token up to and **including** the first newline character.
     ///
     /// ```
     /// use rome_rowan::raw_language::{RawLanguage, RawLanguageKind, RawSyntaxTreeBuilder};
@@ -269,7 +269,7 @@ impl<L: Language> SyntaxToken<L> {
         SyntaxTrivia::new(self.raw.leading_trivia())
     }
 
-    /// Returns the token trailing trivia.
+    /// The trivia directly following the token up to, but **not including**, the next new line character.
     ///
     /// ```
     /// use rome_rowan::raw_language::{RawLanguage, RawLanguageKind, RawSyntaxTreeBuilder};

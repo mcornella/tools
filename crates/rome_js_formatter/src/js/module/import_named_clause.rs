@@ -53,7 +53,7 @@ impl FormatNodeRule<JsImportNamedClause> for FormatJsImportNamedClause {
             match named_import {
                 JsAnyNamedImport::JsNamedImportSpecifiers(ref specifiers)
                     if specifiers.specifiers().len() == 1
-                        && !f.context().comments().is_suppressed(specifiers.syntax()) =>
+                        && !f.context().is_suppressed(specifiers.syntax()) =>
                 {
                     // SAFETY: we know that the `specifiers.specifiers().len() == 1`, so unwrap `iter().next()` is safe.
                     let first_specifier = specifiers.specifiers().elements().next().unwrap();

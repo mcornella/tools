@@ -1,10 +1,11 @@
 use rome_formatter::printer::PrinterOptions;
 use rome_formatter::{
-    CommentKind, CommentStyle, Comments, CstFormatContext, FormatContext, IndentStyle, LineWidth,
+    CommentKind, CommentPosition, CommentStyle, Comments, CstFormatContext, DecoratedComment,
+    FormatContext, IndentStyle, LineWidth,
 };
 use rome_js_syntax::suppression::{parse_suppression_comment, SuppressionCategory};
 use rome_js_syntax::{JsLanguage, JsSyntaxKind, SourceType};
-use rome_rowan::SyntaxTriviaPieceComments;
+use rome_rowan::{Direction, SyntaxElement, SyntaxTriviaPieceComments};
 use std::fmt;
 use std::fmt::Debug;
 use std::rc::Rc;
@@ -143,6 +144,33 @@ impl CommentStyle<JsLanguage> for JsCommentStyle {
         parse_suppression_comment(text)
             .flat_map(|suppression| suppression.categories)
             .any(|(category, _)| category == SuppressionCategory::Format)
+    }
+
+    fn comment_position(
+        &self,
+        comment: DecoratedComment<JsLanguage>,
+    ) -> CommentPosition<JsLanguage> {
+        if let Some(following_node) = comment.following_node() {
+            if matches!(
+                following_node.kind(),
+                JsSyntaxKind::JS_SCRIPT | JsSyntaxKind::JS_MODULE
+            ) {
+                let first_non_list = following_node
+                    .descendants_with_tokens(Direction::Next)
+                    // Skip the root itself
+                    .skip(1)
+                    .find(|element| !element.kind().is_list());
+
+                return match first_non_list {
+                    // Attach any leading comments to the first statement or directive in a module or script to prevent
+                    // that a rome-ignore comment on the first statement ignores the whole file.
+                    Some(SyntaxElement::Node(node)) => CommentPosition::Leading { node, comment },
+                    None | Some(SyntaxElement::Token(_)) => CommentPosition::Default(comment),
+                };
+            }
+        }
+
+        CommentPosition::Default(comment)
     }
 
     fn get_comment_kind(&self, comment: &SyntaxTriviaPieceComments<JsLanguage>) -> CommentKind {

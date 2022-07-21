@@ -430,7 +430,7 @@ impl JsAnyAssignmentLike {
 
                 let name = name?;
 
-                let is_short = if f.context().comments().is_suppressed(name.syntax()) {
+                let is_short = if f.context().is_suppressed(name.syntax()) {
                     write!(f, [format_suppressed_node(name.syntax())])?;
                     false
                 } else {
@@ -581,7 +581,7 @@ impl JsAnyAssignmentLike {
         let right = self.right()?;
 
         if let RightAssignmentLike::JsInitializerClause(initializer) = &right {
-            if f.context().comments().is_suppressed(initializer.syntax()) {
+            if f.context().is_suppressed(initializer.syntax()) {
                 return Ok(AssignmentLikeLayout::SuppressedInitializer);
             }
         }

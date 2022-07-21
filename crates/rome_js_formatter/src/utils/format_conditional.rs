@@ -31,14 +31,14 @@ impl Conditional {
     fn format_head(&self, f: &mut JsFormatter) -> FormatResult<()> {
         match self {
             Conditional::Expression(expr) => {
-                if f.context().comments().is_suppressed(expr.syntax()) {
+                if f.context().is_suppressed(expr.syntax()) {
                     write!(f, [format_suppressed_node(expr.syntax())])
                 } else {
                     write![f, [expr.test()?.format(), space_token(),]]
                 }
             }
             Conditional::Type(t) => {
-                if f.context().comments().is_suppressed(t.syntax()) {
+                if f.context().is_suppressed(t.syntax()) {
                     write!(f, [format_suppressed_node(t.syntax())])
                 } else {
                     write![
