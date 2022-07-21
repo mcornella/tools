@@ -1,6 +1,8 @@
 use crate::prelude::*;
 use crate::AsFormat;
-use rome_formatter::token::{FormatInserted, FormatInsertedCloseParen, FormatInsertedOpenParen};
+use rome_formatter::cst_builders::{
+    FormatInserted, FormatInsertedCloseParen, FormatInsertedOpenParen,
+};
 use rome_formatter::{
     format_args, write, Argument, Arguments, CstFormatContext, GroupId, PreambleBuffer, VecBuffer,
 };

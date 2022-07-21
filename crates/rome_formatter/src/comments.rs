@@ -52,8 +52,12 @@ pub struct SourceComment<L: Language> {
     /// The number of lines appearing before this comment
     lines_before: u32,
 
+    lines_after: u32,
+
     /// The comment piece
     piece: SyntaxTriviaPieceComments<L>,
+
+    kind: CommentKind,
 }
 
 impl<L: Language> SourceComment<L> {
@@ -62,6 +66,9 @@ impl<L: Language> SourceComment<L> {
         Self {
             lines_before: 0,
             piece,
+            // FIXME
+            lines_after: 0,
+            kind: CommentKind::InlineBlock,
         }
     }
 
@@ -70,6 +77,9 @@ impl<L: Language> SourceComment<L> {
         Self {
             lines_before,
             piece,
+            // FIXME
+            kind: CommentKind::InlineBlock,
+            lines_after: 0,
         }
     }
 
@@ -81,6 +91,15 @@ impl<L: Language> SourceComment<L> {
     /// Returns the number of lines before directly before this comment
     pub fn lines_before(&self) -> u32 {
         self.lines_before
+    }
+
+    pub fn lines_after(&self) -> u32 {
+        self.lines_after
+    }
+
+    /// The kind of the comment
+    pub fn kind(&self) -> CommentKind {
+        self.kind
     }
 }
 
@@ -133,6 +152,7 @@ pub struct DecoratedComment<L: Language> {
     preceding: Option<SyntaxNode<L>>,
     following: Option<SyntaxNode<L>>,
     lines_before: u32,
+    lines_after: u32,
     trailing_token_comment: bool,
     comment: SyntaxTriviaPieceComments<L>,
     kind: CommentKind,
@@ -193,7 +213,9 @@ impl<L: Language> From<DecoratedComment<L>> for SourceComment<L> {
     fn from(decorated: DecoratedComment<L>) -> Self {
         Self {
             lines_before: decorated.lines_before,
+            lines_after: decorated.lines_after,
             piece: decorated.comment,
+            kind: decorated.kind,
         }
     }
 }
@@ -499,7 +521,7 @@ struct CommentsBuilderVisitor<'a, Context: CstFormatContext> {
     dangling_trivia: DanglingTriviaBuilder<Context::Language>,
     preceding_node: Option<SyntaxNode<Context::Language>>,
     following_node: Option<SyntaxNode<Context::Language>>,
-    trailing_comments: Vec<DecoratedComment<Context::Language>>,
+    last_token: Option<SyntaxToken<Context::Language>>,
 }
 
 impl<'a, Context> CommentsBuilderVisitor<'a, Context>
@@ -513,7 +535,7 @@ where
             dangling_trivia: Default::default(),
             preceding_node: None,
             following_node: None,
-            trailing_comments: Default::default(),
+            last_token: None,
         }
     }
 
@@ -526,8 +548,6 @@ where
                     return;
                 }
 
-                self.handle_trailing_comments(Some(&node));
-
                 // Associate comments with the most outer node
                 if self.following_node.is_none() {
                     self.following_node = Some(node);
@@ -535,8 +555,10 @@ where
             }
 
             WalkEvent::Leave(node) => {
-                if !node.kind().is_list() {
+                if self.following_node.as_ref() == Some(&node) {
                     self.following_node = None;
+                }
+                if !node.kind().is_list() {
                     self.preceding_node = Some(node);
                 }
             }
@@ -544,18 +566,31 @@ where
     }
 
     fn visit_token(&mut self, token: SyntaxToken<Context::Language>) {
-        // Handle the trailing trivia of the previous token (if any)
-        self.handle_trailing_comments(None);
+        // Store the last processed comment so that we can set `line_break_after`
+        let mut last_comment = None;
 
-        // Extract the leading trivia of the current token and schedule the trailing trivia for later.
-        self.extract_trivia(token);
+        if let Some(last_token) = self.last_token.take() {
+            for piece in last_token
+                .trailing_trivia()
+                .pieces()
+                .filter_map(|piece| piece.as_comments())
+            {
+                if let Some(last_comment) = last_comment.take() {
+                    self.handle_comment(last_comment);
+                }
 
-        // Set following to `None`, not known yet what the following node will be.
-        self.following_node = None;
-    }
-
-    fn extract_trivia(&mut self, token: SyntaxToken<Context::Language>) {
-        debug_assert!(self.trailing_comments.is_empty());
+                last_comment = Some(DecoratedComment {
+                    // Always `None` because the comment is directly preceded by a token
+                    preceding: None,
+                    following: self.following_node.clone(),
+                    lines_before: 0,
+                    lines_after: 0,
+                    trailing_token_comment: true,
+                    kind: self.context.comment_style().get_comment_kind(&piece),
+                    comment: piece,
+                });
+            }
+        }
 
         let mut lines_before = 0;
         let mut has_skipped = false;
@@ -564,6 +599,11 @@ where
             if leading.is_newline() {
                 lines_before += 1;
             } else if let Some(skipped) = leading.as_skipped() {
+                if let Some(mut last_comment) = last_comment.take() {
+                    last_comment.lines_after = lines_before;
+                    self.handle_comment(last_comment);
+                }
+
                 self.dangling_trivia.insert_trivia(
                     token.clone(),
                     DanglingTrivia::SkippedToken(SkippedTokenTrivia {
@@ -571,62 +611,50 @@ where
                         piece: skipped,
                     }),
                 );
+
                 lines_before = 0;
                 has_skipped = true;
             } else if let Some(comment) = leading.as_comments() {
+                if let Some(mut last_comment) = last_comment.take() {
+                    last_comment.lines_after = lines_before;
+                    self.handle_comment(last_comment);
+                }
+
+                let kind = self.context.comment_style().get_comment_kind(&comment);
                 if has_skipped {
                     self.dangling_trivia.insert_trivia(
                         token.clone(),
                         DanglingTrivia::Comment(SourceComment {
                             lines_before,
+                            // FIXME
+                            lines_after: 0,
                             piece: comment,
+                            kind,
                         }),
                     );
                 } else {
-                    let comment = DecoratedComment {
+                    last_comment = Some(DecoratedComment {
                         preceding: self.preceding_node.clone(),
                         following: self.following_node.clone(),
                         lines_before,
+                        lines_after: 0,
                         trailing_token_comment: false,
-                        kind: self.context.comment_style().get_comment_kind(&comment),
+                        kind,
                         comment,
-                    };
-
-                    self.handle_comment(comment);
+                    });
                 }
                 lines_before = 0;
             }
         }
 
+        if let Some(mut last_comment) = last_comment.take() {
+            last_comment.lines_after = lines_before;
+            self.handle_comment(last_comment);
+        }
+
         // Any comment following now is preceded by 'token' and not a node.
         self.preceding_node = None;
-
-        self.trailing_comments.extend(
-            token
-                .trailing_trivia()
-                .pieces()
-                .filter_map(|piece| piece.as_comments())
-                .map(|comment| DecoratedComment {
-                    // Always `None` because the comment is directly preceded by a token
-                    preceding: None,
-                    // Not known yet, gets set inside of `visit_node`
-                    following: None,
-                    lines_before: 0,
-                    trailing_token_comment: true,
-                    kind: self.context.comment_style().get_comment_kind(&comment),
-                    comment,
-                })
-                .rev(),
-        );
-    }
-
-    /// Processes the trailing comments of the previous token
-    fn handle_trailing_comments(&mut self, following: Option<&SyntaxNode<Context::Language>>) {
-        while let Some(mut trailing_comment) = self.trailing_comments.pop() {
-            trailing_comment.following = following.cloned();
-
-            self.handle_comment(trailing_comment);
-        }
+        self.following_node = None;
     }
 
     fn handle_comment(&mut self, comment: DecoratedComment<Context::Language>) {
@@ -693,8 +721,6 @@ where
     }
 
     fn finish(self) -> Comments<Context::Language> {
-        debug_assert!(self.trailing_comments.is_empty());
-
         let (leading_comments, trailing_comments) = self.node_comments.finish();
         let dangling_trivia = self.dangling_trivia.finish();
 

@@ -25,6 +25,7 @@ mod arguments;
 mod buffer;
 mod builders;
 mod comments;
+pub mod cst_builders;
 pub mod format_element;
 mod format_extensions;
 pub mod formatter;
@@ -35,7 +36,6 @@ pub mod prelude;
 #[cfg(debug_assertions)]
 pub mod printed_tokens;
 pub mod printer;
-pub mod token;
 
 use crate::formatter::Formatter;
 use crate::group_id::UniqueGroupIdBuilder;
