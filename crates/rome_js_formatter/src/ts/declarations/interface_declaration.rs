@@ -1,5 +1,6 @@
 use crate::prelude::*;
 
+use rome_formatter::cst_builders::format_dangling_trivia;
 use rome_formatter::{format_args, write, CstFormatContext};
 use rome_js_syntax::{TsInterfaceDeclaration, TsInterfaceDeclarationFields};
 
@@ -92,12 +93,25 @@ impl FormatNodeRule<TsInterfaceDeclaration> for FormatTsInterfaceDeclaration {
             write!(f, [format_id, format_extends])?;
         }
 
-        write!(
-            f,
-            [
-                space_token(),
-                format_delimited(&l_curly_token, &members.format(), &r_curly_token).block_indent()
-            ]
-        )
+        write!(f, [space_token()])?;
+
+        if members.is_empty() {
+            write!(
+                f,
+                [
+                    l_curly_token.format(),
+                    &format_dangling_trivia(&r_curly_token).indented(),
+                    r_curly_token.format()
+                ]
+            )
+        } else {
+            write!(
+                f,
+                [
+                    format_delimited(&l_curly_token, &members.format(), &r_curly_token)
+                        .block_indent()
+                ]
+            )
+        }
     }
 }

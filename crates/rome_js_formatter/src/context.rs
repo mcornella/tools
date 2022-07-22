@@ -4,11 +4,11 @@ use rome_formatter::{
     FormatContext, IndentStyle, LineWidth,
 };
 use rome_js_syntax::suppression::{parse_suppression_comment, SuppressionCategory};
-use rome_js_syntax::JsSyntaxKind::JS_FUNCTION_BODY;
+
 use rome_js_syntax::{
-    JsAnyClass, JsArrayHole, JsBlockStatement, JsElseClause, JsFunctionBody, JsLanguage,
-    JsObjectMemberList, JsPropertyObjectMember, JsSyntaxKind, SourceType, TsEnumDeclaration,
-    TsInterfaceDeclaration,
+    JsAnyClass, JsArrayHole, JsBlockStatement, JsFunctionBody, JsImportAssertionEntry, JsLanguage,
+    JsNamedImportSpecifiers, JsObjectMemberList, JsPropertyObjectMember, JsStaticMemberExpression,
+    JsSyntaxKind, SourceType, TsEnumDeclaration, TsInterfaceDeclaration,
 };
 use rome_rowan::{
     AstNode, AstNodeList, AstSeparatedList, Direction, SyntaxElement, SyntaxTriviaPieceComments,
@@ -153,10 +153,11 @@ impl CommentStyle<JsLanguage> for JsCommentStyle {
             .any(|(category, _)| category == SuppressionCategory::Format)
     }
 
-    fn comment_position(
+    fn position_comment(
         &self,
         comment: DecoratedComment<JsLanguage>,
     ) -> CommentPosition<JsLanguage> {
+        dbg!(&comment);
         if let Some(following_node) = comment.following_node() {
             match following_node.kind() {
                 JsSyntaxKind::JS_SCRIPT | JsSyntaxKind::JS_MODULE => {
@@ -340,6 +341,58 @@ impl CommentStyle<JsLanguage> for JsCommentStyle {
             }
         }
 
+        let enclosing_node = comment.enclosing_node();
+
+        // Handle comments before the `}` token
+        //
+        // ```javascript
+        // import {
+        //  loooooooooooooooooooong2 as moreeeeeeloooooooooooooooooooong2,
+        //  // some other comment
+        // } from "test";
+        // ```
+        if JsNamedImportSpecifiers::can_cast(enclosing_node.kind()) {
+            let import_specifiers = JsNamedImportSpecifiers::unwrap_cast(enclosing_node.clone());
+
+            if import_specifiers.r_curly_token().as_ref() == Ok(comment.following_token()) {
+                if let Some(Ok(last_specifier)) = import_specifiers.specifiers().iter().last() {
+                    return CommentPosition::Trailing {
+                        node: last_specifier.into_syntax(),
+                        comment,
+                    };
+                }
+            }
+        }
+        // Push comments between `key` and `colon` or `colon` and `value` to the end to prevent that they
+        // get formatted as dangling comments.
+        else if JsImportAssertionEntry::can_cast(enclosing_node.kind())
+            && comment.following_node().is_none()
+        {
+            return CommentPosition::Trailing {
+                node: enclosing_node.clone(),
+                comment,
+            };
+        }
+        // Makes comments that appear in a static member expression (anywhere between object and member)
+        // that are not on the same line as the object to become a leading comment of the expression.
+        // ```javascript
+        // a
+        //  /* test */.other -> /* test */ a.other
+        // ```
+        //
+        // It doesn't change comments that are on the same line as the object.
+        // ```javascript
+        // a /* test */.other -> a /* test */.other
+        // ```
+        else if JsStaticMemberExpression::can_cast(enclosing_node.kind())
+            && !comment.is_trailing_token_trivia()
+        {
+            return CommentPosition::Leading {
+                node: enclosing_node.clone(),
+                comment,
+            };
+        }
+
         CommentPosition::Default(comment)
     }
 
@@ -353,26 +406,6 @@ impl CommentStyle<JsLanguage> for JsCommentStyle {
         } else {
             CommentKind::Line
         }
-    }
-
-    fn is_group_start_token(&self, kind: JsSyntaxKind) -> bool {
-        matches!(
-            kind,
-            JsSyntaxKind::L_PAREN | JsSyntaxKind::L_BRACK | JsSyntaxKind::L_CURLY
-        )
-    }
-
-    fn is_group_end_token(&self, kind: JsSyntaxKind) -> bool {
-        matches!(
-            kind,
-            JsSyntaxKind::R_BRACK
-                | JsSyntaxKind::R_CURLY
-                | JsSyntaxKind::R_PAREN
-                | JsSyntaxKind::COMMA
-                | JsSyntaxKind::SEMICOLON
-                | JsSyntaxKind::DOT
-                | JsSyntaxKind::EOF
-        )
     }
 }
 

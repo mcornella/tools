@@ -1,5 +1,6 @@
 use crate::prelude::*;
 use crate::utils::{is_call_like_expression, write_arguments_multi_line};
+use rome_formatter::cst_builders::format_dangling_trivia;
 use rome_formatter::{format_args, write};
 use rome_js_syntax::{
     JsAnyCallArgument, JsAnyExpression, JsAnyFunctionBody, JsAnyLiteralExpression, JsAnyName,
@@ -21,18 +22,18 @@ impl FormatNodeRule<JsCallArguments> for FormatJsCallArguments {
 
         let l_paren_token = l_paren_token?;
         let r_paren_token = r_paren_token?;
-        let arguments_len = args.len();
-        if arguments_len == 0 {
+        if args.is_empty() {
             return write!(
                 f,
                 [
                     l_paren_token.format(),
-                    args.format(),
+                    format_dangling_trivia(&r_paren_token),
                     r_paren_token.format()
                 ]
             );
         }
 
+        let arguments_len = args.len();
         let mut iter = args.iter();
         let first_argument = iter.next();
         let second_argument = iter.next();

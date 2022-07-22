@@ -154,7 +154,7 @@ where
         let mut last_line_comment = false;
 
         let format_leading_comments = format_once(|f| {
-            if matches!(dangling_trivia.first(), Some(DanglingTrivia::Comment(_))) {
+            if self.indent && matches!(dangling_trivia.first(), Some(DanglingTrivia::Comment(_))) {
                 write!(f, [hard_line_break()])?;
             }
 

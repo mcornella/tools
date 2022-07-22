@@ -244,21 +244,10 @@ pub trait CommentStyle<L: Language> {
     /// Returns `true` if a comment with the given `text` is a `rome-ignore format:` suppression comment.
     fn is_suppression(&self, text: &str) -> bool;
 
-    fn comment_position(&self, comment: DecoratedComment<L>) -> CommentPosition<L>;
+    fn position_comment(&self, comment: DecoratedComment<L>) -> CommentPosition<L>;
 
     /// Returns the (kind)[CommentKind] of the comment
     fn get_comment_kind(&self, comment: &SyntaxTriviaPieceComments<L>) -> CommentKind;
-
-    /// Returns `true` if a token with the passed `kind` marks the start of a group. Common group tokens are:
-    /// * left parentheses: `(`, `[`, `{`
-    fn is_group_start_token(&self, kind: L::Kind) -> bool;
-
-    /// Returns `true` if a token with the passed `kind` marks the end of a group. Common group end tokens are:
-    /// * right parentheses: `)`, `]`, `}`
-    /// * end of statement token: `;`
-    /// * element separator: `,` or `.`.
-    /// * end of file token: `EOF`
-    fn is_group_end_token(&self, kind: L::Kind) -> bool;
 }
 
 /// Type that stores the comments of a tree and gives access to:
@@ -314,7 +303,7 @@ impl<L: Language> Comments<L> {
             }
         }
 
-        builder.finish()
+        dbg!(builder.finish())
     }
 
     /// Returns `true` if the given [node] has
@@ -665,7 +654,8 @@ where
         comment: DecoratedComment<Context::Language>,
         token: &SyntaxToken<Context::Language>,
     ) {
-        match self.context.comment_style().comment_position(comment) {
+        dbg!(&comment);
+        match self.context.comment_style().position_comment(comment) {
             CommentPosition::Leading { node, comment } => {
                 self.node_comments
                     .insert_leading_comment(node, comment.into());

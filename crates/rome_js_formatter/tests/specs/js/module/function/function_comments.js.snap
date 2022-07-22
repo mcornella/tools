@@ -31,6 +31,7 @@ Quote style: Double Quotes
 function a() {
 	// trailing comment
 	let a = 2;
+
 	/** leading comment **/
 }
 

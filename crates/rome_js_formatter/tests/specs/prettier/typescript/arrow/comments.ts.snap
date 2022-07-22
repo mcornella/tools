@@ -25,9 +25,9 @@ const fn1 = () => {
 
 const fn2 = () => {
   return;
-}
+};
+
 // foo
-;
 
 ```
 

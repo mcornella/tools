@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 use rome_formatter::cst_builders::format_dangling_trivia;
-use rome_formatter::{format_args, write, CstFormatContext};
+use rome_formatter::{format_args, write};
 use rome_js_syntax::JsFunctionBody;
 use rome_js_syntax::JsFunctionBodyFields;
 
