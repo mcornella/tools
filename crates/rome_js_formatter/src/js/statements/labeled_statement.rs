@@ -2,7 +2,7 @@ use crate::prelude::*;
 use rome_formatter::write;
 
 use rome_js_syntax::{JsAnyStatement, JsLabeledStatement};
-use rome_js_syntax::{JsLabeledStatementFields, JsSyntaxKind};
+use rome_js_syntax::{JsLabeledStatementFields};
 
 #[derive(Debug, Clone, Default)]
 pub struct FormatJsLabeledStatement;
@@ -20,10 +20,7 @@ impl FormatNodeRule<JsLabeledStatement> for FormatJsLabeledStatement {
         match body? {
             JsAnyStatement::JsEmptyStatement(empty) => {
                 // If the body is an empty statement, force semicolon insertion
-                write!(
-                    f,
-                    [empty.format(), format_inserted(JsSyntaxKind::SEMICOLON)]
-                )
+                write!(f, [empty.format(), token(";")])
             }
             body => {
                 write!(f, [space_token(), body.format()])

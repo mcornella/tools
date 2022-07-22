@@ -289,7 +289,7 @@ Quote style: Double Quotes
 	} = privateNamesMap.get(name);
 
 	// rome-ignore format: test
-		const {
+	const {
 			id, static: isStatic, method: isMethod,
 			methodId, getId, setId,
 		} = privateNamesMap.get(name);
@@ -298,7 +298,7 @@ Quote style: Double Quotes
 
 	const { id1, method: isMethod1, methodId1 } =
 	// rome-ignore format: test
-			privateNamesMap.get(name);
+	privateNamesMap.get(name);
 
 	const {
 		id3,
@@ -307,7 +307,7 @@ Quote style: Double Quotes
 	} = anodyneCondosMalateOverateRetinol.get(bifornCringerMoshedPerplexSawder);
 
 	// rome-ignore format: test
-		const {
+	const {
 			id3, method: isMethod3,
 			methodId3,
 		} =
@@ -730,7 +730,7 @@ let looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 
 const a
 	// rome-ignore format: Ignore the initializer
-				=
+	=
 
 			[A,    B,   C].push( aaa );
 

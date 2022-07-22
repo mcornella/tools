@@ -261,6 +261,9 @@ use rome_rowan::TextRange;
 use crate::builders::format_suppressed_node;
 use crate::context::JsFormatContext;
 use crate::cst::FormatJsSyntaxNode;
+use rome_formatter::cst_builders::{
+    format_dangling_trivia, format_leading_comments, format_trailing_comments,
+};
 use std::iter::FusedIterator;
 use std::marker::PhantomData;
 
@@ -414,7 +417,9 @@ where
         if f.context().is_suppressed(syntax) {
             write!(f, [format_suppressed_node(syntax)])?;
         } else {
+            write!(f, [format_leading_comments(node.syntax())])?;
             self.fmt_fields(node, f)?;
+            write!(f, [format_trailing_comments(node.syntax())])?;
         };
 
         Ok(())
@@ -435,11 +440,7 @@ impl FormatRule<JsSyntaxToken> for FormatJsSyntaxToken {
 
         write!(
             f,
-            [
-                format_leading_trivia(token),
-                format_trimmed_token(token),
-                format_trailing_trivia(token),
-            ]
+            [format_dangling_trivia(token), format_trimmed_token(token),]
         )
     }
 }
@@ -700,32 +701,27 @@ mod test {
     // use this test check if your snippet prints as you wish, without using a snapshot
     fn quick_test() {
         let src = r#"
-// #8736
+({
+               x: 1,
+               y: 2
+                /* a */
+                /* more */
+            })
 
-function HelloWorld() {
-  return (
-    <div
-      {...{} /*
-      // @ts-ignore */ /* prettier-ignore */}
-      invalidProp="HelloWorld"
-    >
-      test
-    </div>
-  );
-}
         "#;
         let syntax = SourceType::tsx();
         let tree = parse(src, 0, syntax);
         let result = format_node(JsFormatContext::default(), &tree.syntax())
             .unwrap()
             .print();
-        check_reformat(CheckReformatParams {
-            root: &tree.syntax(),
-            text: result.as_code(),
-            source_type: syntax,
-            file_name: "quick_test",
-            format_context: JsFormatContext::default(),
-        });
+        // check_reformat(CheckReformatParams {
+        //     root: &tree.syntax(),
+        //     text: result.as_code(),
+        //     source_type: syntax,
+        //     file_name: "quick_test",
+        //     format_context: JsFormatContext::default(),
+        // });
+        println!("{}", result.as_code());
         assert_eq!(
             result.as_code(),
             "type B8 = /*1*/ (C);\ntype B9 = (/*1*/ C);\ntype B10 = /*1*/ /*2*/ C;\n"

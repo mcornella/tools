@@ -5,7 +5,7 @@ use std::convert::Infallible;
 use crate::utils::array::write_array_node;
 
 use crate::utils::has_formatter_trivia;
-use rome_js_syntax::{JsAnyExpression, JsArrayElementList, JsSyntaxKind};
+use rome_js_syntax::{JsAnyExpression, JsArrayElementList};
 use rome_rowan::{AstNode, AstSeparatedList};
 
 #[derive(Debug, Clone, Default)]
@@ -30,10 +30,7 @@ impl FormatRule<JsArrayElementList> for FormatJsArrayElementList {
             // Using format_separated is valid in this case as can_print_fill does not allow holes
             return f
                 .fill(soft_line_break_or_space())
-                .entries(
-                    node.format_separated(JsSyntaxKind::COMMA)
-                        .with_group_id(self.group_id),
-                )
+                .entries(node.format_separated(",").with_group_id(self.group_id))
                 .finish();
         }
 

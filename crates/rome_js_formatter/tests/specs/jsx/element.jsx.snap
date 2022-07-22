@@ -1,6 +1,5 @@
 ---
 source: crates/rome_js_formatter/tests/spec_test.rs
-assertion_line: 256
 expression: element.jsx
 ---
 # Input
@@ -338,12 +337,7 @@ let b = <a> </a>;
 
 // comments
 let a = <a>{/* comment */ " " /* comment */}</a>;
-let a = (
-	<a>
-		{" "
-		/* comment */}
-	</a>
-);
+let a = <a>{" " /* comment */}</a>;
 let a = <a>{/* comment */ " "}</a>;
 
 

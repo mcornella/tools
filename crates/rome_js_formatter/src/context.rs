@@ -4,8 +4,14 @@ use rome_formatter::{
     FormatContext, IndentStyle, LineWidth,
 };
 use rome_js_syntax::suppression::{parse_suppression_comment, SuppressionCategory};
-use rome_js_syntax::{JsLanguage, JsSyntaxKind, SourceType};
-use rome_rowan::{Direction, SyntaxElement, SyntaxTriviaPieceComments};
+use rome_js_syntax::JsSyntaxKind::JS_FUNCTION_BODY;
+use rome_js_syntax::{
+    JsAnyClass, JsArrayHole, JsBlockStatement, JsFunctionBody, JsLanguage, JsObjectMemberList,
+    JsPropertyObjectMember, JsSyntaxKind, SourceType, TsEnumDeclaration, TsInterfaceDeclaration,
+};
+use rome_rowan::{
+    AstNode, AstNodeList, AstSeparatedList, Direction, SyntaxElement, SyntaxTriviaPieceComments,
+};
 use std::fmt;
 use std::fmt::Debug;
 use std::rc::Rc;
@@ -151,21 +157,173 @@ impl CommentStyle<JsLanguage> for JsCommentStyle {
         comment: DecoratedComment<JsLanguage>,
     ) -> CommentPosition<JsLanguage> {
         if let Some(following_node) = comment.following_node() {
-            if matches!(
-                following_node.kind(),
-                JsSyntaxKind::JS_SCRIPT | JsSyntaxKind::JS_MODULE
-            ) {
-                let first_non_list = following_node
-                    .descendants_with_tokens(Direction::Next)
-                    // Skip the root itself
-                    .skip(1)
-                    .find(|element| !element.kind().is_list());
+            match following_node.kind() {
+                JsSyntaxKind::JS_SCRIPT | JsSyntaxKind::JS_MODULE => {
+                    let first_non_list = following_node
+                        .descendants_with_tokens(Direction::Next)
+                        // Skip the root itself
+                        .skip(1)
+                        .find(|element| !element.kind().is_list());
 
-                return match first_non_list {
-                    // Attach any leading comments to the first statement or directive in a module or script to prevent
-                    // that a rome-ignore comment on the first statement ignores the whole file.
-                    Some(SyntaxElement::Node(node)) => CommentPosition::Leading { node, comment },
-                    None | Some(SyntaxElement::Token(_)) => CommentPosition::Default(comment),
+                    return match first_non_list {
+                        // Attach any leading comments to the first statement or directive in a module or script to prevent
+                        // that a rome-ignore comment on the first statement ignores the whole file.
+                        Some(SyntaxElement::Node(node)) => {
+                            CommentPosition::Leading { node, comment }
+                        }
+                        None | Some(SyntaxElement::Token(_)) => CommentPosition::Default(comment),
+                    };
+                }
+
+                // Move leading comments in front of the `{` inside of the block
+                // ```
+                // if (test) /* comment */ {
+                //  console.log('test');
+                // }
+                // ```
+                //
+                // becomes
+                // ```
+                // if (test) {
+                //  /* comment */ console.log('test');
+                // }
+                // ```
+                JsSyntaxKind::JS_BLOCK_STATEMENT => {
+                    let block = JsBlockStatement::unwrap_cast(following_node.clone());
+
+                    if let (Ok(_), Ok(r_curly_token)) =
+                        (block.l_curly_token(), block.r_curly_token())
+                    {
+                        return if let Some(fist_statement) = block.statements().first() {
+                            CommentPosition::Leading {
+                                node: fist_statement.into_syntax(),
+                                comment,
+                            }
+                        } else {
+                            CommentPosition::Dangling {
+                                token: r_curly_token,
+                                comment,
+                            }
+                        };
+                    }
+                }
+
+                // Move comments in front of the `{` inside of the function body
+                JsSyntaxKind::JS_FUNCTION_BODY => {
+                    let function_body = JsFunctionBody::unwrap_cast(following_node.clone());
+
+                    if let (Ok(_), Ok(r_curly_token)) =
+                        (function_body.l_curly_token(), function_body.r_curly_token())
+                    {
+                        let first_directive = function_body
+                            .directives()
+                            .first()
+                            .map(|node| node.into_syntax());
+                        let first_statement = function_body
+                            .statements()
+                            .first()
+                            .map(|node| node.into_syntax());
+                        return if let Some(first_node) = first_directive.or(first_statement) {
+                            CommentPosition::Leading {
+                                node: first_node,
+                                comment,
+                            }
+                        } else {
+                            CommentPosition::Dangling {
+                                token: r_curly_token,
+                                comment,
+                            }
+                        };
+                    }
+                }
+
+                _ => {}
+            }
+        }
+
+        if comment.following_node().is_none() {
+            if let Some(preceding_parent) = comment
+                .preceding_node()
+                .and_then(|preceding| preceding.parent())
+            {
+                if JsAnyClass::can_cast(preceding_parent.kind()) {
+                    let class = JsAnyClass::unwrap_cast(preceding_parent);
+
+                    if let (Ok(l_curly_token), Ok(r_curly_token)) =
+                        (class.l_curly_token(), class.r_curly_token())
+                    {
+                        if comment.following_token() == &l_curly_token {
+                            return if let Some(first_member) = class.members().first() {
+                                CommentPosition::Leading {
+                                    node: first_member.into_syntax(),
+                                    comment,
+                                }
+                            } else {
+                                // attach it to the r_curly token
+                                CommentPosition::Dangling {
+                                    token: r_curly_token,
+                                    comment,
+                                }
+                            };
+                        }
+                    }
+                } else if TsEnumDeclaration::can_cast(preceding_parent.kind()) {
+                    let enum_declaration = TsEnumDeclaration::unwrap_cast(preceding_parent);
+
+                    if let (Ok(l_curly_token), Ok(r_curly_token)) = (
+                        enum_declaration.l_curly_token(),
+                        enum_declaration.r_curly_token(),
+                    ) {
+                        if comment.following_token() == &l_curly_token {
+                            return match enum_declaration.members().first() {
+                                Some(Ok(member)) => CommentPosition::Leading {
+                                    node: member.into_syntax(),
+                                    comment,
+                                },
+                                Some(Err(_)) => {
+                                    // Don't move the comment, formatting will fail anyway
+                                    CommentPosition::Default(comment)
+                                }
+                                None => CommentPosition::Dangling {
+                                    token: r_curly_token,
+                                    comment,
+                                },
+                            };
+                        }
+                    }
+                } else if TsInterfaceDeclaration::can_cast(preceding_parent.kind()) {
+                    let interface_declaration =
+                        TsInterfaceDeclaration::unwrap_cast(preceding_parent);
+
+                    if let (Ok(l_curly_token), Ok(r_curly_token)) = (
+                        interface_declaration.l_curly_token(),
+                        interface_declaration.r_curly_token(),
+                    ) {
+                        if comment.following_token() == &l_curly_token {
+                            return if let Some(first_member) =
+                                interface_declaration.members().first()
+                            {
+                                CommentPosition::Leading {
+                                    node: first_member.into_syntax(),
+                                    comment,
+                                }
+                            } else {
+                                CommentPosition::Dangling {
+                                    token: r_curly_token,
+                                    comment,
+                                }
+                            };
+                        }
+                    }
+                }
+            }
+        }
+
+        if let Some(preceding_node) = comment.preceding_node() {
+            if JsArrayHole::can_cast(preceding_node.kind()) {
+                return CommentPosition::Leading {
+                    node: preceding_node.clone(),
+                    comment,
                 };
             }
         }

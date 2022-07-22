@@ -2,7 +2,7 @@ use crate::prelude::*;
 use rome_formatter::write;
 
 use rome_js_syntax::JsIfStatementFields;
-use rome_js_syntax::JsSyntaxKind;
+
 use rome_js_syntax::{JsAnyStatement, JsIfStatement};
 
 #[derive(Debug, Clone, Default)]
@@ -57,9 +57,9 @@ impl Format<JsFormatContext> for FormatIfElseConsequentBlock {
                 f,
                 [
                     space_token(),
-                    format_inserted(JsSyntaxKind::L_CURLY),
+                    token("{"),
                     block_indent(&stmt.format()),
-                    format_inserted(JsSyntaxKind::R_CURLY)
+                    token("}")
                 ]
             )
         }

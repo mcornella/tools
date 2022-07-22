@@ -1,7 +1,6 @@
 pub use crate::builders::*;
 pub use crate::cst_builders::{
-    format_leading_trivia, format_only_if_breaks, format_removed, format_replaced,
-    format_trailing_trivia, format_trimmed_token,
+    format_only_if_breaks, format_removed, format_replaced, format_trimmed_token,
 };
 pub use crate::format_element::*;
 pub use crate::format_extensions::{FormatOptional as _, MemoizeFormat};

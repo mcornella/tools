@@ -1,11 +1,10 @@
-use crate::builders::{format_close_delimiter, format_open_delimiter};
 use crate::prelude::*;
 use crate::utils::{is_call_like_expression, write_arguments_multi_line};
 use rome_formatter::{format_args, write};
 use rome_js_syntax::{
     JsAnyCallArgument, JsAnyExpression, JsAnyFunctionBody, JsAnyLiteralExpression, JsAnyName,
     JsAnyStatement, JsArrayExpression, JsArrowFunctionExpression, JsCallArgumentList,
-    JsCallArguments, JsCallArgumentsFields, JsCallExpression, JsSyntaxKind, TsReferenceType,
+    JsCallArguments, JsCallArgumentsFields, JsCallExpression, TsReferenceType,
 };
 use rome_rowan::{AstSeparatedList, SyntaxResult, SyntaxTokenText};
 
@@ -66,7 +65,7 @@ impl FormatNodeRule<JsCallArguments> for FormatJsCallArguments {
             if is_framework_test_call || is_react_hook_with_deps_array {
                 write!(f, [l_paren_token.format(),])?;
                 let separated = args
-                    .format_separated(JsSyntaxKind::COMMA)
+                    .format_separated(",")
                     .with_trailing_separator(TrailingSeparator::Omit);
 
                 f.join_with(space_token()).entries(separated).finish()?;
@@ -74,20 +73,10 @@ impl FormatNodeRule<JsCallArguments> for FormatJsCallArguments {
             }
         };
 
-        // we create open a close delimiters
-        let open_delimiter = format_open_delimiter(&l_paren_token);
-        let close_delimiter = format_close_delimiter(&r_paren_token);
-
-        // we now extracts the formatted version of trivias and tokens of the delimiters
-        // tokens on the left
-        let l_leading_trivia = open_delimiter.format_leading_trivia();
-        let l_paren = open_delimiter.format_token();
-        let l_trailing_trivia = open_delimiter.format_trailing_trivia();
+        let l_paren = l_paren_token.format();
 
         // tokens on the right
-        let r_leading_trivia = close_delimiter.format_leading_trivia();
-        let r_paren = close_delimiter.format_token();
-        let r_trailing_trivia = close_delimiter.format_trailing_trivia();
+        let r_paren = r_paren_token.format();
 
         let should_group_first_argument = should_group_first_argument(&args)?;
         let should_group_last_argument = should_group_last_argument(&args)?;
@@ -99,7 +88,7 @@ impl FormatNodeRule<JsCallArguments> for FormatJsCallArguments {
             // we can't attempt to print the same node twice without incur in "printed token twice" errors.
             // We also disallow the trailing separator, we are interested in doing it manually.
             let mut separated: Vec<_> = args
-                .format_separated(JsSyntaxKind::COMMA)
+                .format_separated(",")
                 .with_trailing_separator(TrailingSeparator::Omit)
                 .map(|e| e.memoized())
                 .collect();
@@ -125,14 +114,10 @@ impl FormatNodeRule<JsCallArguments> for FormatJsCallArguments {
             // We now cache them the delimiters tokens. This is needed because `[rome_formatter::best_fitting]` will try to
             // print each version first
             // tokens on the left
-            let l_leading_trivia = l_leading_trivia.memoized();
             let l_paren = l_paren.memoized();
-            let l_trailing_trivia = l_trailing_trivia.memoized();
 
             // tokens on the right
-            let r_leading_trivia = r_leading_trivia.memoized();
             let r_paren = r_paren.memoized();
-            let r_trailing_trivia = r_trailing_trivia.memoized();
 
             // This is the version of where all the arguments are broken out
             let all_arguments_expanded = format_with(|f| {
@@ -141,25 +126,21 @@ impl FormatNodeRule<JsCallArguments> for FormatJsCallArguments {
                 write!(
                     f,
                     [
-                        &l_leading_trivia,
                         &l_paren,
                         &group_elements(&format_with(|f| {
                             write!(
                                 f,
                                 [
                                     &soft_block_indent(&format_args![
-                                        &l_trailing_trivia,
                                         format_with(|f| {
                                             write_arguments_multi_line(separated.iter(), f)
                                         }),
-                                        &r_leading_trivia,
                                         soft_line_break()
                                     ]),
                                     &r_paren
                                 ]
                             )
                         })),
-                        &r_trailing_trivia
                     ]
                 )
             });
@@ -177,7 +158,7 @@ impl FormatNodeRule<JsCallArguments> for FormatJsCallArguments {
                 // which means that if one is `false`, then the other is `true`.
                 // This means that in this branch we format the case where `should_group_first_argument`,
                 // in the else branch we format the case where `should_group_last_argument` is `true`.
-                write!(f, [l_leading_trivia, l_paren, l_trailing_trivia,])?;
+                write!(f, [l_paren])?;
                 if should_group_first_argument {
                     // special formatting of the first element
                     let mut iter = separated.iter();
@@ -202,22 +183,18 @@ impl FormatNodeRule<JsCallArguments> for FormatJsCallArguments {
                         }))
                         .finish()?;
                 }
-                write!(f, [r_leading_trivia, r_paren, r_trailing_trivia])
+                write!(f, [r_paren])
             });
 
             write!(
                 f,
                 [best_fitting![
                     format_args![
-                        l_leading_trivia,
                         l_paren,
-                        l_trailing_trivia,
                         group_elements(&format_args![format_with(|f| {
                             write_arguments_multi_line(separated.iter(), f)
                         })]),
-                        r_leading_trivia,
                         r_paren,
-                        r_trailing_trivia
                     ],
                     edge_arguments_do_not_break,
                     all_arguments_expanded
@@ -226,23 +203,17 @@ impl FormatNodeRule<JsCallArguments> for FormatJsCallArguments {
         } else {
             write!(
                 f,
-                [
-                    l_leading_trivia,
-                    &group_elements(&format_args![
-                        l_paren,
-                        l_trailing_trivia,
-                        &soft_block_indent(&format_with(|f| {
-                            let separated = args
-                                .format_separated(JsSyntaxKind::COMMA)
-                                .with_trailing_separator(TrailingSeparator::Omit)
-                                .nodes_grouped();
-                            write_arguments_multi_line(separated, f)
-                        }),),
-                        r_leading_trivia,
-                        r_paren,
-                    ],),
-                    r_trailing_trivia
-                ]
+                [&group_elements(&format_args![
+                    l_paren,
+                    &soft_block_indent(&format_with(|f| {
+                        let separated = args
+                            .format_separated(",")
+                            .with_trailing_separator(TrailingSeparator::Omit)
+                            .nodes_grouped();
+                        write_arguments_multi_line(separated, f)
+                    })),
+                    r_paren,
+                ])]
             )
         }
     }

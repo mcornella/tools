@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use rome_js_syntax::{JsAnyConstructorParameter, JsConstructorParameterList, JsSyntaxKind};
+use rome_js_syntax::{JsAnyConstructorParameter, JsConstructorParameterList};
 
 #[derive(Debug, Clone, Default)]
 pub struct FormatJsConstructorParameterList;
@@ -21,7 +21,7 @@ impl FormatRule<JsConstructorParameterList> for FormatJsConstructorParameterList
         };
         f.join_with(&soft_line_break_or_space())
             .entries(
-                node.format_separated(JsSyntaxKind::COMMA)
+                node.format_separated(",")
                     .with_trailing_separator(trailing_separator),
             )
             .finish()

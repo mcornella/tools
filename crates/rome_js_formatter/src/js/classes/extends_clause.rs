@@ -1,9 +1,9 @@
 use crate::prelude::*;
 
-use rome_formatter::{format_args, write};
+use rome_formatter::{format_args, write, CstFormatContext};
+use rome_js_syntax::JsExtendsClause;
 use rome_js_syntax::JsExtendsClauseFields;
 use rome_js_syntax::JsSyntaxKind::JS_ASSIGNMENT_EXPRESSION;
-use rome_js_syntax::{JsExtendsClause, JsSyntaxKind};
 
 #[derive(Debug, Clone, Default)]
 pub struct FormatJsExtendsClause;
@@ -18,14 +18,15 @@ impl FormatNodeRule<JsExtendsClause> for FormatJsExtendsClause {
 
         let super_class = super_class?;
 
-        let format_super = format_with(|f| {
+        let format_super = format_with(|f: &mut JsFormatter| {
             let content =
                 format_with(|f| write!(f, [super_class.format(), type_arguments.format()]));
+            let comments = f.context().comments();
 
             let has_trailing_comments = if let Some(type_arguments) = &type_arguments {
-                type_arguments.syntax().has_trailing_comments()
+                comments.has_trailing_comments(type_arguments.syntax())
             } else {
-                super_class.syntax().has_trailing_comments()
+                comments.has_trailing_comments(super_class.syntax())
             };
 
             if node
@@ -33,15 +34,8 @@ impl FormatNodeRule<JsExtendsClause> for FormatJsExtendsClause {
                 .parent()
                 .map_or(false, |p| p.kind() == JS_ASSIGNMENT_EXPRESSION)
             {
-                if super_class.syntax().has_leading_comments() || has_trailing_comments {
-                    write!(
-                        f,
-                        [format_parenthesize(
-                            super_class.syntax().first_token(),
-                            &content,
-                            super_class.syntax().last_token()
-                        )]
-                    )
+                if comments.has_leading_comments(super_class.syntax()) || has_trailing_comments {
+                    write!(f, [format_parenthesize(&content,)])
                 } else {
                     let content = content.memoized();
                     write!(
@@ -49,9 +43,9 @@ impl FormatNodeRule<JsExtendsClause> for FormatJsExtendsClause {
                         [
                             if_group_breaks(&format_args![
                                 // Format_inserted is fine here because it is known that super has no comments
-                                format_inserted(JsSyntaxKind::L_PAREN),
-                                &soft_block_indent(&content),
-                                format_inserted(JsSyntaxKind::R_PAREN),
+                                token("("),
+                                soft_block_indent(&content),
+                                token(")"),
                             ]),
                             if_group_fits_on_line(&content)
                         ]

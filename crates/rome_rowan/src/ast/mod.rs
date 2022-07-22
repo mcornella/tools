@@ -370,6 +370,10 @@ pub trait AstSeparatedList {
         self.len() == 0
     }
 
+    fn first(&self) -> Option<SyntaxResult<Self::Node>> {
+        self.iter().next()
+    }
+
     fn len(&self) -> usize {
         (self.syntax_list().len() + 1) / 2
     }

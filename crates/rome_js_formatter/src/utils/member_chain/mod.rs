@@ -160,7 +160,9 @@ fn get_call_expression_groups(
 
     // Here we check if the first element of Groups::groups can be moved inside the head.
     // If so, then we extract it and concatenate it together with the head.
-    if let Some(group_to_merge) = rest_of_groups.should_merge_with_first_group(&head_group) {
+    if let Some(group_to_merge) =
+        rest_of_groups.should_merge_with_first_group(&head_group, &f.context().comments())
+    {
         let group_to_merge = group_to_merge.into_iter().flatten().collect();
         head_group.expand_group(group_to_merge);
     }
@@ -247,8 +249,10 @@ fn compute_groups(
 ) -> Groups {
     let mut has_seen_call_expression = false;
     let mut groups = Groups::new(in_expression_statement, f.context().tab_width());
+    let comments = f.context().comments();
+
     for item in flatten_items {
-        let has_trailing_comments = item.as_syntax().has_trailing_comments();
+        let has_trailing_comments = comments.has_trailing_comments(item.as_syntax());
 
         match item {
             FlattenItem::StaticMember(_) => {
@@ -302,7 +306,7 @@ fn write_groups(
     // TODO use Alternatives once available
     write!(f, [head_group])?;
 
-    if groups.groups_should_break(calls_count, &head_group)? {
+    if groups.groups_should_break(calls_count, &head_group, &f.context().comments())? {
         write!(
             f,
             [indent(&format_args!(
@@ -370,5 +374,5 @@ pub fn is_member_call_chain(
     f: &mut JsFormatter,
 ) -> SyntaxResult<bool> {
     let (_, _, groups) = get_call_expression_groups(expression.syntax(), f)?;
-    groups.is_member_call_chain()
+    groups.is_member_call_chain(&f.context().comments())
 }

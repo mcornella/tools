@@ -1,6 +1,6 @@
 use crate::prelude::*;
 use rome_js_syntax::{
-    JsAnyObjectBindingPatternMember, JsObjectBindingPatternPropertyList, JsSyntaxKind,
+    JsAnyObjectBindingPatternMember, JsObjectBindingPatternPropertyList,
 };
 
 #[derive(Debug, Clone, Default)]
@@ -31,7 +31,7 @@ impl FormatRule<JsObjectBindingPatternPropertyList> for FormatJsObjectBindingPat
 
         f.join_with(&soft_line_break_or_space())
             .entries(
-                node.format_separated(JsSyntaxKind::COMMA)
+                node.format_separated(",")
                     .with_trailing_separator(trailing_separator),
             )
             .finish()

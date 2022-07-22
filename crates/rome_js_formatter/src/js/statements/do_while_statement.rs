@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 use rome_formatter::write;
 use rome_js_syntax::{JsAnyStatement, JsDoWhileStatement};
-use rome_js_syntax::{JsDoWhileStatementFields, JsSyntaxKind};
+use rome_js_syntax::{JsDoWhileStatementFields};
 
 #[derive(Debug, Clone, Default)]
 pub struct FormatJsDoWhileStatement;
@@ -43,7 +43,7 @@ impl FormatNodeRule<JsDoWhileStatement> for FormatJsDoWhileStatement {
 
         match semicolon_token {
             Some(semicolon_token) => write!(f, [semicolon_token.format()]),
-            None => format_inserted(JsSyntaxKind::SEMICOLON).fmt(f),
+            None => token(";").fmt(f),
         }
     }
 }

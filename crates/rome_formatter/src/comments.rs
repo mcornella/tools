@@ -49,14 +49,9 @@ pub enum CommentKind {
 
 #[derive(Debug, Clone)]
 pub struct SourceComment<L: Language> {
-    /// The number of lines appearing before this comment
     lines_before: u32,
-
     lines_after: u32,
-
-    /// The comment piece
     piece: SyntaxTriviaPieceComments<L>,
-
     kind: CommentKind,
 }
 
@@ -151,6 +146,7 @@ pub enum DanglingTrivia<L: Language> {
 pub struct DecoratedComment<L: Language> {
     preceding: Option<SyntaxNode<L>>,
     following: Option<SyntaxNode<L>>,
+    following_token: SyntaxToken<L>,
     lines_before: u32,
     lines_after: u32,
     trailing_token_comment: bool,
@@ -168,10 +164,6 @@ impl<L: Language> DecoratedComment<L> {
             .token()
             .parent()
             .expect("Expected token to have a parent node.")
-    }
-
-    pub fn token(&self) -> SyntaxToken<L> {
-        self.comment.as_piece().token()
     }
 
     /// The node directly preceding the comment or [None] if the comment is preceded by a token or is the first
@@ -207,6 +199,10 @@ impl<L: Language> DecoratedComment<L> {
     pub fn kind(&self) -> CommentKind {
         self.kind
     }
+
+    pub fn following_token(&self) -> &SyntaxToken<L> {
+        &self.following_token
+    }
 }
 
 impl<L: Language> From<DecoratedComment<L>> for SourceComment<L> {
@@ -230,6 +226,11 @@ pub enum CommentPosition<L: Language> {
     /// Overrides the positioning of the comment to be a trailing node comment.
     Trailing {
         node: SyntaxNode<L>,
+        comment: DecoratedComment<L>,
+    },
+
+    Dangling {
+        token: SyntaxToken<L>,
         comment: DecoratedComment<L>,
     },
 
@@ -338,7 +339,7 @@ impl<L: Language> Comments<L> {
     /// * there's a line break before the commend ending before this comment and the comment.
     #[inline]
     pub fn has_leading_comments(&self, node: &SyntaxNode<L>) -> bool {
-        self.leading_comments(node).is_empty()
+        !self.leading_comments(node).is_empty()
     }
 
     /// Returns `true` if the given [node] has any trailing comments.
@@ -347,7 +348,7 @@ impl<L: Language> Comments<L> {
     /// * there's **no** line break between the node and this comment.
     #[inline]
     pub fn has_trailing_comments(&self, node: &SyntaxNode<L>) -> bool {
-        self.trailing_comments(node).is_empty()
+        !self.trailing_comments(node).is_empty()
     }
 
     /// Returns `true` if any direct child token of [node] has any dangling trivia.
@@ -375,7 +376,7 @@ impl<L: Language> Comments<L> {
 
     #[inline]
     pub fn has_dangling_trivia(&self, token: &SyntaxToken<L>) -> bool {
-        self.dangling_trivia(token).is_empty()
+        !self.dangling_trivia(token).is_empty()
     }
 
     /// Marks that it isn't necessary for the given node to check if it has been suppressed or not.
@@ -576,13 +577,13 @@ where
                 .filter_map(|piece| piece.as_comments())
             {
                 if let Some(last_comment) = last_comment.take() {
-                    self.handle_comment(last_comment);
+                    self.handle_comment(last_comment, &token);
                 }
 
                 last_comment = Some(DecoratedComment {
-                    // Always `None` because the comment is directly preceded by a token
-                    preceding: None,
+                    preceding: self.preceding_node.clone(),
                     following: self.following_node.clone(),
+                    following_token: token.clone(),
                     lines_before: 0,
                     lines_after: 0,
                     trailing_token_comment: true,
@@ -601,7 +602,7 @@ where
             } else if let Some(skipped) = leading.as_skipped() {
                 if let Some(mut last_comment) = last_comment.take() {
                     last_comment.lines_after = lines_before;
-                    self.handle_comment(last_comment);
+                    self.handle_comment(last_comment, &token);
                 }
 
                 self.dangling_trivia.insert_trivia(
@@ -617,7 +618,7 @@ where
             } else if let Some(comment) = leading.as_comments() {
                 if let Some(mut last_comment) = last_comment.take() {
                     last_comment.lines_after = lines_before;
-                    self.handle_comment(last_comment);
+                    self.handle_comment(last_comment, &token);
                 }
 
                 let kind = self.context.comment_style().get_comment_kind(&comment);
@@ -636,6 +637,7 @@ where
                     last_comment = Some(DecoratedComment {
                         preceding: self.preceding_node.clone(),
                         following: self.following_node.clone(),
+                        following_token: token.clone(),
                         lines_before,
                         lines_after: 0,
                         trailing_token_comment: false,
@@ -649,15 +651,20 @@ where
 
         if let Some(mut last_comment) = last_comment.take() {
             last_comment.lines_after = lines_before;
-            self.handle_comment(last_comment);
+            self.handle_comment(last_comment, &token);
         }
 
         // Any comment following now is preceded by 'token' and not a node.
         self.preceding_node = None;
         self.following_node = None;
+        self.last_token = Some(token);
     }
 
-    fn handle_comment(&mut self, comment: DecoratedComment<Context::Language>) {
+    fn handle_comment(
+        &mut self,
+        comment: DecoratedComment<Context::Language>,
+        token: &SyntaxToken<Context::Language>,
+    ) {
         match self.context.comment_style().comment_position(comment) {
             CommentPosition::Leading { node, comment } => {
                 self.node_comments
@@ -667,8 +674,34 @@ where
                 self.node_comments
                     .insert_trailing_comment(node, comment.into());
             }
+            CommentPosition::Dangling { token, comment } => self
+                .dangling_trivia
+                .insert_trivia(token, DanglingTrivia::Comment(comment.into())),
             CommentPosition::Default(mut comment) => {
                 if comment.is_trailing_token_trivia() {
+                    let enclosing = comment.enclosing_node();
+
+                    // The enclosing can only ever be a list if the comment is a leading or trailing comment of a
+                    // separator token in a separated list.
+                    // Example:
+                    // ```js
+                    // [
+                    //   a, // test
+                    //   b
+                    // ]
+                    // ```
+                    // The default algorithm would make `// test` a leading comment of the node `b` but
+                    // it should be a trailing comment of `a` because that's most likely what the user intended.
+                    if enclosing.kind().is_list() {
+                        if let Some(SyntaxElement::Node(node)) =
+                            comment.comment.as_piece().token().prev_sibling_or_token()
+                        {
+                            self.node_comments
+                                .insert_trailing_comment(node, comment.into());
+                            return;
+                        }
+                    }
+
                     match (comment.take_preceding_node(), comment.take_following_node()) {
                         (Some(preceding), Some(following)) => {
                             if self
@@ -693,7 +726,7 @@ where
                         }
                         (None, None) => {
                             self.dangling_trivia.insert_trivia(
-                                comment.token(),
+                                token.clone(),
                                 DanglingTrivia::Comment(comment.into()),
                             );
                         }
@@ -710,7 +743,7 @@ where
                         }
                         (None, None) => {
                             self.dangling_trivia.insert_trivia(
-                                comment.token(),
+                                token.clone(),
                                 DanglingTrivia::Comment(comment.into()),
                             );
                         }

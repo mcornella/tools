@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use rome_js_syntax::{JsAnyParameter, JsParameterList, JsSyntaxKind};
+use rome_js_syntax::{JsAnyParameter, JsParameterList};
 
 #[derive(Debug, Clone, Default)]
 pub struct FormatJsParameterList;
@@ -22,7 +22,7 @@ impl FormatRule<JsParameterList> for FormatJsParameterList {
 
         f.join_with(&soft_line_break_or_space())
             .entries(
-                node.format_separated(JsSyntaxKind::COMMA)
+                node.format_separated(",")
                     .with_trailing_separator(trailing_separator),
             )
             .finish()

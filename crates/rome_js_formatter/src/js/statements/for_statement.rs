@@ -3,7 +3,7 @@ use rome_formatter::write;
 
 use rome_js_syntax::JsForStatement;
 use rome_js_syntax::JsForStatementFields;
-use rome_js_syntax::{JsAnyStatement, JsSyntaxKind};
+use rome_js_syntax::{JsAnyStatement};
 
 #[derive(Debug, Clone, Default)]
 pub struct FormatJsForStatement;
@@ -55,7 +55,7 @@ impl FormatNodeRule<JsForStatement> for FormatJsForStatement {
             // Force semicolon insertion for empty bodies
             match body.as_ref()? {
                 JsAnyStatement::JsEmptyStatement(body) => {
-                    write![f, [body.format(), format_inserted(JsSyntaxKind::SEMICOLON)]]
+                    write![f, [body.format(), token(";")]]
                 }
                 body => {
                     write!(f, [space_token(), body.format()])

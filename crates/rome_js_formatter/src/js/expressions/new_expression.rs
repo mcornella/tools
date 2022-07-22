@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 use rome_formatter::write;
 use rome_js_syntax::JsNewExpressionFields;
-use rome_js_syntax::{JsNewExpression, JsSyntaxKind};
+use rome_js_syntax::{JsNewExpression};
 
 #[derive(Debug, Clone, Default)]
 pub struct FormatJsNewExpression;
@@ -31,13 +31,7 @@ impl FormatNodeRule<JsNewExpression> for FormatJsNewExpression {
                 write!(f, [arguments.format()])
             }
             None => {
-                write!(
-                    f,
-                    [
-                        format_inserted(JsSyntaxKind::L_PAREN),
-                        format_inserted(JsSyntaxKind::R_PAREN)
-                    ]
-                )
+                write!(f, [token("()")])
             }
         }
     }

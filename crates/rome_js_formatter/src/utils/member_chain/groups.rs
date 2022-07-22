@@ -2,7 +2,8 @@ use crate::context::TabWidth;
 use crate::prelude::*;
 use crate::utils::member_chain::flatten_item::FlattenItem;
 use crate::utils::member_chain::simple_argument::SimpleArgument;
-use rome_js_syntax::JsCallExpression;
+use rome_formatter::Comments;
+use rome_js_syntax::{JsCallExpression, JsLanguage};
 use rome_rowan::{AstSeparatedList, SyntaxResult};
 use std::mem;
 
@@ -38,12 +39,16 @@ impl Groups {
     }
 
     /// This function checks if the current grouping should be merged with the first group.
-    pub fn should_merge(&self, head_group: &HeadGroup) -> SyntaxResult<bool> {
+    pub fn should_merge(
+        &self,
+        head_group: &HeadGroup,
+        comments: &Comments<JsLanguage>,
+    ) -> SyntaxResult<bool> {
         Ok(!self.groups.len() >= 1
             && self.should_not_wrap(head_group)?
-            && !self.groups[0]
-                .first()
-                .map_or(false, |item| item.has_trailing_comments()))
+            && !self.groups[0].first().map_or(false, |item| {
+                comments.has_trailing_comments(item.as_syntax())
+            }))
     }
 
     /// starts a new group
@@ -81,6 +86,7 @@ impl Groups {
         &self,
         calls_count: usize,
         head_group: &HeadGroup,
+        comments: &Comments<JsLanguage>,
     ) -> FormatResult<bool> {
         // Do not allow the group to break if it only contains a single call expression
         if calls_count <= 1 {
@@ -95,7 +101,7 @@ impl Groups {
 
         // TODO: add here will_break logic
 
-        let node_has_comments = self.has_comments()? || head_group.has_comments();
+        let node_has_comments = self.has_comments(&comments)? || head_group.has_comments(&comments);
 
         let should_break = node_has_comments || call_expressions_are_not_simple;
 
@@ -103,12 +109,12 @@ impl Groups {
     }
 
     /// Checks if the groups contain comments.
-    pub fn has_comments(&self) -> SyntaxResult<bool> {
+    pub fn has_comments(&self, comments: &Comments<JsLanguage>) -> SyntaxResult<bool> {
         let mut has_leading_comments = false;
 
         let flat_groups = self.groups.iter().flat_map(|item| item.iter());
         for item in flat_groups {
-            if item.has_leading_comments()? {
+            if item.has_leading_comments(comments)? {
                 has_leading_comments = true;
                 break;
             }
@@ -118,14 +124,14 @@ impl Groups {
             .groups
             .iter()
             .flat_map(|item| item.iter())
-            .any(|item| item.has_trailing_comments());
+            .any(|item| comments.has_trailing_comments(item.as_syntax()));
 
         let cutoff_has_leading_comments = if self.groups.len() >= self.cutoff as usize {
             let group = self.groups.get(self.cutoff as usize);
             if let Some(group) = group {
                 let first_item = group.first();
                 if let Some(first_item) = first_item {
-                    first_item.has_leading_comments()?
+                    first_item.has_leading_comments(comments)?
                 } else {
                     false
                 }
@@ -235,8 +241,9 @@ impl Groups {
     pub(crate) fn should_merge_with_first_group(
         &mut self,
         head_group: &HeadGroup,
+        comments: &Comments<JsLanguage>,
     ) -> Option<Vec<Vec<FlattenItem>>> {
-        if self.should_merge(head_group).unwrap_or(false) {
+        if self.should_merge(head_group, comments).unwrap_or(false) {
             let mut new_groups = self.groups.split_off(1);
             // self.groups is now the head (one element), while `new_groups` is a new vector without the
             // first element.
@@ -251,8 +258,11 @@ impl Groups {
     /// Here we check if the length of the groups exceeds the cutoff or there are comments
     /// This function is the inverse of the prettier function
     /// [Prettier applies]: https://github.com/prettier/prettier/blob/a043ac0d733c4d53f980aa73807a63fc914f23bd/src/language-js/print/member-chain.js#L342
-    pub(crate) fn is_member_call_chain(&self) -> SyntaxResult<bool> {
-        Ok(self.groups.len() > self.cutoff as usize || self.has_comments()?)
+    pub(crate) fn is_member_call_chain(
+        &self,
+        comments: &Comments<JsLanguage>,
+    ) -> SyntaxResult<bool> {
+        Ok(self.groups.len() > self.cutoff as usize || self.has_comments(comments)?)
     }
 }
 
@@ -274,8 +284,10 @@ impl HeadGroup {
         self.items.extend(group)
     }
 
-    fn has_comments(&self) -> bool {
-        self.items.iter().any(|item| item.has_trailing_comments())
+    fn has_comments(&self, comments: &Comments<JsLanguage>) -> bool {
+        self.items
+            .iter()
+            .any(|item| comments.has_trailing_comments(item.as_syntax()))
     }
 }
 

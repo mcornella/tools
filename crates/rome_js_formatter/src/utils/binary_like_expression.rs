@@ -1,9 +1,9 @@
 use crate::prelude::*;
-use rome_formatter::{write, Buffer, CstFormatContext};
+use rome_formatter::{write, Buffer, Comments, CstFormatContext};
 use rome_js_syntax::{
     JsAnyExpression, JsAnyInProperty, JsBinaryExpression, JsBinaryOperator, JsInExpression,
-    JsInstanceofExpression, JsLogicalExpression, JsLogicalOperator, JsPrivateName, JsSyntaxKind,
-    JsSyntaxNode, JsSyntaxToken,
+    JsInstanceofExpression, JsLanguage, JsLogicalExpression, JsLogicalOperator, JsPrivateName,
+    JsSyntaxKind, JsSyntaxNode, JsSyntaxToken,
 };
 
 use crate::utils::should_break_after_operator;
@@ -102,6 +102,7 @@ pub(crate) fn format_binary_like_expression(
 ) -> FormatResult<()> {
     let mut flatten_items = FlattenItems::default();
     let current_node = expression.clone();
+    let comments = f.context().comments();
 
     let post_order_binary_like_expressions = PostorderIterator::new(expression);
     let mut left: Option<JsAnyBinaryLikeExpression> = None;
@@ -115,7 +116,11 @@ pub(crate) fn format_binary_like_expression(
             f.context()
                 .comments()
                 .mark_suppression_checked(left.syntax());
-            flatten_items.flatten_binary_expression_right_hand_side(left, Some(parent_operator))?;
+            flatten_items.flatten_binary_expression_right_hand_side(
+                left,
+                Some(parent_operator),
+                &comments,
+            )?;
         } else {
             // Leaf binary like expression. Format the left hand side.
             // The right hand side gets formatted when traversing upwards in the tree.
@@ -135,7 +140,7 @@ pub(crate) fn format_binary_like_expression(
 
     // Format the top most binary like expression
     if let Some(root) = left {
-        flatten_items.flatten_binary_expression_right_hand_side(root, None)?;
+        flatten_items.flatten_binary_expression_right_hand_side(root, None, &comments)?;
     }
 
     let group = FlattenedBinaryExpressionPart::Group {
@@ -225,13 +230,9 @@ fn format_sub_expression<'a>(
 ) -> impl Format<JsFormatContext> + 'a {
     format_with(move |f| {
         if needs_parens(parent_operator, sub_expression)? {
-            format_parenthesize(
-                sub_expression.syntax().first_token(),
-                &sub_expression,
-                sub_expression.syntax().last_token(),
-            )
-            .grouped_with_soft_block_indent()
-            .fmt(f)
+            format_parenthesize(&sub_expression)
+                .grouped_with_soft_block_indent()
+                .fmt(f)
         } else {
             write!(f, [sub_expression])
         }
@@ -328,13 +329,14 @@ impl FlattenItems {
         &mut self,
         expression: JsAnyBinaryLikeExpression,
         parent_operator: Option<JsSyntaxToken>,
+        comments: &Comments<JsLanguage>,
     ) -> FormatResult<()> {
         let should_flatten = expression.can_flatten()?;
 
         if should_flatten {
             self.flatten_right_hand_side(expression, parent_operator)
         } else {
-            self.flatten_new_binary_like_group(expression, parent_operator)
+            self.flatten_new_binary_like_group(expression, parent_operator, comments)
         }
     }
 
@@ -366,6 +368,7 @@ impl FlattenItems {
         &mut self,
         binary_like_expression: JsAnyBinaryLikeExpression,
         parent_operator: Option<JsSyntaxToken>,
+        comments: &Comments<JsLanguage>,
     ) -> FormatResult<()> {
         if let Some(last) = self.items.last_mut() {
             // Remove any line breaks and the trailing operator so that the operator/trailing aren't part
@@ -403,7 +406,7 @@ impl FlattenItems {
         // Flatten the right node
         let parent_operator_has_comments = parent_operator
             .as_ref()
-            .map(|operator| operator.has_leading_comments());
+            .map(|operator| comments.has_dangling_trivia(operator));
 
         let mut right_item = FlattenItem::new(
             FlattenedBinaryExpressionPart::Right {
@@ -426,7 +429,7 @@ impl FlattenItems {
             // trailing comments will be added after the end of the whole expression.
             // We want to handle cases like `lorem && (3 + 5 == 9) // comment`.
             // This part is a signal to the formatter to tell it if the whole expression should break.
-            right_item = right_item.with_comments(right.syntax().has_leading_comments())
+            right_item = right_item.with_comments(comments.has_leading_comments(right.syntax()))
         };
 
         self.items.push(right_item);
@@ -578,10 +581,7 @@ impl FlattenedBinaryExpressionPart {
                 });
 
                 if *parenthesized {
-                    let first_token = current.syntax().first_token();
-                    let last_token = current.syntax().last_token();
-
-                    format_parenthesize(first_token, &content, last_token)
+                    format_parenthesize(&content)
                         .grouped_with_soft_block_indent()
                         .fmt(f)
                 } else {

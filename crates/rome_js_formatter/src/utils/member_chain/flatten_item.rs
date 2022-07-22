@@ -1,9 +1,9 @@
 use crate::context::TabWidth;
 use crate::prelude::*;
-use rome_formatter::write;
+use rome_formatter::{write, Comments};
 use rome_js_syntax::{
     JsAnyExpression, JsCallExpression, JsCallExpressionFields, JsComputedMemberExpression,
-    JsComputedMemberExpressionFields, JsIdentifierExpression, JsImportCallExpression,
+    JsComputedMemberExpressionFields, JsIdentifierExpression, JsImportCallExpression, JsLanguage,
     JsNewExpression, JsStaticMemberExpression, JsStaticMemberExpressionFields, JsSyntaxNode,
     JsThisExpression,
 };
@@ -46,15 +46,6 @@ impl FlattenItem {
         }
     }
 
-    pub(crate) fn has_trailing_comments(&self) -> bool {
-        match self {
-            FlattenItem::StaticMember(node) => node.syntax().has_trailing_comments(),
-            FlattenItem::CallExpression(node) => node.syntax().has_trailing_comments(),
-            FlattenItem::ComputedMember(node) => node.syntax().has_trailing_comments(),
-            FlattenItem::Node(node) => node.has_trailing_comments(),
-        }
-    }
-
     pub fn is_computed_expression(&self) -> bool {
         matches!(self, FlattenItem::ComputedMember(..))
     }
@@ -73,14 +64,18 @@ impl FlattenItem {
         }
     }
 
-    pub(crate) fn has_leading_comments(&self) -> SyntaxResult<bool> {
+    pub(crate) fn has_leading_comments(
+        &self,
+        comments: &Comments<JsLanguage>,
+    ) -> SyntaxResult<bool> {
         Ok(match self {
             FlattenItem::StaticMember(node) => {
-                node.syntax().has_comments_direct() || node.operator_token()?.has_leading_comments()
+                comments.has_comments(node.syntax())
+                    || comments.has_dangling_trivia(&node.operator_token()?)
             }
-            FlattenItem::CallExpression(node) => node.syntax().has_leading_comments(),
-            FlattenItem::ComputedMember(node) => node.syntax().has_leading_comments(),
-            FlattenItem::Node(node) => node.has_leading_comments(),
+            FlattenItem::CallExpression(node) => comments.has_leading_comments(node.syntax()),
+            FlattenItem::ComputedMember(node) => comments.has_leading_comments(node.syntax()),
+            FlattenItem::Node(node) => comments.has_leading_comments(node),
         })
     }
 

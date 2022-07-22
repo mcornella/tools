@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use rome_formatter::cst_builders::format_dangling_trivia;
 
 use rome_formatter::write;
 use rome_js_syntax::JsArrayExpression;
@@ -15,16 +16,27 @@ impl FormatNodeRule<JsArrayExpression> for FormatJsArrayExpression {
             r_brack_token,
         } = node.as_fields();
 
-        let group_id = f.group_id("array");
+        let r_brack_token = r_brack_token?;
 
-        let elements = elements.format().with_options(Some(group_id));
+        if elements.is_empty() {
+            write!(
+                f,
+                [
+                    l_brack_token.format(),
+                    format_dangling_trivia(&r_brack_token).indented(),
+                    r_brack_token.format()
+                ]
+            )
+        } else {
+            let group_id = f.group_id("array");
 
-        write!(
-            f,
-            [
-                format_delimited(&l_brack_token?, &elements, &r_brack_token?)
-                    .soft_block_indent_with_group_id(Some(group_id))
-            ]
-        )
+            let elements = elements.format().with_options(Some(group_id));
+
+            write!(
+                f,
+                [format_delimited(&l_brack_token?, &elements, &r_brack_token)
+                    .soft_block_indent_with_group_id(Some(group_id))]
+            )
+        }
     }
 }

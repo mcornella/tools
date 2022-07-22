@@ -36,7 +36,7 @@ impl FormatNodeRule<TsUnionType> for FormatTsUnionType {
                 [
                     soft_line_break(),
                     FormatTypeSetLeadingSeparator {
-                        separator: JsSyntaxKind::PIPE,
+                        separator: "|",
                         leading_separator: leading_separator_token.as_ref()
                     },
                     types.format()

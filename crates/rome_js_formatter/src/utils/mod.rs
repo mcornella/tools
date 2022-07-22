@@ -29,7 +29,7 @@ use rome_js_syntax::{
 };
 use rome_js_syntax::{JsSyntaxKind, JsSyntaxNode, JsSyntaxToken};
 use rome_rowan::{AstNode, AstNodeList, Direction, SyntaxResult};
-use std::fmt::Debug;
+
 pub(crate) use typescript::should_hug_type;
 
 pub(crate) use simple::*;
@@ -168,7 +168,7 @@ impl Format<JsFormatContext> for FormatBodyStatement<'_> {
     fn fmt(&self, f: &mut JsFormatter) -> FormatResult<()> {
         match self.body {
             JsAnyStatement::JsEmptyStatement(body) => {
-                write!(f, [body.format(), format_inserted(JsSyntaxKind::SEMICOLON)])
+                write!(f, [body.format(), token(";")])
             }
             body => {
                 write!(f, [space_token(), body.format()])
@@ -436,7 +436,7 @@ impl Format<JsFormatContext> for FormatWithSemicolon<'_> {
         if let Some(semicolon) = self.semicolon {
             write!(f, [semicolon.format()])?;
         } else if !is_unknown {
-            format_inserted(JsSyntaxKind::SEMICOLON).fmt(f)?;
+            token(";").fmt(f)?;
         }
         Ok(())
     }
