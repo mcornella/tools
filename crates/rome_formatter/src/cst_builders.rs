@@ -80,8 +80,6 @@ where
         for comment in trailing_comments {
             total_lines_before += comment.lines_before();
 
-            let content = format_with(|f| write!(f, [space_token(), comment.piece()]));
-
             // This allows comments at the end of nested structures:
             // {
             //   x: 1,
@@ -93,21 +91,20 @@ where
             // trailing comment for `2`. We can simulate the above by checking
             // if this a comment on its own line; normal trailing comments are
             // always at the end of another expression.
-            if dbg!(total_lines_before) > 0 {
+            if total_lines_before > 0 {
                 write!(
                     f,
                     [line_suffix(&format_with(|f| {
-                        write!(f, [hard_line_break()])?;
-
                         match comment.lines_before() {
                             0 | 1 => write!(f, [hard_line_break()])?,
                             _ => write!(f, [empty_line()])?,
                         };
 
-                        write!(f, [content])
+                        write!(f, [comment.piece()])
                     }))]
                 )?;
             } else {
+                let content = format_with(|f| write!(f, [space_token(), comment.piece()]));
                 if comment.kind().is_line() {
                     write!(f, [line_suffix(&content), expand_parent()])?;
                 } else {

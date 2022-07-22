@@ -3,7 +3,6 @@ use rome_formatter::cst_builders::format_dangling_trivia;
 use rome_formatter::{write, Buffer, CstFormatContext};
 use rome_js_syntax::JsAnyStatement;
 use rome_js_syntax::JsBlockStatement;
-use std::os::linux::raw::stat;
 
 use rome_js_syntax::JsBlockStatementFields;
 use rome_js_syntax::JsSyntaxKind;
@@ -31,7 +30,22 @@ impl FormatNodeRule<JsBlockStatement> for FormatJsBlockStatement {
                 write!(f, [hard_line_break()])?;
             }
         } else {
-            write!(f, [block_indent(&statements.format())])?;
+            write!(
+                f,
+                [block_indent(&format_with(|f| {
+                    let all_empty = statements
+                        .iter()
+                        .all(|stmt| matches!(stmt, JsAnyStatement::JsEmptyStatement(_)));
+
+                    // The formatting of empty statements removes the statements. Let's make sure that a block
+                    // that only contained empty statements won't collapse if it isn't allowed to.
+                    if all_empty && !can_collapse_empty_block(node) {
+                        write!(f, [hard_line_break()])?;
+                    }
+
+                    write!(f, [statements.format()])
+                }))]
+            )?;
         }
 
         write!(f, [r_curly_token.format()])

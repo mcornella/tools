@@ -6,8 +6,9 @@ use rome_formatter::{
 use rome_js_syntax::suppression::{parse_suppression_comment, SuppressionCategory};
 use rome_js_syntax::JsSyntaxKind::JS_FUNCTION_BODY;
 use rome_js_syntax::{
-    JsAnyClass, JsArrayHole, JsBlockStatement, JsFunctionBody, JsLanguage, JsObjectMemberList,
-    JsPropertyObjectMember, JsSyntaxKind, SourceType, TsEnumDeclaration, TsInterfaceDeclaration,
+    JsAnyClass, JsArrayHole, JsBlockStatement, JsElseClause, JsFunctionBody, JsLanguage,
+    JsObjectMemberList, JsPropertyObjectMember, JsSyntaxKind, SourceType, TsEnumDeclaration,
+    TsInterfaceDeclaration,
 };
 use rome_rowan::{
     AstNode, AstNodeList, AstSeparatedList, Direction, SyntaxElement, SyntaxTriviaPieceComments,
@@ -234,6 +235,17 @@ impl CommentStyle<JsLanguage> for JsCommentStyle {
                                 comment,
                             }
                         };
+                    }
+                }
+
+                JsSyntaxKind::JS_ELSE_CLAUSE => {
+                    if let Some(preceding_node) = comment.preceding_node() {
+                        if JsBlockStatement::can_cast(preceding_node.kind()) {
+                            return CommentPosition::Trailing {
+                                node: preceding_node.clone(),
+                                comment,
+                            };
+                        }
                     }
                 }
 

@@ -23,7 +23,7 @@ impl FormatNodeRule<JsElseClause> for FormatJsElseClause {
                 write!(f, [space_token(), if_statement.format()])
             }
             other => {
-                write!(f, [FormatIfElseConsequentBlock::from(other)])
+                write!(f, [FormatIfElseConsequentBlock::from(&other)])
             }
         }
     }

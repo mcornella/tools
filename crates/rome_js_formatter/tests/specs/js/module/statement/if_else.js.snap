@@ -127,7 +127,6 @@ if (true) {
 
 if (true) {
 	// trailing
-
 } else {
 	// trailing
 }
@@ -139,5 +138,6 @@ if (true) {
 if (true) {
 }
 // rome-ignore format: Test suppression comments
-else     if (true &&  false) {}
+else if (true && false) {
+}
 

@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use rome_formatter::write;
+use rome_formatter::{write, CstFormatContext};
 
 use rome_js_syntax::JsIfStatementFields;
 
@@ -19,29 +19,54 @@ impl FormatNodeRule<JsIfStatement> for FormatJsIfStatement {
             else_clause,
         } = node.as_fields();
 
-        write![
+        let consequent = consequent?;
+
+        write!(
             f,
             [
                 if_token.format(),
                 space_token(),
                 format_delimited(&l_paren_token?, &test.format(), &r_paren_token?)
                     .soft_block_indent(),
-                FormatIfElseConsequentBlock::from(consequent?),
-                else_clause.format()
+                FormatIfElseConsequentBlock::from(&consequent),
             ]
-        ]
+        )?;
+
+        if let Some(else_clause) = else_clause {
+            // Place the `else` clause on its own line if the block has any trailing line comments.
+            // Used to format
+            // ```
+            // if (test) {
+            //   ...
+            // }
+            // // comment
+            // else {}
+            // ```
+            if f.context()
+                .comments()
+                .trailing_comments(consequent.syntax())
+                .iter()
+                .any(|comment| comment.kind().is_line())
+            {
+                write!(f, [hard_line_break()])?;
+            }
+
+            write!(f, [else_clause.format()])?;
+        }
+
+        Ok(())
     }
 }
 
-pub struct FormatIfElseConsequentBlock(JsAnyStatement);
+pub struct FormatIfElseConsequentBlock<'a>(&'a JsAnyStatement);
 
-impl From<JsAnyStatement> for FormatIfElseConsequentBlock {
-    fn from(stmt: JsAnyStatement) -> Self {
+impl<'a> From<&'a JsAnyStatement> for FormatIfElseConsequentBlock<'a> {
+    fn from(stmt: &'a JsAnyStatement) -> Self {
         FormatIfElseConsequentBlock(stmt)
     }
 }
 
-impl Format<JsFormatContext> for FormatIfElseConsequentBlock {
+impl Format<JsFormatContext> for FormatIfElseConsequentBlock<'_> {
     fn fmt(&self, f: &mut Formatter<JsFormatContext>) -> FormatResult<()> {
         let stmt = &self.0;
 
