@@ -858,7 +858,7 @@
                     {<span class="ident">DiagnosticHeader</span> {
                         <span class="ident">locus</span>: <span class="ident">file_name</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">Locus::File</span> { <span class="ident">name</span> }),
                         <span class="ident">severity</span>: <span class="ident">err</span>.<span class="ident">severity</span>,
-                        <span class="ident">code</span>: <span class="prelude-val">Some</span>(<span class="ident">err</span>.<span class="ident">code</span>),
+                        <span class="ident">code</span>: <span class="prelude-val">Some</span>(<span class="macro">markup!</span>({<span class="ident">err</span>.<span class="ident">code</span>})),
                         <span class="ident">title</span>: <span class="macro">markup!</span>{ {<span class="ident">err</span>.<span class="ident">message</span>} },
                     }}
                 });
@@ -917,14 +917,14 @@
                     <span class="ident">DiagnosticHeader</span> {
                         <span class="ident">locus</span>: <span class="prelude-val">Some</span>(<span class="ident">Locus::File</span> { <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">file_name</span> }),
                         <span class="ident">severity</span>: <span class="ident">Severity::Error</span>,
-                        <span class="ident">code</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;CI&quot;</span>),
+                        <span class="ident">code</span>: <span class="prelude-val">Some</span>(<span class="macro">markup!</span>(<span class="string">&quot;CI&quot;</span>)),
                         <span class="ident">title</span>: <span class="macro">markup!</span> { <span class="string">&quot;File content differs from formatting output&quot;</span> },
                     }
                 } <span class="kw">else</span> {
                     <span class="ident">DiagnosticHeader</span> {
                         <span class="ident">locus</span>: <span class="prelude-val">Some</span>(<span class="ident">Locus::File</span> { <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">file_name</span> }),
                         <span class="ident">severity</span>: <span class="ident">Severity::Help</span>,
-                        <span class="ident">code</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;Formatter&quot;</span>),
+                        <span class="ident">code</span>: <span class="prelude-val">Some</span>(<span class="macro">markup!</span>(<span class="string">&quot;Formatter&quot;</span>)),
                         <span class="ident">title</span>: <span class="macro">markup!</span> { <span class="string">&quot;Formatter would have printed the following content:&quot;</span> },
                     }
                 };

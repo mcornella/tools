@@ -480,6 +480,12 @@
 <span id="475">475</span>
 <span id="476">476</span>
 <span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_console::fmt::Display</span>;
 <span class="kw">use</span> <span class="ident">rome_console</span>::{<span class="ident">markup</span>, <span class="ident">MarkupBuf</span>};
 <span class="kw">use</span> <span class="ident">rome_diagnostics::file::FileSpan</span>;
@@ -916,11 +922,17 @@
     <span class="doccomment">/// Convert this [`RuleDiagnostic`] into an instance of [`Diagnostic`] by</span>
     <span class="doccomment">/// injecting the name of the rule that emitted it and the ID of the file</span>
     <span class="doccomment">/// the rule was being run on</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_diagnostic</span>(<span class="self">self</span>, <span class="ident">file_id</span>: <span class="ident">FileId</span>, <span class="ident">code</span>: <span class="ident">String</span>) -&gt; <span class="ident">Diagnostic</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_diagnostic</span>(
+        <span class="self">self</span>,
+        <span class="ident">file_id</span>: <span class="ident">FileId</span>,
+        <span class="ident">code</span>: <span class="ident">String</span>,
+        <span class="ident">code_link</span>: <span class="ident">String</span>,
+    ) -&gt; <span class="ident">Diagnostic</span> {
         <span class="ident">Diagnostic</span> {
             <span class="ident">file_id</span>,
             <span class="ident">severity</span>: <span class="self">self</span>.<span class="ident">severity</span>,
             <span class="ident">code</span>: <span class="prelude-val">Some</span>(<span class="ident">code</span>),
+            <span class="ident">code_link</span>: <span class="prelude-val">Some</span>(<span class="ident">code_link</span>),
             <span class="ident">title</span>: <span class="self">self</span>.<span class="ident">title</span>,
             <span class="ident">summary</span>: <span class="self">self</span>.<span class="ident">summary</span>,
             <span class="ident">tag</span>: <span class="self">self</span>.<span class="ident">tag</span>,

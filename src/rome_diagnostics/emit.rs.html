@@ -343,6 +343,29 @@
 <span id="338">338</span>
 <span id="339">339</span>
 <span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Implementation of converting, and emitting diagnostics</span>
 <span class="doccomment">//! using `codespan`.</span>
 
@@ -435,19 +458,42 @@
         <span class="comment">// If the diagnostic doesn&#39;t have a codespan, show the locus in the header instead</span>
         <span class="kw">let</span> <span class="ident">has_codespan</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">d</span>.<span class="ident">primary</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">d</span>.<span class="ident">children</span>.<span class="ident">is_empty</span>();
 
-        <span class="ident">fmt</span>.<span class="ident">write_markup</span>(<span class="macro">markup!</span> {
-            {<span class="ident">DiagnosticHeader</span> {
-                <span class="ident">locus</span>: <span class="kw">if</span> <span class="op">!</span><span class="ident">has_codespan</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">locus</span>)
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                },
-                <span class="ident">severity</span>: <span class="self">self</span>.<span class="ident">d</span>.<span class="ident">severity</span>,
-                <span class="ident">code</span>: <span class="self">self</span>.<span class="ident">d</span>.<span class="ident">code</span>.<span class="ident">as_deref</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">code</span><span class="op">|</span> <span class="op">!</span><span class="ident">code</span>.<span class="ident">is_empty</span>()),
-                <span class="ident">title</span>: <span class="macro">markup!</span> { {<span class="self">self</span>.<span class="ident">d</span>.<span class="ident">title</span>} },
-            }}
-            <span class="string">&quot;\n&quot;</span>
-        })<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">header_locus</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">has_codespan</span> { <span class="prelude-val">Some</span>(<span class="ident">locus</span>) } <span class="kw">else</span> { <span class="prelude-val">None</span> };
+
+        <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">d</span>.<span class="ident">code</span>.<span class="ident">as_ref</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">code</span><span class="op">|</span> <span class="op">!</span><span class="ident">code</span>.<span class="ident">is_empty</span>());
+        <span class="kw">match</span> (<span class="ident">code</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">d</span>.<span class="ident">code_link</span>) {
+            (<span class="prelude-val">Some</span>(<span class="ident">code</span>), <span class="prelude-val">Some</span>(<span class="ident">href</span>)) =&gt; <span class="ident">fmt</span>.<span class="ident">write_markup</span>(<span class="macro">markup!</span> {
+                {<span class="ident">DiagnosticHeader</span> {
+                    <span class="ident">locus</span>: <span class="ident">header_locus</span>,
+                    <span class="ident">severity</span>: <span class="self">self</span>.<span class="ident">d</span>.<span class="ident">severity</span>,
+                    <span class="ident">code</span>: <span class="prelude-val">Some</span>(<span class="macro">markup!</span> {
+                        <span class="op">&lt;</span><span class="ident">Hyperlink</span> <span class="ident">href</span><span class="op">=</span>{<span class="ident">href</span>}<span class="op">&gt;</span>
+                            {<span class="ident">code</span>}
+                        <span class="op">&lt;</span><span class="op">/</span><span class="ident">Hyperlink</span><span class="op">&gt;</span>
+                    }),
+                    <span class="ident">title</span>: <span class="macro">markup!</span> { {<span class="self">self</span>.<span class="ident">d</span>.<span class="ident">title</span>} },
+                }}
+                <span class="string">&quot;\n&quot;</span>
+            })<span class="question-mark">?</span>,
+            (<span class="prelude-val">Some</span>(<span class="ident">code</span>), <span class="prelude-val">None</span>) =&gt; <span class="ident">fmt</span>.<span class="ident">write_markup</span>(<span class="macro">markup!</span> {
+                {<span class="ident">DiagnosticHeader</span> {
+                    <span class="ident">locus</span>: <span class="ident">header_locus</span>,
+                    <span class="ident">severity</span>: <span class="self">self</span>.<span class="ident">d</span>.<span class="ident">severity</span>,
+                    <span class="ident">code</span>: <span class="prelude-val">Some</span>(<span class="macro">markup!</span>( {<span class="ident">code</span>} )),
+                    <span class="ident">title</span>: <span class="macro">markup!</span> { {<span class="self">self</span>.<span class="ident">d</span>.<span class="ident">title</span>} },
+                }}
+                <span class="string">&quot;\n&quot;</span>
+            })<span class="question-mark">?</span>,
+            (<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; <span class="ident">fmt</span>.<span class="ident">write_markup</span>(<span class="macro">markup!</span> {
+                {<span class="ident">DiagnosticHeader</span> {
+                    <span class="ident">locus</span>: <span class="ident">header_locus</span>,
+                    <span class="ident">severity</span>: <span class="self">self</span>.<span class="ident">d</span>.<span class="ident">severity</span>,
+                    <span class="ident">code</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">title</span>: <span class="macro">markup!</span> { {<span class="self">self</span>.<span class="ident">d</span>.<span class="ident">title</span>} },
+                }}
+                <span class="string">&quot;\n&quot;</span>
+            })<span class="question-mark">?</span>,
+        }
 
         <span class="kw">if</span> <span class="ident">has_codespan</span> {
             <span class="kw">let</span> <span class="ident">labels</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
@@ -585,7 +631,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DiagnosticHeader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="ident">locus</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Locus</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">severity</span>: <span class="ident">Severity</span>,
-    <span class="kw">pub</span> <span class="ident">code</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">code</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Markup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">title</span>: <span class="ident">Markup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
 }
 

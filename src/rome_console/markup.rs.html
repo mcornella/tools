@@ -195,7 +195,33 @@
 <span id="190">190</span>
 <span id="191">191</span>
 <span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
+    <span class="ident">borrow::Cow</span>,
     <span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>},
     <span class="ident">io</span>,
 };
@@ -206,8 +232,8 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::fmt</span>::{<span class="ident">Display</span>, <span class="ident">Formatter</span>, <span class="ident">MarkupElements</span>, <span class="ident">Write</span>};
 
 <span class="doccomment">/// Enumeration of all the supported markup elements</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MarkupElement</span> {
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MarkupElement</span><span class="op">&lt;</span><span class="lifetime">&#39;fmt</span><span class="op">&gt;</span> {
     <span class="ident">Emphasis</span>,
     <span class="ident">Dim</span>,
     <span class="ident">Italic</span>,
@@ -216,9 +242,10 @@
     <span class="ident">Success</span>,
     <span class="ident">Warn</span>,
     <span class="ident">Info</span>,
+    <span class="ident">Hyperlink</span> { <span class="ident">href</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;fmt</span>, <span class="ident">str</span><span class="op">&gt;</span> },
 }
 
-<span class="kw">impl</span> <span class="ident">MarkupElement</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;fmt</span><span class="op">&gt;</span> <span class="ident">MarkupElement</span><span class="op">&lt;</span><span class="lifetime">&#39;fmt</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Mutate a [ColorSpec] object in place to apply this element&#39;s associated</span>
     <span class="doccomment">/// style to it</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_color</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">color</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ColorSpec</span>) {
@@ -256,6 +283,27 @@
 
                 <span class="ident">color</span>.<span class="ident">set_fg</span>(<span class="prelude-val">Some</span>(<span class="ident">BLUE</span>));
             }
+
+            <span class="ident">MarkupElement::Hyperlink</span> { .. } =&gt; {}
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">to_owned</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">MarkupElement</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">MarkupElement::Emphasis</span> =&gt; <span class="ident">MarkupElement::Emphasis</span>,
+            <span class="ident">MarkupElement::Dim</span> =&gt; <span class="ident">MarkupElement::Dim</span>,
+            <span class="ident">MarkupElement::Italic</span> =&gt; <span class="ident">MarkupElement::Italic</span>,
+            <span class="ident">MarkupElement::Underline</span> =&gt; <span class="ident">MarkupElement::Underline</span>,
+            <span class="ident">MarkupElement::Error</span> =&gt; <span class="ident">MarkupElement::Error</span>,
+            <span class="ident">MarkupElement::Success</span> =&gt; <span class="ident">MarkupElement::Success</span>,
+            <span class="ident">MarkupElement::Warn</span> =&gt; <span class="ident">MarkupElement::Warn</span>,
+            <span class="ident">MarkupElement::Info</span> =&gt; <span class="ident">MarkupElement::Info</span>,
+            <span class="ident">MarkupElement::Hyperlink</span> { <span class="ident">href</span> } =&gt; <span class="ident">MarkupElement::Hyperlink</span> {
+                <span class="ident">href</span>: <span class="ident">Cow::Owned</span>(<span class="kw">match</span> <span class="ident">href</span> {
+                    <span class="ident">Cow::Borrowed</span>(<span class="ident">href</span>) =&gt; <span class="ident">href</span>.<span class="ident">to_string</span>(),
+                    <span class="ident">Cow::Owned</span>(<span class="ident">href</span>) =&gt; <span class="ident">href</span>.<span class="ident">clone</span>(),
+                }),
+            },
         }
     }
 }
@@ -264,13 +312,13 @@
 <span class="doccomment">/// associated styles applied to it</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MarkupNode</span><span class="op">&lt;</span><span class="lifetime">&#39;fmt</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">elements</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;fmt</span> [<span class="ident">MarkupElement</span>],
+    <span class="kw">pub</span> <span class="ident">elements</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;fmt</span> [<span class="ident">MarkupElement</span><span class="op">&lt;</span><span class="lifetime">&#39;fmt</span><span class="op">&gt;</span>],
     <span class="kw">pub</span> <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;fmt</span> <span class="kw">dyn</span> <span class="ident">Display</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MarkupNodeBuf</span> {
-    <span class="kw">pub</span> <span class="ident">elements</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MarkupElement</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">elements</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MarkupElement</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">String</span>,
 }
 
@@ -325,8 +373,9 @@
     <span class="kw">fn</span> <span class="ident">write_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">elements</span>: <span class="kw-2">&amp;</span><span class="ident">MarkupElements</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">styles</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="ident">elements</span>.<span class="ident">for_each</span>(<span class="kw-2">&amp;mut</span> <span class="op">|</span><span class="ident">elements</span><span class="op">|</span> {
-            <span class="ident">styles</span>.<span class="ident">extend_from_slice</span>(<span class="ident">elements</span>);
-        });
+            <span class="ident">styles</span>.<span class="ident">extend</span>(<span class="ident">elements</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">MarkupElement::to_owned</span>));
+            <span class="prelude-val">Ok</span>(())
+        })<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">last</span>) <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">last_mut</span>() {
             <span class="kw">if</span> <span class="ident">last</span>.<span class="ident">elements</span> <span class="op">==</span> <span class="ident">styles</span> {
@@ -346,8 +395,9 @@
     <span class="kw">fn</span> <span class="ident">write_fmt</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">elements</span>: <span class="kw-2">&amp;</span><span class="ident">MarkupElements</span>, <span class="ident">content</span>: <span class="ident">fmt::Arguments</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">styles</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="ident">elements</span>.<span class="ident">for_each</span>(<span class="kw-2">&amp;mut</span> <span class="op">|</span><span class="ident">elements</span><span class="op">|</span> {
-            <span class="ident">styles</span>.<span class="ident">extend_from_slice</span>(<span class="ident">elements</span>);
-        });
+            <span class="ident">styles</span>.<span class="ident">extend</span>(<span class="ident">elements</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">MarkupElement::to_owned</span>));
+            <span class="prelude-val">Ok</span>(())
+        })<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">last</span>) <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">last_mut</span>() {
             <span class="kw">if</span> <span class="ident">last</span>.<span class="ident">elements</span> <span class="op">==</span> <span class="ident">styles</span> {
