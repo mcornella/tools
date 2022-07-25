@@ -66,13 +66,13 @@
     <span class="ident">CliSession</span>, <span class="ident">Termination</span>,
 };
 <span class="kw">use</span> <span class="ident">rome_diagnostics::MAXIMUM_DISPLAYABLE_DIAGNOSTICS</span>;
+<span class="kw">use</span> <span class="ident">rome_service::load_config</span>;
 <span class="kw">use</span> <span class="ident">rome_service::settings::WorkspaceSettings</span>;
 <span class="kw">use</span> <span class="ident">rome_service::workspace::UpdateSettingsParams</span>;
-<span class="kw">use</span> <span class="ident">rome_service</span>::{<span class="ident">load_config</span>, <span class="ident">ConfigurationType</span>};
 
 <span class="doccomment">/// Handler for the &quot;check&quot; command of the Rome CLI</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">check</span>(<span class="kw-2">mut</span> <span class="ident">session</span>: <span class="ident">CliSession</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Termination</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">configuration</span> <span class="op">=</span> <span class="ident">load_config</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>.<span class="ident">app</span>.<span class="ident">fs</span>, <span class="ident">ConfigurationType::Root</span>)<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">configuration</span> <span class="op">=</span> <span class="ident">load_config</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>.<span class="ident">app</span>.<span class="ident">fs</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">workspace_settings</span> <span class="op">=</span> <span class="ident">WorkspaceSettings::default</span>();
 
     <span class="kw">let</span> <span class="ident">max_diagnostics</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">session</span>

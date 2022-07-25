@@ -181,52 +181,6 @@
 <span id="176">176</span>
 <span id="177">177</span>
 <span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
-<span id="214">214</span>
-<span id="215">215</span>
-<span id="216">216</span>
-<span id="217">217</span>
-<span id="218">218</span>
-<span id="219">219</span>
-<span id="220">220</span>
-<span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module contains the configuration of `rome.json`</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The configuration is divided by &quot;tool&quot;, and then it&#39;s possible to further customise it</span>
@@ -252,11 +206,6 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Configuration</span> {
-    <span class="doccomment">/// One root file should exist. Useful when `extends` comes into play.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `true`, this file should be the master configuration.</span>
-    <span class="kw">pub</span> <span class="ident">root</span>: <span class="ident">bool</span>,
-
     <span class="doccomment">/// The configuration of the formatter</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">formatter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FormatterConfiguration</span><span class="op">&gt;</span>,
@@ -274,7 +223,6 @@
     <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="comment">// TODO: enable recommendation settings https://github.com/rome/tools/issues/2912</span>
         <span class="self">Self</span> {
-            <span class="ident">root</span>: <span class="bool-val">true</span>,
             <span class="ident">linter</span>: <span class="prelude-val">Some</span>(<span class="ident">LinterConfiguration</span> {
                 <span class="ident">enabled</span>: <span class="bool-val">true</span>,
                 ..<span class="ident">LinterConfiguration::default</span>()
@@ -297,8 +245,6 @@
 
 <span class="doccomment">/// Series of errors that can be thrown while computing the configuration</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ConfigurationError</span> {
-    <span class="doccomment">/// Thrown when the main configuration file doesn&#39;t have</span>
-    <span class="ident">NotRoot</span>,
     <span class="doccomment">/// Thrown when the program can&#39;t serialize the configuration, while saving it</span>
     <span class="ident">SerializationError</span>,
 
@@ -315,7 +261,6 @@
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">ConfigurationError</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ConfigurationError::NotRoot</span> =&gt; <span class="ident">std::fmt::Display::fmt</span>(<span class="self">self</span>, <span class="ident">f</span>),
             <span class="ident">ConfigurationError::SerializationError</span> =&gt; <span class="ident">std::fmt::Display::fmt</span>(<span class="self">self</span>, <span class="ident">f</span>),
             <span class="ident">ConfigurationError::DeserializationError</span>(<span class="kw">_</span>) =&gt; <span class="ident">std::fmt::Display::fmt</span>(<span class="self">self</span>, <span class="ident">f</span>),
 
@@ -327,12 +272,6 @@
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ConfigurationError</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ConfigurationError::NotRoot</span> =&gt; {
-                <span class="macro">write!</span>(
-                <span class="ident">f</span>,
-                <span class="string">&quot;the main configuration file, rome.json, must have the field &#39;root&#39; set to `true`&quot;</span>
-            )
-            }
             <span class="ident">ConfigurationError::SerializationError</span> =&gt; {
                 <span class="macro">write!</span>(
                     <span class="ident">f</span>,
@@ -358,7 +297,6 @@
 <span class="doccomment">/// The `file_system` will read the configuration file</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_config</span>(
     <span class="ident">file_system</span>: <span class="kw-2">&amp;</span><span class="ident">DynRef</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FileSystem</span><span class="op">&gt;</span>,
-    <span class="ident">configuration_type</span>: <span class="ident">ConfigurationType</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Configuration</span><span class="op">&gt;</span>, <span class="ident">RomeError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">config_name</span> <span class="op">=</span> <span class="ident">file_system</span>.<span class="ident">config_name</span>();
     <span class="kw">let</span> <span class="ident">configuration_path</span> <span class="op">=</span> <span class="ident">PathBuf::from</span>(<span class="ident">config_name</span>);
@@ -375,7 +313,7 @@
                 <span class="ident">RomeError::Configuration</span>(<span class="ident">ConfigurationError::DeserializationError</span>(<span class="ident">err</span>.<span class="ident">to_string</span>()))
             })<span class="question-mark">?</span>;
 
-            <span class="ident">compute_configuration</span>(<span class="ident">configuration</span>, <span class="ident">configuration_type</span>)
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">configuration</span>))
         }
         <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
             <span class="comment">// We throw an error only when the error is found.</span>
@@ -420,36 +358,6 @@
         .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">RomeError::CantReadFile</span>(<span class="ident">path</span>))<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
-}
-
-<span class="doccomment">/// The type of configuration we want to load</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ConfigurationType</span> {
-    <span class="doccomment">/// The main configuration, usually `rome.json`</span>
-    <span class="ident">Root</span>,
-    <span class="doccomment">/// The extended configuration, usually to be loaded via `extends` field</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span>
-    <span class="ident">Extended</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">ConfigurationType</span> {
-    <span class="kw">fn</span> <span class="ident">is_root</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">ConfigurationType::Root</span>)
-    }
-}
-
-<span class="doccomment">/// This function computes the configuration that is being loaded and makes sure that is correct.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Operations are:</span>
-<span class="doccomment">/// - making sure that the master configuration is set to `root: true`</span>
-<span class="kw">fn</span> <span class="ident">compute_configuration</span>(
-    <span class="ident">configuration</span>: <span class="ident">Configuration</span>,
-    <span class="ident">configuration_type</span>: <span class="ident">ConfigurationType</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Configuration</span><span class="op">&gt;</span>, <span class="ident">RomeError</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">configuration_type</span>.<span class="ident">is_root</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">configuration</span>.<span class="ident">root</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">RomeError::Configuration</span>(<span class="ident">ConfigurationError::NotRoot</span>));
-    }
-
-    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">configuration</span>))
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rome_service" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
