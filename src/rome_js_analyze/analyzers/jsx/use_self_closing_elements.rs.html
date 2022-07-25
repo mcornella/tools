@@ -147,6 +147,8 @@
 <span id="142">142</span>
 <span id="143">143</span>
 <span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_analyze</span>::{
     <span class="ident">context::RuleContext</span>, <span class="ident">declare_rule</span>, <span class="ident">ActionCategory</span>, <span class="ident">Ast</span>, <span class="ident">Rule</span>, <span class="ident">RuleCategory</span>, <span class="ident">RuleDiagnostic</span>,
 };
@@ -154,7 +156,7 @@
 <span class="kw">use</span> <span class="ident">rome_diagnostics::Applicability</span>;
 <span class="kw">use</span> <span class="ident">rome_js_factory::make</span>;
 <span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{<span class="ident">JsSyntaxToken</span>, <span class="ident">JsxAnyTag</span>, <span class="ident">JsxElement</span>, <span class="ident">JsxOpeningElementFields</span>, <span class="ident">T</span>};
-<span class="kw">use</span> <span class="ident">rome_rowan</span>::{<span class="ident">AstNode</span>, <span class="ident">AstNodeExt</span>, <span class="ident">AstNodeList</span>, <span class="ident">TriviaPiece</span>};
+<span class="kw">use</span> <span class="ident">rome_rowan</span>::{<span class="ident">AstNode</span>, <span class="ident">AstNodeList</span>, <span class="ident">BatchMutationExt</span>, <span class="ident">TriviaPiece</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::JsRuleAction</span>;
 
@@ -233,6 +235,8 @@
     }
 
     <span class="kw">fn</span> <span class="ident">action</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">RuleContext</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::State</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsRuleAction</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mutation</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">root</span>().<span class="ident">begin</span>();
+
         <span class="kw">let</span> <span class="ident">open_element</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">query</span>().<span class="ident">opening_element</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">JsxOpeningElementFields</span> {
             <span class="ident">l_angle_token</span>,
@@ -279,15 +283,15 @@
                 <span class="ident">self_closing_element_builder</span>.<span class="ident">with_type_arguments</span>(<span class="ident">type_arguments</span>);
         }
         <span class="kw">let</span> <span class="ident">self_closing_element</span> <span class="op">=</span> <span class="ident">self_closing_element_builder</span>.<span class="ident">build</span>();
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">root</span>().<span class="ident">replace_node</span>(
+        <span class="ident">mutation</span>.<span class="ident">replace_node</span>(
             <span class="ident">JsxAnyTag::JsxElement</span>(<span class="ident">ctx</span>.<span class="ident">query</span>().<span class="ident">clone</span>()),
             <span class="ident">JsxAnyTag::JsxSelfClosingElement</span>(<span class="ident">self_closing_element</span>),
-        )<span class="question-mark">?</span>;
+        );
         <span class="prelude-val">Some</span>(<span class="ident">JsRuleAction</span> {
             <span class="ident">category</span>: <span class="ident">ActionCategory::QuickFix</span>,
             <span class="ident">applicability</span>: <span class="ident">Applicability::MaybeIncorrect</span>,
             <span class="ident">message</span>: <span class="macro">markup!</span> { <span class="string">&quot;Use a SelfClosingElement instead&quot;</span> }.<span class="ident">to_owned</span>(),
-            <span class="ident">root</span>,
+            <span class="ident">mutation</span>,
         })
     }
 }

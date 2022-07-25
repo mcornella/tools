@@ -491,7 +491,7 @@
 <span class="kw">use</span> <span class="ident">rome_diagnostics::file::FileSpan</span>;
 <span class="kw">use</span> <span class="ident">rome_diagnostics</span>::{<span class="ident">file::FileId</span>, <span class="ident">Applicability</span>, <span class="ident">Severity</span>};
 <span class="kw">use</span> <span class="ident">rome_diagnostics</span>::{<span class="ident">Diagnostic</span>, <span class="ident">DiagnosticTag</span>, <span class="ident">Footer</span>, <span class="ident">Span</span>, <span class="ident">SubDiagnostic</span>};
-<span class="kw">use</span> <span class="ident">rome_rowan</span>::{<span class="ident">Language</span>, <span class="ident">TextRange</span>};
+<span class="kw">use</span> <span class="ident">rome_rowan</span>::{<span class="ident">BatchMutation</span>, <span class="ident">Language</span>, <span class="ident">TextRange</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::categories</span>::{<span class="ident">ActionCategory</span>, <span class="ident">RuleCategory</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::context::RuleContext</span>;
@@ -967,7 +967,7 @@
     <span class="kw">pub</span> <span class="ident">category</span>: <span class="ident">ActionCategory</span>,
     <span class="kw">pub</span> <span class="ident">applicability</span>: <span class="ident">Applicability</span>,
     <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">MarkupBuf</span>,
-    <span class="kw">pub</span> <span class="ident">root</span>: <span class="ident">LanguageRoot</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">mutation</span>: <span class="ident">BatchMutation</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">LanguageRoot</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rome_analyze" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>

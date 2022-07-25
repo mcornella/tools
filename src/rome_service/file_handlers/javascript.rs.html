@@ -313,6 +313,8 @@
 <span id="308">308</span>
 <span id="309">309</span>
 <span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_analyze</span>::{<span class="ident">AnalysisFilter</span>, <span class="ident">AnalyzerAction</span>, <span class="ident">ControlFlow</span>, <span class="ident">Never</span>, <span class="ident">RuleCategories</span>};
 <span class="kw">use</span> <span class="ident">rome_diagnostics</span>::{<span class="ident">Applicability</span>, <span class="ident">Diagnostic</span>};
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">IndentStyle</span>, <span class="ident">LineWidth</span>, <span class="ident">Printed</span>};
@@ -326,7 +328,7 @@
 <span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{<span class="ident">JsAnyRoot</span>, <span class="ident">JsLanguage</span>, <span class="ident">SourceType</span>, <span class="ident">TextRange</span>, <span class="ident">TextSize</span>, <span class="ident">TokenAtOffset</span>};
 <span class="kw">use</span> <span class="ident">rome_rowan</span>::{<span class="ident">AstNode</span>, <span class="ident">BatchMutationExt</span>, <span class="ident">Direction</span>};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::workspace::FixFileResult</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::workspace</span>::{<span class="ident">FixFileResult</span>, <span class="ident">RenameResult</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">settings</span>::{<span class="ident">FormatSettings</span>, <span class="ident">Language</span>, <span class="ident">LanguageSettings</span>, <span class="ident">LanguagesSettings</span>, <span class="ident">SettingsHandle</span>},
     <span class="ident">workspace::server::AnyParse</span>,
@@ -518,8 +520,10 @@
 
         <span class="kw">match</span> <span class="ident">action</span> {
             <span class="prelude-val">Some</span>(<span class="ident">action</span>) =&gt; {
-                <span class="ident">tree</span> <span class="op">=</span> <span class="ident">action</span>.<span class="ident">root</span>;
-                <span class="ident">rules</span>.<span class="ident">push</span>((<span class="ident">action</span>.<span class="ident">rule_name</span>, <span class="ident">action</span>.<span class="ident">original_range</span>));
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">original_range</span>, <span class="kw">_</span>)) <span class="op">=</span> <span class="ident">action</span>.<span class="ident">mutation</span>.<span class="ident">as_text_edits</span>() {
+                    <span class="ident">tree</span> <span class="op">=</span> <span class="ident">action</span>.<span class="ident">mutation</span>.<span class="ident">commit</span>();
+                    <span class="ident">rules</span>.<span class="ident">push</span>((<span class="ident">action</span>.<span class="ident">rule_name</span>, <span class="ident">original_range</span>));
+                }
             }
             <span class="prelude-val">None</span> =&gt; {
                 <span class="kw">return</span> <span class="ident">FixFileResult</span> {
@@ -590,7 +594,7 @@
     <span class="ident">parse</span>: <span class="ident">AnyParse</span>,
     <span class="ident">symbol_at</span>: <span class="ident">TextSize</span>,
     <span class="ident">new_name</span>: <span class="ident">String</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">RomeError</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RenameResult</span>, <span class="ident">RomeError</span><span class="op">&gt;</span> {
     <span class="kw">use</span> <span class="ident">rome_js_analyze::utils::rename::RenameSymbolExtensions</span>;
 
     <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">parse</span>.<span class="ident">tree</span>();
@@ -613,8 +617,8 @@
                         <span class="ident">new_name</span>,
                     }))
                 } <span class="kw">else</span> {
-                    <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">batch</span>.<span class="ident">commit</span>();
-                    <span class="prelude-val">Ok</span>(<span class="ident">root</span>.<span class="ident">to_string</span>())
+                    <span class="kw">let</span> (<span class="ident">range</span>, <span class="ident">indels</span>) <span class="op">=</span> <span class="ident">batch</span>.<span class="ident">as_text_edits</span>().<span class="ident">unwrap_or_default</span>();
+                    <span class="prelude-val">Ok</span>(<span class="ident">RenameResult</span> { <span class="ident">range</span>, <span class="ident">indels</span> })
                 }
             }
             <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">RomeError::RenameError</span>(<span class="ident">err</span>)),

@@ -121,6 +121,13 @@
 <span id="116">116</span>
 <span id="117">117</span>
 <span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::syntax::SyntaxTrivia</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">cursor</span>, <span class="ident">Language</span>, <span class="ident">NodeOrToken</span>, <span class="ident">SyntaxNode</span>, <span class="ident">SyntaxToken</span>};
 <span class="kw">use</span> <span class="ident">std::iter</span>;
@@ -176,6 +183,13 @@
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">NodeOrToken::Node</span>(<span class="ident">it</span>) =&gt; <span class="ident">it</span>.<span class="ident">parent</span>(),
             <span class="ident">NodeOrToken::Token</span>(<span class="ident">it</span>) =&gt; <span class="ident">it</span>.<span class="ident">parent</span>(),
+        }
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">NodeOrToken::Node</span>(<span class="ident">it</span>) =&gt; <span class="ident">it</span>.<span class="ident">index</span>(),
+            <span class="ident">NodeOrToken::Token</span>(<span class="ident">it</span>) =&gt; <span class="ident">it</span>.<span class="ident">index</span>(),
         }
     }
 

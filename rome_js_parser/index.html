@@ -102,7 +102,7 @@ advance in the parsing process and consume tokens - if it returns <code>Absent</
 <h4 id="parse-children"><a href="#parse-children">Parse children</a></h4>
 <p>The parse rules will guide you in how to write your implementation and the parser infrastructure provides the following convenience APIs:</p>
 <ul>
-<li>Optional token <code>'ident'?</code>: Use <code>p.eat(token)</code>. It eats the next token if it matches the passed-in token. </li>
+<li>Optional token <code>'ident'?</code>: Use <code>p.eat(token)</code>. It eats the next token if it matches the passed-in token.</li>
 <li>Required token <code>'ident'</code>: Use<code>p.expect(token)</code>. It eats the next token if it matches the passed-in token.
 It adds an <code>Expected 'x' but found 'y' instead</code> error and a missing marker if the token isn’t present in the source code.</li>
 <li>Optional node <code>body: JsBlockStatement?</code>: Use<code>parse_block_statement(p).or_missing(p)</code>. It parses the block if it is present in the source code and adds a missing marker if it isn’t.</li>
@@ -231,7 +231,7 @@ The main motivation behind doing so is that this gives us perfect error recovery
 <h3 id="summary"><a href="#summary">Summary</a></h3>
 <ul>
 <li>Parse rules are named <code>parse_rule_name</code></li>
-<li>The parse rules should return a <code>ParsedSyntax</code> </li>
+<li>The parse rules should return a <code>ParsedSyntax</code></li>
 <li>The rule must return <code>Present</code> if it consumes any token and, therefore, can parse the node with at least some of its children.</li>
 <li>It returns <code>Absent</code> otherwise and must not progress parsing nor add any errors.</li>
 <li>Lists must perform error recovery to avoid infinite loops.</li>

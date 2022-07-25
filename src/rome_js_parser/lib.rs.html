@@ -597,7 +597,7 @@
 <span class="doccomment">//! ### Parse children</span>
 <span class="doccomment">//! The parse rules will guide you in how to write your implementation and the parser infrastructure provides the following convenience APIs:</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! * Optional token `&#39;ident&#39;?`: Use `p.eat(token)`. It eats the next token if it matches the passed-in token. </span>
+<span class="doccomment">//! * Optional token `&#39;ident&#39;?`: Use `p.eat(token)`. It eats the next token if it matches the passed-in token.</span>
 <span class="doccomment">//! * Required token `&#39;ident&#39;`: Use`p.expect(token)`. It eats the next token if it matches the passed-in token.</span>
 <span class="doccomment">//! It adds an `Expected &#39;x&#39; but found &#39;y&#39; instead` error and a missing marker if the token isn&#39;t present in the source code.</span>
 <span class="doccomment">//! * Optional node `body: JsBlockStatement?`: Use`parse_block_statement(p).or_missing(p)`. It parses the block if it is present in the source code and adds a missing marker if it isn&#39;t.</span>
@@ -762,7 +762,7 @@
 <span class="doccomment">//! ## Summary</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! * Parse rules are named `parse_rule_name`</span>
-<span class="doccomment">//! * The parse rules should return a `ParsedSyntax` </span>
+<span class="doccomment">//! * The parse rules should return a `ParsedSyntax`</span>
 <span class="doccomment">//! * The rule must return `Present` if it consumes any token and, therefore, can parse the node with at least some of its children.</span>
 <span class="doccomment">//! * It returns `Absent` otherwise and must not progress parsing nor add any errors.</span>
 <span class="doccomment">//! * Lists must perform error recovery to avoid infinite loops.</span>

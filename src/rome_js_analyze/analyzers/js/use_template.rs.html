@@ -341,6 +341,7 @@
 <span id="336">336</span>
 <span id="337">337</span>
 <span id="338">338</span>
+<span id="339">339</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_analyze::RuleSuppressions</span>;
 <span class="kw">use</span> <span class="ident">rome_analyze</span>::{
     <span class="ident">context::RuleContext</span>, <span class="ident">declare_rule</span>, <span class="ident">ActionCategory</span>, <span class="ident">Ast</span>, <span class="ident">Rule</span>, <span class="ident">RuleCategory</span>, <span class="ident">RuleDiagnostic</span>,
@@ -353,7 +354,7 @@
     <span class="ident">JsAnyExpression</span>, <span class="ident">JsAnyLiteralExpression</span>, <span class="ident">JsBinaryExpression</span>, <span class="ident">JsBinaryOperator</span>, <span class="ident">JsLanguage</span>,
     <span class="ident">JsSyntaxKind</span>, <span class="ident">JsSyntaxToken</span>, <span class="ident">JsTemplate</span>, <span class="ident">JsTemplateElementList</span>, <span class="ident">WalkEvent</span>, <span class="ident">T</span>,
 };
-<span class="kw">use</span> <span class="ident">rome_rowan</span>::{<span class="ident">AstNode</span>, <span class="ident">AstNodeExt</span>, <span class="ident">AstNodeList</span>, <span class="ident">SyntaxToken</span>, <span class="ident">TriviaPiece</span>};
+<span class="kw">use</span> <span class="ident">rome_rowan</span>::{<span class="ident">AstNode</span>, <span class="ident">AstNodeExt</span>, <span class="ident">AstNodeList</span>, <span class="ident">BatchMutationExt</span>, <span class="ident">SyntaxToken</span>, <span class="ident">TriviaPiece</span>};
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">utils::escape_string</span>, <span class="ident">JsRuleAction</span>};
 
@@ -455,18 +456,19 @@
 
     <span class="kw">fn</span> <span class="ident">action</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">RuleContext</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::State</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsRuleAction</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">query</span>();
-        <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">root</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mutation</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">root</span>().<span class="ident">begin</span>();
 
         <span class="kw">let</span> <span class="ident">template</span> <span class="op">=</span> <span class="ident">convert_expressions_to_js_template</span>(<span class="ident">state</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">next_root</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">replace_node</span>(
+        <span class="ident">mutation</span>.<span class="ident">replace_node</span>(
             <span class="ident">JsAnyExpression::JsBinaryExpression</span>(<span class="ident">node</span>.<span class="ident">clone</span>()),
             <span class="ident">JsAnyExpression::JsTemplate</span>(<span class="ident">template</span>),
-        )<span class="question-mark">?</span>;
+        );
+
         <span class="prelude-val">Some</span>(<span class="ident">JsRuleAction</span> {
             <span class="ident">category</span>: <span class="ident">ActionCategory::QuickFix</span>,
             <span class="ident">applicability</span>: <span class="ident">Applicability::MaybeIncorrect</span>,
             <span class="ident">message</span>: <span class="macro">markup!</span> { <span class="string">&quot;Use a &quot;</span><span class="op">&lt;</span><span class="ident">Emphasis</span><span class="op">&gt;</span><span class="string">&quot;TemplateLiteral&quot;</span><span class="op">&lt;</span><span class="op">/</span><span class="ident">Emphasis</span><span class="op">&gt;</span><span class="string">&quot;.&quot;</span> }.<span class="ident">to_owned</span>(),
-            <span class="ident">root</span>: <span class="ident">next_root</span>,
+            <span class="ident">mutation</span>,
         })
     }
 }

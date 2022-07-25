@@ -307,6 +307,9 @@
 <span id="302">302</span>
 <span id="303">303</span>
 <span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The [Workspace] is the main entry point for high-level clients (the Rome</span>
 <span class="doccomment">//! CLI and Language Server) into the various language-specific services of the</span>
 <span class="doccomment">//! Rome toolchain (parser, formatter, analyzer ...)</span>
@@ -367,6 +370,7 @@
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">IndentStyle</span>, <span class="ident">Printed</span>};
 <span class="kw">use</span> <span class="ident">rome_fs::RomePath</span>;
 <span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{<span class="ident">JsLanguage</span>, <span class="ident">TextRange</span>, <span class="ident">TextSize</span>};
+<span class="kw">use</span> <span class="ident">rome_text_edit::Indel</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">settings::WorkspaceSettings</span>, <span class="ident">RomeError</span>};
 
@@ -453,8 +457,10 @@
 }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RenameResult</span> {
-    <span class="doccomment">/// New source code for the file with all fixes applied</span>
-    <span class="kw">pub</span> <span class="ident">code</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Range of source code modified by this rename operation</span>
+    <span class="kw">pub</span> <span class="ident">range</span>: <span class="ident">TextRange</span>,
+    <span class="doccomment">/// List of text edit operations to apply on the source code</span>
+    <span class="kw">pub</span> <span class="ident">indels</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Indel</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Workspace</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">RefUnwindSafe</span> {
