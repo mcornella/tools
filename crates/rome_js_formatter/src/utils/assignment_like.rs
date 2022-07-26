@@ -333,7 +333,7 @@ impl JsAnyAssignmentLike {
         }
     }
 
-    fn left(&self) -> SyntaxResult<LeftAssignmentLike> {
+    pub(crate) fn left(&self) -> SyntaxResult<LeftAssignmentLike> {
         match self {
             JsAnyAssignmentLike::JsPropertyObjectMember(property) => Ok(property.name()?.into()),
             JsAnyAssignmentLike::JsAssignmentExpression(assignment) => {

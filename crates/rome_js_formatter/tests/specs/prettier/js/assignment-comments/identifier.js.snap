@@ -1,5 +1,6 @@
 ---
 source: crates/rome_js_formatter/tests/prettier_tests.rs
+assertion_line: 182
 expression: identifier.js
 ---
 # Input
@@ -16,18 +17,16 @@ const bifornCringerMoshedPerplexSawder = // !!!
 
 # Output
 ```js
-const kochabCooieGameOnOboleUnweave =
-  // ???
+const kochabCooieGameOnOboleUnweave = // ???
   annularCooeedSplicesWalksWayWay;
 
-const bifornCringerMoshedPerplexSawder =
-  // !!!
+const bifornCringerMoshedPerplexSawder = // !!!
   glimseGlyphsHazardNoopsTieTie + averredBathersBoxroomBuggyNurl - anodyneCondosMalateOverateRetinol;
 
 ```
 
 # Lines exceeding max width of 80 characters
 ```
-    7:   glimseGlyphsHazardNoopsTieTie + averredBathersBoxroomBuggyNurl - anodyneCondosMalateOverateRetinol;
+    5:   glimseGlyphsHazardNoopsTieTie + averredBathersBoxroomBuggyNurl - anodyneCondosMalateOverateRetinol;
 ```
 

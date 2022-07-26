@@ -1,5 +1,6 @@
 ---
 source: crates/rome_js_formatter/tests/prettier_tests.rs
+assertion_line: 182
 expression: function.js
 ---
 # Input
@@ -9,61 +10,61 @@ f1 = (
   //comment
   b
 ) => {};
-  
+
 f2 = (
   a = //comment
   b
 ) => {};
-  
+
 f3 = (
   a =
   b //comment
 ) => {};
-  
+
 f4 = // Comment
   () => {};
 
 f5 =
-  
+
   // Comment
-  
+
  () => {}
-  
+
 f6 = /* comment */
-  
+
   // Comment
-  
+
   () => {}
-  
+
 let f1 = (
   a =
   //comment
   b
 ) => {};
-  
+
 let f2 = (
   a = //comment
   b
 ) => {};
-  
+
 let f3 = (
   a =
   b //comment
 ) => {};
-  
+
 let f4 = // Comment
   () => {};
-  
+
 let f5 =
-  
+
   // Comment
-  
+
   () => {}
-  
+
 let f6 = /* comment */
-  
+
   // Comment
-  
+
   () => {}
 
 ```
@@ -71,9 +72,8 @@ let f6 = /* comment */
 # Output
 ```js
 f1 = (
-  a =
   //comment
-  b,
+  a = b,
 ) => {};
 
 f2 = (
@@ -84,8 +84,7 @@ f3 = (
   a = b, //comment
 ) => {};
 
-f4 =
-  // Comment
+f4 = // Comment
   () => {};
 
 f5 =
@@ -93,15 +92,16 @@ f5 =
 
   () => {};
 
-f6 = /* comment */
+f6 =
+  /* comment */
+
   // Comment
 
   () => {};
 
 let f1 = (
-  a =
   //comment
-  b,
+  a = b,
 ) => {};
 
 let f2 = (
@@ -112,8 +112,7 @@ let f3 = (
   a = b, //comment
 ) => {};
 
-let f4 =
-  // Comment
+let f4 = // Comment
   () => {};
 
 let f5 =
@@ -121,7 +120,9 @@ let f5 =
 
   () => {};
 
-let f6 = /* comment */
+let f6 =
+  /* comment */
+
   // Comment
 
   () => {};

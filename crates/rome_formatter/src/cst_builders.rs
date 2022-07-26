@@ -35,7 +35,7 @@ where
                         0 => write!(f, [space_token()])?,
                         1 => {
                             if comment.lines_before() == 0 {
-                                write!(f, [soft_line_break()])?;
+                                write!(f, [soft_line_break_or_space()])?;
                             } else {
                                 write!(f, [hard_line_break()])?;
                             }

@@ -1,5 +1,6 @@
 ---
 source: crates/rome_js_formatter/tests/prettier_tests.rs
+assertion_line: 182
 expression: string.js
 ---
 # Input
@@ -116,8 +117,7 @@ fnString =
     "long" +
     "string";
 
-fnString =
-  // Comment0
+fnString = // Comment0
   // Comment1
   "some" + "long" + "string";
 
@@ -161,8 +161,7 @@ var fnString =
   "long" +
   "string";
 
-var fnString =
-  // Comment0
+var fnString = // Comment0
   // Comment1
   "some" + "long" + "string";
 

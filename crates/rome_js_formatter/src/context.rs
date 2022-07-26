@@ -5,12 +5,15 @@ use rome_formatter::{
 };
 use rome_js_syntax::suppression::{parse_suppression_comment, SuppressionCategory};
 
+use crate::utils::JsAnyAssignmentLike;
 use rome_js_syntax::{
-    JsAnyClass, JsArrayExpression, JsArrayHole, JsBlockStatement, JsBreakStatement,
-    JsCallArguments, JsConditionalExpression, JsContinueStatement, JsDefaultClause, JsFunctionBody,
-    JsImportAssertionEntry, JsLanguage, JsNamedImportSpecifiers, JsObjectExpression,
-    JsObjectMemberList, JsParameters, JsPropertyObjectMember, JsStaticMemberExpression,
-    JsSyntaxKind, SourceType, TsConditionalType, TsEnumDeclaration, TsInterfaceDeclaration,
+    JsAnyClass, JsAnyExpression, JsAnyParameter, JsArrayExpression, JsArrayHole,
+    JsAssignmentExpression, JsBlockStatement, JsBreakStatement, JsCallArguments,
+    JsConditionalExpression, JsContinueStatement, JsDefaultClause, JsFormalParameter,
+    JsFunctionBody, JsImportAssertionEntry, JsInitializerClause, JsLanguage,
+    JsNamedImportSpecifiers, JsObjectExpression, JsObjectMemberList, JsParameters,
+    JsPropertyObjectMember, JsStaticMemberExpression, JsSyntaxKind, SourceType, TsConditionalType,
+    TsEnumDeclaration, TsInterfaceDeclaration,
 };
 use rome_rowan::{
     AstNode, AstNodeList, AstSeparatedList, Direction, SyntaxElement, SyntaxTriviaPieceComments,
@@ -255,6 +258,32 @@ impl CommentStyle<JsLanguage> for JsCommentStyle {
                     }
                 }
 
+                // Handles parameter initializer's comments that follow the `=` token, after a new line.
+                // ```javascript
+                // let f1 = (
+                //   a =
+                //   //comment
+                //   /* test */ b
+                // ) => {};
+                // ```
+                kind if JsAnyExpression::can_cast(kind)
+                    && comment.preceding_node().is_none()
+                    && !comment.is_trailing_token_trivia() =>
+                {
+                    let initializer = following_node.parent().and_then(JsInitializerClause::cast);
+                    let parameter = initializer
+                        .and_then(|initializer| initializer.parent::<JsFormalParameter>());
+
+                    if let Some(parameter) = parameter {
+                        if let Ok(binding) = parameter.binding() {
+                            return CommentPosition::Leading {
+                                node: binding.into_syntax(),
+                                comment,
+                            };
+                        }
+                    }
+                }
+
                 _ => {}
             }
         }
@@ -338,6 +367,8 @@ impl CommentStyle<JsLanguage> for JsCommentStyle {
                 }
             }
         }
+
+        dbg!(&comment);
 
         if let Some(preceding_node) = comment.preceding_node() {
             if JsArrayHole::can_cast(preceding_node.kind()) {
@@ -439,7 +470,7 @@ impl CommentStyle<JsLanguage> for JsCommentStyle {
                 node: enclosing_node.clone(),
                 comment,
             };
-        } else if dbg!(JsCallArguments::can_cast(enclosing_node.kind())) {
+        } else if JsCallArguments::can_cast(enclosing_node.kind()) {
             let arguments = JsCallArguments::unwrap_cast(enclosing_node.clone());
 
             if arguments.r_paren_token().as_ref() == Ok(comment.following_token()) {
@@ -547,6 +578,58 @@ impl CommentStyle<JsLanguage> for JsCommentStyle {
                         };
                     }
                 }
+            }
+        }
+        // Special handling for initializers inside of assignments. Moves
+        // the trailing comment's attached to the initializer's `=` token
+        // to become trailing comments of the assignment target.
+        else if JsInitializerClause::can_cast(enclosing_node.kind())
+            && comment.is_trailing_token_trivia()
+            && comment.kind().is_line()
+            && comment.preceding_node().is_none()
+        {
+            if let Some(parent) = enclosing_node.parent() {
+                if JsAnyAssignmentLike::can_cast(parent.kind()) {
+                    let assignment = JsAnyAssignmentLike::unwrap_cast(parent);
+
+                    if let Ok(left) = assignment.left() {
+                        return CommentPosition::Trailing {
+                            node: left.into_syntax(),
+                            comment,
+                        };
+                    }
+                }
+                // Handles comments after the `=` token inside of parameters
+                // ```javascript
+                // f2 = (
+                //   a = //comment
+                //   b
+                // ) => {};
+                // ```
+                else if JsFormalParameter::can_cast(parent.kind()) {
+                    let parameter = JsFormalParameter::unwrap_cast(parent);
+                    if let Ok(binding) = parameter.binding() {
+                        return CommentPosition::Trailing {
+                            node: binding.into_syntax(),
+                            comment,
+                        };
+                    }
+                }
+            }
+        }
+        // Special handling for assignment expressions. Moves comments attached to the `=` token
+        // to become trailing comments of the pattern.
+        else if JsAssignmentExpression::can_cast(enclosing_node.kind())
+            && comment.is_trailing_token_trivia()
+            && comment.kind().is_line()
+            && comment.preceding_node().is_none()
+        {
+            let assignment = JsAssignmentExpression::unwrap_cast(enclosing_node.clone());
+            if let Ok(left) = assignment.left() {
+                return CommentPosition::Trailing {
+                    node: left.into_syntax(),
+                    comment,
+                };
             }
         }
 
