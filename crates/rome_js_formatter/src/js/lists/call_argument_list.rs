@@ -1,7 +1,7 @@
 use crate::prelude::*;
 use crate::utils::write_arguments_multi_line;
 use rome_formatter::write;
-use rome_js_syntax::{JsCallArgumentList};
+use rome_js_syntax::JsCallArgumentList;
 
 #[derive(Debug, Clone, Default)]
 pub struct FormatJsCallArgumentList;
@@ -20,7 +20,7 @@ impl FormatRule<JsCallArgumentList> for FormatJsCallArgumentList {
                 let separated = node
                     .format_separated(",")
                     .with_trailing_separator(TrailingSeparator::Omit);
-                write_arguments_multi_line(separated, f)
+                write_arguments_multi_line(node, separated, f)
             })))]
         )
     }

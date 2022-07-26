@@ -1,11 +1,11 @@
 use crate::prelude::*;
 use crate::utils::{is_call_like_expression, write_arguments_multi_line};
 use rome_formatter::cst_builders::format_dangling_trivia;
-use rome_formatter::{format_args, write};
+use rome_formatter::{format_args, write, Comments, CstFormatContext};
 use rome_js_syntax::{
     JsAnyCallArgument, JsAnyExpression, JsAnyFunctionBody, JsAnyLiteralExpression, JsAnyName,
     JsAnyStatement, JsArrayExpression, JsArrowFunctionExpression, JsCallArgumentList,
-    JsCallArguments, JsCallArgumentsFields, JsCallExpression, TsReferenceType,
+    JsCallArguments, JsCallArgumentsFields, JsCallExpression, JsLanguage, TsReferenceType,
 };
 use rome_rowan::{AstSeparatedList, SyntaxResult, SyntaxTokenText};
 
@@ -61,8 +61,11 @@ impl FormatNodeRule<JsCallArguments> for FormatJsCallArguments {
             };
 
             let is_react_hook_with_deps_array =
-                is_react_hook_with_deps_array(&first_argument, &second_argument)?
-                    && !node.syntax().first_or_last_token_have_comments();
+                is_react_hook_with_deps_array(
+                    &first_argument,
+                    &second_argument,
+                    &f.context().comments(),
+                )? && !node.syntax().first_or_last_token_have_comments();
 
             if is_framework_test_call || is_react_hook_with_deps_array {
                 write!(f, [l_paren_token.format(),])?;
@@ -135,7 +138,7 @@ impl FormatNodeRule<JsCallArguments> for FormatJsCallArguments {
                                 [
                                     &soft_block_indent(&format_args![
                                         format_with(|f| {
-                                            write_arguments_multi_line(separated.iter(), f)
+                                            write_arguments_multi_line(&args, separated.iter(), f)
                                         }),
                                         soft_line_break()
                                     ]),
@@ -194,7 +197,7 @@ impl FormatNodeRule<JsCallArguments> for FormatJsCallArguments {
                     format_args![
                         l_paren,
                         group_elements(&format_args![format_with(|f| {
-                            write_arguments_multi_line(separated.iter(), f)
+                            write_arguments_multi_line(&args, separated.iter(), f)
                         })]),
                         r_paren,
                     ],
@@ -212,7 +215,7 @@ impl FormatNodeRule<JsCallArguments> for FormatJsCallArguments {
                             .format_separated(",")
                             .with_trailing_separator(TrailingSeparator::Omit)
                             .nodes_grouped();
-                        write_arguments_multi_line(separated, f)
+                        write_arguments_multi_line(&args, separated, f)
                     })),
                     r_paren,
                 ])]
@@ -417,22 +420,23 @@ fn could_group_argument(
 fn is_react_hook_with_deps_array(
     first_argument: &JsAnyCallArgument,
     second_argument: &JsAnyCallArgument,
+    comments: &Comments<JsLanguage>,
 ) -> SyntaxResult<bool> {
     let first_node_matches = if let JsAnyCallArgument::JsAnyExpression(
         JsAnyExpression::JsArrowFunctionExpression(arrow_function),
     ) = first_argument
     {
         let no_parameters = arrow_function.parameters()?.is_empty();
-        let body = arrow_function.body()?;
-        let is_block = matches!(body, JsAnyFunctionBody::JsFunctionBody(_));
+        let is_block = matches!(arrow_function.body()?, JsAnyFunctionBody::JsFunctionBody(_));
 
-        no_parameters && is_block
+        no_parameters && is_block && !comments.has_comments(first_argument.syntax())
     } else {
         false
     };
 
-    let second_node_matches = matches!(second_argument, JsAnyCallArgument::JsAnyExpression(_));
-    // let no_comments = !node.syntax().first_or_last_token_have_comments();
+    let second_node_matches = matches!(second_argument, JsAnyCallArgument::JsAnyExpression(_))
+        && !comments.has_comments(second_argument.syntax());
+
     if first_node_matches && second_node_matches {
         Ok(true)
     } else {

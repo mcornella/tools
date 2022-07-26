@@ -26,10 +26,10 @@ use rome_formatter::{
     format_args, normalize_newlines, write, Buffer, Comments, CstFormatContext, VecBuffer,
 };
 use rome_js_syntax::{
-    JsAnyExpression, JsAnyFunction, JsAnyStatement, JsComputedMemberExpression,
-    JsConditionalExpression, JsInitializerClause, JsLanguage, JsSequenceExpression,
-    JsStaticMemberExpression, JsTemplateElement, Modifiers, TsConditionalType, TsTemplateElement,
-    TsType,
+    JsAnyExpression, JsAnyFunction, JsAnyStatement, JsCallArgumentList, JsCallArguments,
+    JsComputedMemberExpression, JsConditionalExpression, JsInitializerClause, JsLanguage,
+    JsSequenceExpression, JsStaticMemberExpression, JsTemplateElement, Modifiers,
+    TsConditionalType, TsTemplateElement, TsType,
 };
 use rome_js_syntax::{JsSyntaxKind, JsSyntaxNode, JsSyntaxToken};
 use rome_rowan::{declare_node_union, AstNode, AstNodeList, Direction, SyntaxNode, SyntaxResult};
@@ -520,22 +520,27 @@ pub(crate) fn is_call_like_expression(expression: &JsAnyExpression) -> bool {
 
 /// This function is in charge to format the call arguments.
 pub(crate) fn write_arguments_multi_line<S: Format<JsFormatContext>, I>(
+    arguments: &JsCallArgumentList,
     separated: I,
     f: &mut JsFormatter,
 ) -> FormatResult<()>
 where
     I: Iterator<Item = S>,
 {
-    let mut iterator = separated.peekable();
-    let mut join_with = f.join_with(soft_line_break_or_space());
+    let with_node = arguments.iter().zip(separated);
+    let mut iterator = with_node.peekable();
+    let mut join_with = f.join_nodes_with_soft_line();
 
-    while let Some(element) = iterator.next() {
+    while let Some((node, element)) = iterator.next() {
         let last = iterator.peek().is_none();
 
         if last {
-            join_with.entry(&format_args![&element, &if_group_breaks(&token(","))]);
+            join_with.entry(
+                node?.syntax(),
+                &format_args![&element, &if_group_breaks(&token(","))],
+            );
         } else {
-            join_with.entry(&element);
+            join_with.entry(node?.syntax(), &element);
         }
     }
 
