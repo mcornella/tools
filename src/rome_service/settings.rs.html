@@ -169,6 +169,33 @@
 <span id="164">164</span>
 <span id="165">165</span>
 <span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">indexmap::IndexSet</span>;
 <span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">RwLock</span>, <span class="ident">RwLockReadGuard</span>};
 
@@ -179,6 +206,10 @@
 
 <span class="doccomment">/// Global settings for the entire workspace</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WorkspaceSettings</span> {
     <span class="doccomment">/// Formatter settings applied to all files in the workspaces</span>
     <span class="kw">pub</span> <span class="ident">format</span>: <span class="ident">FormatSettings</span>,
@@ -217,6 +248,10 @@
 
 <span class="doccomment">/// Formatter settings for the entire workspace</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FormatSettings</span> {
     <span class="doccomment">/// Enabled by default</span>
     <span class="kw">pub</span> <span class="ident">enabled</span>: <span class="ident">bool</span>,
@@ -240,6 +275,10 @@
 
 <span class="doccomment">/// Linter settings for the entire workspace</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LinterSettings</span> {
     <span class="doccomment">/// Enabled by default</span>
     <span class="kw">pub</span> <span class="ident">enabled</span>: <span class="ident">bool</span>,
@@ -259,6 +298,10 @@
 
 <span class="doccomment">/// Static map of language names to language-specific settings</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LanguagesSettings</span> {
     <span class="kw">pub</span> <span class="ident">javascript</span>: <span class="ident">LanguageSettings</span><span class="op">&lt;</span><span class="ident">JsLanguage</span><span class="op">&gt;</span>,
 }
@@ -287,6 +330,10 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LanguageSettings</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">Language</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Formatter settings for this language</span>
     <span class="kw">pub</span> <span class="ident">format</span>: <span class="ident">L::FormatSettings</span>,
@@ -295,6 +342,13 @@
     <span class="kw">pub</span> <span class="ident">linter</span>: <span class="ident">L::LinterSettings</span>,
 
     <span class="doccomment">/// Globals variables/bindings that can be found in a file</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(
+        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+        <span class="ident">serde</span>(
+            <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;crate::configuration::deserialize_globals&quot;</span>,
+            <span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;crate::configuration::serialize_globals&quot;</span>
+        )
+    )]</span>
     <span class="kw">pub</span> <span class="ident">globals</span>: <span class="ident">IndexSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 

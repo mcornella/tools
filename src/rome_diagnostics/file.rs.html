@@ -329,8 +329,8 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">FileId</span> <span class="op">=</span> <span class="ident">usize</span>;
 
 <span class="doccomment">/// A range that is indexed in a specific file.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>))]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FileSpan</span> {
     <span class="kw">pub</span> <span class="ident">file</span>: <span class="ident">FileId</span>,
     <span class="kw">pub</span> <span class="ident">range</span>: <span class="ident">TextRange</span>,

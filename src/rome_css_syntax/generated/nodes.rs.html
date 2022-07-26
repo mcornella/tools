@@ -4987,13 +4987,6 @@
 <span id="4982">4982</span>
 <span id="4983">4983</span>
 <span id="4984">4984</span>
-<span id="4985">4985</span>
-<span id="4986">4986</span>
-<span id="4987">4987</span>
-<span id="4988">4988</span>
-<span id="4989">4989</span>
-<span id="4990">4990</span>
-<span id="4991">4991</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Generated file, do not edit by hand, see `xtask/codegen`</span>
 
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::enum_variant_names</span>)]</span>
@@ -5011,9 +5004,9 @@
     <span class="ident">AstNodeList</span>, <span class="ident">AstNodeListIterator</span>, <span class="ident">AstSeparatedList</span>, <span class="ident">AstSeparatedListNodesIterator</span>,
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde_crate::ser::SerializeSeq</span>;
+<span class="kw">use</span> <span class="ident">serde::ser::SerializeSeq</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde_crate</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Formatter</span>};
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssAnyFunction</span> {
@@ -5045,7 +5038,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssAnyFunctionFields</span> {
     <span class="kw">pub</span> <span class="ident">css_simple_function</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssSimpleFunction</span><span class="op">&gt;</span>,
 }
@@ -5095,7 +5088,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssAtKeyframesFields</span> {
     <span class="kw">pub</span> <span class="ident">at_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">keyframes_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
@@ -5139,7 +5132,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssAtKeyframesBodyFields</span> {
     <span class="kw">pub</span> <span class="ident">l_curly_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">items</span>: <span class="ident">CssAtKeyframesItemList</span>,
@@ -5191,7 +5184,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssAtMediaFields</span> {
     <span class="kw">pub</span> <span class="ident">at_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">media_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
@@ -5244,7 +5237,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssAtMediaQueryFields</span> {
     <span class="kw">pub</span> <span class="ident">condition_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">or_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
@@ -5288,7 +5281,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssAtMediaQueryConsequentFields</span> {
     <span class="kw">pub</span> <span class="ident">and_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">condition_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
@@ -5332,7 +5325,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssAtMediaQueryFeatureFields</span> {
     <span class="kw">pub</span> <span class="ident">l_paren_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">feature</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssAnyAtMediaQueryFeatureType</span><span class="op">&gt;</span>,
@@ -5368,7 +5361,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssAtMediaQueryFeatureBooleanFields</span> {
     <span class="kw">pub</span> <span class="ident">css_identifier</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssIdentifier</span><span class="op">&gt;</span>,
 }
@@ -5410,7 +5403,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssAtMediaQueryFeatureCompareFields</span> {
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssIdentifier</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">range</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssAtMediaQueryRange</span><span class="op">&gt;</span>,
@@ -5454,7 +5447,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssAtMediaQueryFeaturePlainFields</span> {
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssIdentifier</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">colon_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
@@ -5506,7 +5499,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssAtMediaQueryFeatureRangeFields</span> {
     <span class="kw">pub</span> <span class="ident">first_value</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssAnyValue</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">first_range</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssAtMediaQueryRange</span><span class="op">&gt;</span>,
@@ -5556,7 +5549,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssAtMediaQueryRangeFields</span> {
     <span class="kw">pub</span> <span class="ident">r_angle_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">l_angle_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
@@ -5603,7 +5596,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssAttributeFields</span> {
     <span class="kw">pub</span> <span class="ident">l_brack_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">attribute_name</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssAttributeName</span><span class="op">&gt;</span>,
@@ -5668,7 +5661,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssAttributeMatcherFields</span> {
     <span class="kw">pub</span> <span class="ident">matcher_type_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">exactly_or_hyphen_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
@@ -5713,7 +5706,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssAttributeMetaFields</span> {
     <span class="kw">pub</span> <span class="ident">attribute_matcher</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CssAttributeMatcher</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">attribute_modifier</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CssAttributeModifier</span><span class="op">&gt;</span>,
@@ -5748,7 +5741,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssAttributeModifierFields</span> {
     <span class="kw">pub</span> <span class="ident">i_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
 }
@@ -5782,7 +5775,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssAttributeNameFields</span> {
     <span class="kw">pub</span> <span class="ident">css_string</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssString</span><span class="op">&gt;</span>,
 }
@@ -5818,7 +5811,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssAttributeSelectorPatternFields</span> {
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssIdentifier</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">attribute_list</span>: <span class="ident">CssAttributeList</span>,
@@ -5859,7 +5852,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssBlockFields</span> {
     <span class="kw">pub</span> <span class="ident">l_curly_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">declaration_list</span>: <span class="ident">CssDeclarationList</span>,
@@ -5899,7 +5892,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssClassSelectorPatternFields</span> {
     <span class="kw">pub</span> <span class="ident">dot_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssIdentifier</span><span class="op">&gt;</span>,
@@ -5954,7 +5947,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssCombinatorSelectorPatternFields</span> {
     <span class="kw">pub</span> <span class="ident">left</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssAnySelectorPattern</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">combinator_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
@@ -5993,7 +5986,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssCustomPropertyFields</span> {
     <span class="kw">pub</span> <span class="ident">value_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
 }
@@ -6043,7 +6036,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssDeclarationFields</span> {
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssIdentifier</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">css_custom_property</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssCustomProperty</span><span class="op">&gt;</span>,
@@ -6085,7 +6078,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssDeclarationImportantFields</span> {
     <span class="kw">pub</span> <span class="ident">excl_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">important_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
@@ -6122,7 +6115,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssDimensionFields</span> {
     <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssNumber</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">unit</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssIdentifier</span><span class="op">&gt;</span>,
@@ -6161,7 +6154,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssIdSelectorPatternFields</span> {
     <span class="kw">pub</span> <span class="ident">hash_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssIdentifier</span><span class="op">&gt;</span>,
@@ -6196,7 +6189,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssIdentifierFields</span> {
     <span class="kw">pub</span> <span class="ident">value_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
 }
@@ -6238,7 +6231,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssKeyframesBlockFields</span> {
     <span class="kw">pub</span> <span class="ident">selectors</span>: <span class="ident">CssKeyframesSelectorList</span>,
     <span class="kw">pub</span> <span class="ident">l_curly_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
@@ -6283,7 +6276,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssKeyframesSelectorFields</span> {
     <span class="kw">pub</span> <span class="ident">from_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">to_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
@@ -6319,7 +6312,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssNumberFields</span> {
     <span class="kw">pub</span> <span class="ident">value_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
 }
@@ -6353,7 +6346,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssParameterFields</span> {
     <span class="kw">pub</span> <span class="ident">css_any_value</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssAnyValue</span><span class="op">&gt;</span>,
 }
@@ -6389,7 +6382,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssPercentageFields</span> {
     <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssNumber</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">reminder_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
@@ -6432,7 +6425,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssPseudoClassSelectorPatternFields</span> {
     <span class="kw">pub</span> <span class="ident">colon_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssIdentifier</span><span class="op">&gt;</span>,
@@ -6476,7 +6469,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssPseudoClassSelectorPatternParametersFields</span> {
     <span class="kw">pub</span> <span class="ident">l_paren_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">parameter</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssAnyValue</span><span class="op">&gt;</span>,
@@ -6516,7 +6509,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssRatioFields</span> {
     <span class="kw">pub</span> <span class="ident">numerator</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssNumber</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">denominator</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssNumber</span><span class="op">&gt;</span>,
@@ -6551,7 +6544,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssRuleFields</span> {
     <span class="kw">pub</span> <span class="ident">prelude</span>: <span class="ident">CssSelectorList</span>,
     <span class="kw">pub</span> <span class="ident">block</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssBlock</span><span class="op">&gt;</span>,
@@ -6584,7 +6577,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssSelectorFields</span> {
     <span class="kw">pub</span> <span class="ident">pattern_list</span>: <span class="ident">CssAnySelectorPatternList</span>,
 }
@@ -6628,7 +6621,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssSimpleFunctionFields</span> {
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssIdentifier</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">l_paren_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
@@ -6665,7 +6658,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssStringFields</span> {
     <span class="kw">pub</span> <span class="ident">value_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
 }
@@ -6699,7 +6692,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssTypeSelectorPatternFields</span> {
     <span class="kw">pub</span> <span class="ident">ident</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssIdentifier</span><span class="op">&gt;</span>,
 }
@@ -6733,7 +6726,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssUniversalSelectorPatternFields</span> {
     <span class="kw">pub</span> <span class="ident">star_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
 }
@@ -6781,7 +6774,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssVarFunctionFields</span> {
     <span class="kw">pub</span> <span class="ident">var_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">l_paren_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
@@ -6823,14 +6816,13 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssVarFunctionValueFields</span> {
     <span class="kw">pub</span> <span class="ident">comma_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">CssIdentifier</span><span class="op">&gt;</span>,
 }
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CssAnyAtMediaQueryFeatureType</span> {
     <span class="ident">CssAtMediaQueryFeatureBoolean</span>(<span class="ident">CssAtMediaQueryFeatureBoolean</span>),
     <span class="ident">CssAtMediaQueryFeatureCompare</span>(<span class="ident">CssAtMediaQueryFeatureCompare</span>),
@@ -6865,7 +6857,6 @@
 }
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CssAnyAtMediaQueryType</span> {
     <span class="ident">CssAtMediaQueryFeature</span>(<span class="ident">CssAtMediaQueryFeature</span>),
     <span class="ident">CssIdentifier</span>(<span class="ident">CssIdentifier</span>),
@@ -6886,7 +6877,6 @@
 }
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CssAnyAtRule</span> {
     <span class="ident">CssAtKeyframes</span>(<span class="ident">CssAtKeyframes</span>),
     <span class="ident">CssAtMedia</span>(<span class="ident">CssAtMedia</span>),
@@ -6907,7 +6897,6 @@
 }
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CssAnyRule</span> {
     <span class="ident">CssAnyAtRule</span>(<span class="ident">CssAnyAtRule</span>),
     <span class="ident">CssRule</span>(<span class="ident">CssRule</span>),
@@ -6928,7 +6917,6 @@
 }
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CssAnySelectorPattern</span> {
     <span class="ident">CssAttributeSelectorPattern</span>(<span class="ident">CssAttributeSelectorPattern</span>),
     <span class="ident">CssClassSelectorPattern</span>(<span class="ident">CssClassSelectorPattern</span>),
@@ -6984,7 +6972,6 @@
 }
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CssAnyValue</span> {
     <span class="ident">CssAnyFunction</span>(<span class="ident">CssAnyFunction</span>),
     <span class="ident">CssCustomProperty</span>(<span class="ident">CssCustomProperty</span>),
@@ -9302,7 +9289,6 @@
 }
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CssUnknown</span> {
     <span class="ident">syntax</span>: <span class="ident">SyntaxNode</span>,
 }

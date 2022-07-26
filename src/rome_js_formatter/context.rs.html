@@ -260,6 +260,7 @@
 <span id="255">255</span>
 <span id="256">256</span>
 <span id="257">257</span>
+<span id="258">258</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_formatter::printer::PrinterOptions</span>;
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{
     <span class="ident">CommentKind</span>, <span class="ident">CommentStyle</span>, <span class="ident">Comments</span>, <span class="ident">CstFormatContext</span>, <span class="ident">FormatContext</span>, <span class="ident">IndentStyle</span>, <span class="ident">LineWidth</span>,
@@ -441,6 +442,7 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">QuoteStyle</span> {
     <span class="ident">Double</span>,
     <span class="ident">Single</span>,

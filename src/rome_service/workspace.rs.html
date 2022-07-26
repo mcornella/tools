@@ -310,6 +310,103 @@
 <span id="305">305</span>
 <span id="306">306</span>
 <span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The [Workspace] is the main entry point for high-level clients (the Rome</span>
 <span class="doccomment">//! CLI and Language Server) into the various language-specific services of the</span>
 <span class="doccomment">//! Rome toolchain (parser, formatter, analyzer ...)</span>
@@ -363,13 +460,13 @@
 <span class="doccomment">//! document does not implement the required capability: for instance trying to</span>
 <span class="doccomment">//! format a file with a language that does not have a formatter</span>
 
-<span class="kw">use</span> <span class="ident">std::panic::RefUnwindSafe</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">panic::RefUnwindSafe</span>};
 
-<span class="kw">use</span> <span class="ident">rome_analyze::AnalyzerAction</span>;
-<span class="kw">use</span> <span class="ident">rome_diagnostics::Diagnostic</span>;
+<span class="kw">use</span> <span class="ident">rome_analyze::ActionCategory</span>;
+<span class="kw">use</span> <span class="ident">rome_diagnostics</span>::{<span class="ident">CodeSuggestion</span>, <span class="ident">Diagnostic</span>};
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">IndentStyle</span>, <span class="ident">Printed</span>};
 <span class="kw">use</span> <span class="ident">rome_fs::RomePath</span>;
-<span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{<span class="ident">JsLanguage</span>, <span class="ident">TextRange</span>, <span class="ident">TextSize</span>};
+<span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{<span class="ident">TextRange</span>, <span class="ident">TextSize</span>};
 <span class="kw">use</span> <span class="ident">rome_text_edit::Indel</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">settings::WorkspaceSettings</span>, <span class="ident">RomeError</span>};
@@ -378,84 +475,185 @@
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">server</span>;
 
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SupportsFeatureParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
     <span class="kw">pub</span> <span class="ident">feature</span>: <span class="ident">FeatureName</span>,
 }
 
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FeatureName</span> {
     <span class="ident">Format</span>,
     <span class="ident">Lint</span>,
 }
 
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UpdateSettingsParams</span> {
     <span class="kw">pub</span> <span class="ident">settings</span>: <span class="ident">WorkspaceSettings</span>,
 }
 
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OpenFileParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
     <span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">i32</span>,
 }
 
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetSyntaxTreeParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
 }
 
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ChangeFileParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
     <span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">i32</span>,
 }
 
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CloseFileParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
 }
 
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PullDiagnosticsParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
     <span class="kw">pub</span> <span class="ident">categories</span>: <span class="ident">RuleCategories</span>,
 }
 
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PullDiagnosticsResult</span> {
+    <span class="kw">pub</span> <span class="ident">diagnostics</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Diagnostic</span><span class="op">&gt;</span>,
+}
+
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PullActionsParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
     <span class="kw">pub</span> <span class="ident">range</span>: <span class="ident">TextRange</span>,
 }
 
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PullActionsResult</span> {
+    <span class="kw">pub</span> <span class="ident">actions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CodeAction</span><span class="op">&gt;</span>,
+}
+
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CodeAction</span> {
+    <span class="kw">pub</span> <span class="ident">category</span>: <span class="ident">ActionCategory</span>,
+    <span class="kw">pub</span> <span class="ident">rule_name</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">suggestion</span>: <span class="ident">CodeSuggestion</span>,
+}
+
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FormatFileParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
     <span class="kw">pub</span> <span class="ident">indent_style</span>: <span class="ident">IndentStyle</span>,
 }
 
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FormatRangeParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
     <span class="kw">pub</span> <span class="ident">range</span>: <span class="ident">TextRange</span>,
     <span class="kw">pub</span> <span class="ident">indent_style</span>: <span class="ident">IndentStyle</span>,
 }
 
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FormatOnTypeParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
     <span class="kw">pub</span> <span class="ident">offset</span>: <span class="ident">TextSize</span>,
     <span class="kw">pub</span> <span class="ident">indent_style</span>: <span class="ident">IndentStyle</span>,
 }
 
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FixFileParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
 }
 
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FixFileResult</span> {
     <span class="doccomment">/// New source code for the file with all fixes applied</span>
     <span class="kw">pub</span> <span class="ident">code</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// List of all the rules applied to the file with their associated text range</span>
-    <span class="kw">pub</span> <span class="ident">rules</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">TextRange</span>)<span class="op">&gt;</span>,
+    <span class="doccomment">/// List of all the code actions applied to the file</span>
+    <span class="kw">pub</span> <span class="ident">actions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FixAction</span><span class="op">&gt;</span>,
 }
 
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FixAction</span> {
+    <span class="doccomment">/// Name of the rule that emitted this code action</span>
+    <span class="kw">pub</span> <span class="ident">rule_name</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Source range at which this action was applied</span>
+    <span class="kw">pub</span> <span class="ident">range</span>: <span class="ident">TextRange</span>,
+}
+
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RenameParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
     <span class="kw">pub</span> <span class="ident">symbol_at</span>: <span class="ident">TextSize</span>,
     <span class="kw">pub</span> <span class="ident">new_name</span>: <span class="ident">String</span>,
 }
 
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RenameResult</span> {
     <span class="doccomment">/// Range of source code modified by this rename operation</span>
     <span class="kw">pub</span> <span class="ident">range</span>: <span class="ident">TextRange</span>,
@@ -485,15 +683,14 @@
     <span class="kw">fn</span> <span class="ident">close_file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">CloseFileParams</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">RomeError</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Retrieves the list of diagnostics associated to a file</span>
-    <span class="kw">fn</span> <span class="ident">pull_diagnostics</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">PullDiagnosticsParams</span>)
-        -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Diagnostic</span><span class="op">&gt;</span>, <span class="ident">RomeError</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">pull_diagnostics</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">params</span>: <span class="ident">PullDiagnosticsParams</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PullDiagnosticsResult</span>, <span class="ident">RomeError</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Retrieves the list of code actions available for a given cursor</span>
     <span class="doccomment">/// position within a file</span>
-    <span class="kw">fn</span> <span class="ident">pull_actions</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">params</span>: <span class="ident">PullActionsParams</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AnalyzerAction</span><span class="op">&lt;</span><span class="ident">JsLanguage</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">RomeError</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">pull_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">PullActionsParams</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PullActionsResult</span>, <span class="ident">RomeError</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Runs the given file through the formatter using the provided options</span>
     <span class="doccomment">/// and returns the resulting source code</span>
@@ -550,17 +747,14 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pull_diagnostics</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">categories</span>: <span class="ident">RuleCategories</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Diagnostic</span><span class="op">&gt;</span>, <span class="ident">RomeError</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PullDiagnosticsResult</span>, <span class="ident">RomeError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">workspace</span>.<span class="ident">pull_diagnostics</span>(<span class="ident">PullDiagnosticsParams</span> {
             <span class="ident">path</span>: <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">clone</span>(),
             <span class="ident">categories</span>,
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pull_actions</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">range</span>: <span class="ident">TextRange</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AnalyzerAction</span><span class="op">&lt;</span><span class="ident">JsLanguage</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">RomeError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pull_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="ident">TextRange</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PullActionsResult</span>, <span class="ident">RomeError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">workspace</span>.<span class="ident">pull_actions</span>(<span class="ident">PullActionsParams</span> {
             <span class="ident">path</span>: <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">clone</span>(),
             <span class="ident">range</span>,

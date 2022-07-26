@@ -676,6 +676,7 @@
 <span id="671">671</span>
 <span id="672">672</span>
 <span id="673">673</span>
+<span id="674">674</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module is a fork of &lt;https://github.com/brendanzab/codespan&gt;</span>
 <span class="doccomment">//! adapted to use the `rome_console` markup for formatting</span>
 <span class="kw">use</span> <span class="ident">std::collections::BTreeMap</span>;
@@ -718,6 +719,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// These are ordered in the following way:</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Severity</span> {
     <span class="doccomment">/// A help message.</span>
     <span class="ident">Help</span>,

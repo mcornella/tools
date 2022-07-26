@@ -46,6 +46,9 @@
 <span id="41">41</span>
 <span id="42">42</span>
 <span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">file::FileSpan</span>, <span class="kw-2">*</span>};
 <span class="kw">use</span> <span class="ident">rome_console::MarkupBuf</span>;
 <span class="kw">use</span> <span class="ident">rome_rowan::TextRange</span>;
@@ -55,6 +58,7 @@
 <span class="doccomment">/// can be reported to the user, and can be automatically</span>
 <span class="doccomment">/// applied if it has the right [`Applicability`].</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CodeSuggestion</span> {
     <span class="doccomment">/// If the `FileId` is `None`, it&#39;s in the same file as</span>
     <span class="doccomment">/// his parent.</span>
@@ -67,12 +71,14 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SuggestionChange</span> {
     <span class="ident">Indels</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Indel</span><span class="op">&gt;</span>),
     <span class="ident">String</span>(<span class="ident">String</span>),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SuggestionStyle</span> {
     <span class="doccomment">/// Do not show the suggestion at all</span>
     <span class="ident">DontShow</span>,

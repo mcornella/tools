@@ -181,6 +181,8 @@
 <span id="176">176</span>
 <span id="177">177</span>
 <span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module contains the configuration of `rome.json`</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The configuration is divided by &quot;tool&quot;, and then it&#39;s possible to further customise it</span>
@@ -200,6 +202,8 @@
 <span class="kw">mod</span> <span class="ident">javascript</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">linter</span>;
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>)]</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">javascript</span>::{<span class="ident">deserialize_globals</span>, <span class="ident">serialize_globals</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">linter</span>::{<span class="ident">RuleConfiguration</span>, <span class="ident">Rules</span>};
 
 <span class="doccomment">/// The configuration that is contained inside the file `rome.json`</span>

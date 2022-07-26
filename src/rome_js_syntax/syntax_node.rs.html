@@ -31,7 +31,6 @@
 <span id="26">26</span>
 <span id="27">27</span>
 <span id="28">28</span>
-<span id="29">29</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module defines the Concrete Syntax Tree used by Rome.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The tree is entirely lossless, whitespace, comments, and errors are preserved.</span>
@@ -42,11 +41,10 @@
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">JsAnyRoot</span>, <span class="ident">JsSyntaxKind</span>};
 <span class="kw">use</span> <span class="ident">rome_rowan::Language</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde_crate::Serialize</span>;
+<span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>, <span class="ident">Default</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JsLanguage</span>;
 
 <span class="kw">impl</span> <span class="ident">Language</span> <span class="kw">for</span> <span class="ident">JsLanguage</span> {

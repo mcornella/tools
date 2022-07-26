@@ -801,7 +801,6 @@
 <span id="796">796</span>
 <span id="797">797</span>
 <span id="798">798</span>
-<span id="799">799</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::green::GreenElement</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::syntax::element::SyntaxElement</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::syntax::SyntaxTrivia</span>;
@@ -810,7 +809,7 @@
     <span class="ident">SyntaxToken</span>, <span class="ident">TokenAtOffset</span>, <span class="ident">WalkEvent</span>,
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde_crate::Serialize</span>;
+<span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 <span class="kw">use</span> <span class="ident">std::any::TypeId</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Formatter</span>};
 <span class="kw">use</span> <span class="ident">std::iter</span>::{<span class="self">self</span>, <span class="ident">FusedIterator</span>};
@@ -1502,7 +1501,6 @@
 <span class="doccomment">/// is stored in an [SyntaxSlot::Empty] to preserve the index of each child.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SyntaxSlot</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">Language</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Slot that stores a node child</span>
     <span class="ident">Node</span>(<span class="ident">SyntaxNode</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>),

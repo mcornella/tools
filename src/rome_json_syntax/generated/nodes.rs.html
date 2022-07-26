@@ -989,8 +989,6 @@
 <span id="984">984</span>
 <span id="985">985</span>
 <span id="986">986</span>
-<span id="987">987</span>
-<span id="988">988</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Generated file, do not edit by hand, see `xtask/codegen`</span>
 
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::enum_variant_names</span>)]</span>
@@ -1008,9 +1006,9 @@
     <span class="ident">AstNodeList</span>, <span class="ident">AstNodeListIterator</span>, <span class="ident">AstSeparatedList</span>, <span class="ident">AstSeparatedListNodesIterator</span>,
 };
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde_crate::ser::SerializeSeq</span>;
+<span class="kw">use</span> <span class="ident">serde::ser::SerializeSeq</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde_crate</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Formatter</span>};
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JsonArray</span> {
@@ -1048,7 +1046,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JsonArrayFields</span> {
     <span class="kw">pub</span> <span class="ident">l_brack_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">elements</span>: <span class="ident">JsonArrayElementList</span>,
@@ -1088,7 +1086,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JsonBooleanFields</span> {
     <span class="kw">pub</span> <span class="ident">true_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">false_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
@@ -1127,7 +1125,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JsonMemberFields</span> {
     <span class="kw">pub</span> <span class="ident">key</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">JsonString</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">colon_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
@@ -1163,7 +1161,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JsonNullFields</span> {
     <span class="kw">pub</span> <span class="ident">null_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
 }
@@ -1197,7 +1195,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JsonNumberFields</span> {
     <span class="kw">pub</span> <span class="ident">json_number_literal_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
 }
@@ -1237,7 +1235,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JsonObjectFields</span> {
     <span class="kw">pub</span> <span class="ident">l_curly_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">json_member_list</span>: <span class="ident">JsonMemberList</span>,
@@ -1273,7 +1271,7 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JsonRootFields</span> {
     <span class="kw">pub</span> <span class="ident">json_value</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">JsonValue</span><span class="op">&gt;</span>,
 }
@@ -1307,13 +1305,12 @@
         <span class="self">self</span>.<span class="ident">as_fields</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
     }
 }
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>), <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JsonStringFields</span> {
     <span class="kw">pub</span> <span class="ident">json_string_literal_token</span>: <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&gt;</span>,
 }
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">JsonValue</span> {
     <span class="ident">JsonArray</span>(<span class="ident">JsonArray</span>),
     <span class="ident">JsonBoolean</span>(<span class="ident">JsonBoolean</span>),
@@ -1779,7 +1776,6 @@
 }
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">serde</span>(<span class="kw">crate</span> <span class="op">=</span> <span class="string">&quot;serde_crate&quot;</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JsonUnknown</span> {
     <span class="ident">syntax</span>: <span class="ident">SyntaxNode</span>,
 }
