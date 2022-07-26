@@ -74,19 +74,35 @@
 <span id="69">69</span>
 <span id="70">70</span>
 <span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
 <span class="kw">mod</span> <span class="ident">rules</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::configuration::linter::rules::Rules</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::settings::LinterSettings</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rules</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>, <span class="ident">default</span>, <span class="ident">deny_unknown_fields</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LinterConfiguration</span> {
-    <span class="doccomment">/// if `false`, it disables the feature. `true` by default</span>
+    <span class="doccomment">/// if `false`, it disables the feature and the linter won&#39;t be executed. `true` by default</span>
     <span class="kw">pub</span> <span class="ident">enabled</span>: <span class="ident">bool</span>,
 
+    <span class="doccomment">/// List of rules</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">rules</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Rules</span><span class="op">&gt;</span>,
 }
@@ -95,16 +111,16 @@
     <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">enabled</span>: <span class="bool-val">true</span>,
-            <span class="ident">rules</span>: <span class="prelude-val">None</span>,
+            <span class="ident">rules</span>: <span class="prelude-val">Some</span>(<span class="ident">Rules::default</span>()),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">LinterConfiguration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LinterSettings</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">conf</span>: <span class="kw-2">&amp;</span><span class="ident">LinterConfiguration</span>) -&gt; <span class="self">Self</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">LinterConfiguration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LinterSettings</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">conf</span>: <span class="ident">LinterConfiguration</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">enabled</span>: <span class="ident">conf</span>.<span class="ident">enabled</span>,
-            <span class="ident">rules</span>: <span class="ident">conf</span>.<span class="ident">rules</span>.<span class="ident">clone</span>(),
+            <span class="ident">rules</span>: <span class="ident">conf</span>.<span class="ident">rules</span>,
         }
     }
 }
@@ -122,6 +138,18 @@
         } <span class="kw">else</span> {
             <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::Plain</span>(<span class="ident">RulePlainConfiguration::Error</span>))
         }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_disabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::WithOptions</span>(<span class="ident">rule</span>) <span class="op">=</span> <span class="self">self</span> {
+            <span class="ident">rule</span>.<span class="ident">level</span> <span class="op">==</span> <span class="ident">RulePlainConfiguration::Off</span>
+        } <span class="kw">else</span> {
+            <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::Plain</span>(<span class="ident">RulePlainConfiguration::Off</span>))
+        }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="op">!</span><span class="self">self</span>.<span class="ident">is_disabled</span>()
     }
 }
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">RuleConfiguration</span> {

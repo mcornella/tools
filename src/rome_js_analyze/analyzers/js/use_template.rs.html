@@ -342,6 +342,7 @@
 <span id="337">337</span>
 <span id="338">338</span>
 <span id="339">339</span>
+<span id="340">340</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_analyze::RuleSuppressions</span>;
 <span class="kw">use</span> <span class="ident">rome_analyze</span>::{
     <span class="ident">context::RuleContext</span>, <span class="ident">declare_rule</span>, <span class="ident">ActionCategory</span>, <span class="ident">Ast</span>, <span class="ident">Rule</span>, <span class="ident">RuleCategory</span>, <span class="ident">RuleDiagnostic</span>,
@@ -393,7 +394,8 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">UseTemplate</span> {
         <span class="ident">version</span>: <span class="string">&quot;0.7.0&quot;</span>,
-        <span class="ident">name</span>: <span class="string">&quot;useTemplate&quot;</span>
+        <span class="ident">name</span>: <span class="string">&quot;useTemplate&quot;</span>,
+        <span class="ident">recommended</span>: <span class="bool-val">true</span>
     }
 }
 

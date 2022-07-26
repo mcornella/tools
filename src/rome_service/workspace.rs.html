@@ -405,8 +405,6 @@
 <span id="400">400</span>
 <span id="401">401</span>
 <span id="402">402</span>
-<span id="403">403</span>
-<span id="404">404</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The [Workspace] is the main entry point for high-level clients (the Rome</span>
 <span class="doccomment">//! CLI and Language Server) into the various language-specific services of the</span>
 <span class="doccomment">//! Rome toolchain (parser, formatter, analyzer ...)</span>
@@ -460,18 +458,16 @@
 <span class="doccomment">//! document does not implement the required capability: for instance trying to</span>
 <span class="doccomment">//! format a file with a language that does not have a formatter</span>
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">panic::RefUnwindSafe</span>};
-
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::settings::WorkspaceSettings</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::RomeError</span>;
 <span class="kw">use</span> <span class="ident">rome_analyze::ActionCategory</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rome_analyze::RuleCategories</span>;
 <span class="kw">use</span> <span class="ident">rome_diagnostics</span>::{<span class="ident">CodeSuggestion</span>, <span class="ident">Diagnostic</span>};
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">IndentStyle</span>, <span class="ident">Printed</span>};
 <span class="kw">use</span> <span class="ident">rome_fs::RomePath</span>;
 <span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{<span class="ident">TextRange</span>, <span class="ident">TextSize</span>};
 <span class="kw">use</span> <span class="ident">rome_text_edit::Indel</span>;
-
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">settings::WorkspaceSettings</span>, <span class="ident">RomeError</span>};
-
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rome_analyze::RuleCategories</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">panic::RefUnwindSafe</span>};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">server</span>;
 

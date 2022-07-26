@@ -136,6 +136,7 @@
 <span id="131">131</span>
 <span id="132">132</span>
 <span id="133">133</span>
+<span id="134">134</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_analyze</span>::{
     <span class="ident">context::RuleContext</span>, <span class="ident">declare_rule</span>, <span class="ident">ActionCategory</span>, <span class="ident">Ast</span>, <span class="ident">Rule</span>, <span class="ident">RuleCategory</span>, <span class="ident">RuleDiagnostic</span>,
 };
@@ -183,7 +184,8 @@
     <span class="doccomment">///```</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">NoImplicitBoolean</span> {
         <span class="ident">version</span>: <span class="string">&quot;0.7.0&quot;</span>,
-        <span class="ident">name</span>: <span class="string">&quot;noImplicitBoolean&quot;</span>
+        <span class="ident">name</span>: <span class="string">&quot;noImplicitBoolean&quot;</span>,
+        <span class="ident">recommended</span>: <span class="bool-val">true</span>
     }
 }
 

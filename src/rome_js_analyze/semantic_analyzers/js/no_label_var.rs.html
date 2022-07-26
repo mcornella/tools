@@ -77,6 +77,7 @@
 <span id="72">72</span>
 <span id="73">73</span>
 <span id="74">74</span>
+<span id="75">75</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">semantic_services::Semantic</span>, <span class="ident">JsRuleAction</span>};
 <span class="kw">use</span> <span class="ident">rome_analyze</span>::{<span class="ident">context::RuleContext</span>, <span class="ident">declare_rule</span>, <span class="ident">Rule</span>, <span class="ident">RuleCategory</span>, <span class="ident">RuleDiagnostic</span>};
 <span class="kw">use</span> <span class="ident">rome_console::markup</span>;
@@ -103,7 +104,8 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">NoLabelVar</span> {
         <span class="ident">version</span>: <span class="string">&quot;0.7.0&quot;</span>,
-        <span class="ident">name</span>: <span class="string">&quot;noLabelVar&quot;</span>
+        <span class="ident">name</span>: <span class="string">&quot;noLabelVar&quot;</span>,
+        <span class="ident">recommended</span>: <span class="bool-val">true</span>
     }
 }
 

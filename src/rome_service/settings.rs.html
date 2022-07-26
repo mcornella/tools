@@ -195,14 +195,12 @@
 <span id="190">190</span>
 <span id="191">191</span>
 <span id="192">192</span>
-<span id="193">193</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">indexmap::IndexSet</span>;
-<span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">RwLock</span>, <span class="ident">RwLockReadGuard</span>};
-
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Configuration</span>, <span class="ident">Rules</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Configuration</span>, <span class="ident">Rules</span>};
+<span class="kw">use</span> <span class="ident">indexmap::IndexSet</span>;
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">IndentStyle</span>, <span class="ident">LineWidth</span>};
 <span class="kw">use</span> <span class="ident">rome_fs::RomePath</span>;
 <span class="kw">use</span> <span class="ident">rome_js_syntax::JsLanguage</span>;
+<span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">RwLock</span>, <span class="ident">RwLockReadGuard</span>};
 
 <span class="doccomment">/// Global settings for the entire workspace</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
@@ -223,7 +221,7 @@
     <span class="doccomment">/// The (configuration)[Configuration] is merged into the workspace</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge_with_configuration</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">configuration</span>: <span class="ident">Configuration</span>) {
         <span class="comment">// formatter part</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">formatter</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">configuration</span>.<span class="ident">formatter</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">formatter</span>) <span class="op">=</span> <span class="ident">configuration</span>.<span class="ident">formatter</span> {
             <span class="self">self</span>.<span class="ident">format</span> <span class="op">=</span> <span class="ident">FormatSettings::from</span>(<span class="ident">formatter</span>);
         }
         <span class="kw">let</span> <span class="ident">formatter</span> <span class="op">=</span> <span class="ident">configuration</span>
@@ -235,7 +233,7 @@
         }
 
         <span class="comment">// linter part</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">linter</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">configuration</span>.<span class="ident">linter</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">linter</span>) <span class="op">=</span> <span class="ident">configuration</span>.<span class="ident">linter</span> {
             <span class="self">self</span>.<span class="ident">linter</span> <span class="op">=</span> <span class="ident">LinterSettings::from</span>(<span class="ident">linter</span>)
         }
 

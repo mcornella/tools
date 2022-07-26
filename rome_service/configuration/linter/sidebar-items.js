@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["RuleConfiguration",""],["RulePlainConfiguration",""]],"struct":[["LinterConfiguration",""],["RuleWithOptions",""],["Rules",""]]});
+initSidebarItems({"enum":[["RuleConfiguration",""],["RulePlainConfiguration",""]],"struct":[["Js",""],["Jsx",""],["LinterConfiguration",""],["Regex",""],["RuleWithOptions",""],["Rules",""],["Ts",""]]});

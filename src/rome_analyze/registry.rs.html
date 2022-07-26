@@ -323,6 +323,10 @@
 <span id="318">318</span>
 <span id="319">319</span>
 <span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow</span>, <span class="ident">collections::BTreeMap</span>};
 
 <span class="kw">use</span> <span class="ident">rome_rowan</span>::{<span class="ident">AstNode</span>, <span class="ident">Language</span>, <span class="ident">RawSyntaxKind</span>, <span class="ident">SyntaxKind</span>, <span class="ident">SyntaxNode</span>};
@@ -438,6 +442,7 @@
                 <span class="ident">version</span>: <span class="ident">R::VERSION</span>,
                 <span class="ident">docs</span>: <span class="ident">R::DOCS</span>,
                 <span class="ident">deprecated</span>: <span class="ident">R::DEPRECATED</span>,
+                <span class="ident">recommended</span>: <span class="ident">R::RECOMMENDED</span>,
             },
         );
     }
@@ -453,6 +458,7 @@
                 <span class="ident">docs</span>: <span class="ident">value</span>.<span class="ident">docs</span>,
                 <span class="ident">version</span>: <span class="ident">value</span>.<span class="ident">version</span>,
                 <span class="ident">deprecated</span>: <span class="ident">value</span>.<span class="ident">deprecated</span>,
+                <span class="ident">recommended</span>: <span class="ident">value</span>.<span class="ident">recommended</span>,
             }
         })
     }
@@ -543,6 +549,7 @@
     <span class="ident">version</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
     <span class="ident">docs</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
     <span class="ident">deprecated</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="ident">recommended</span>: <span class="ident">bool</span>,
 }
 
 <span class="doccomment">/// Metadata entry for a rule in the registry</span>
@@ -552,6 +559,7 @@
     <span class="kw">pub</span> <span class="ident">docs</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
     <span class="kw">pub</span> <span class="ident">version</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
     <span class="kw">pub</span> <span class="ident">deprecated</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">recommended</span>: <span class="ident">bool</span>,
 }
 
 <span class="doccomment">/// Internal representation of a single rule in the registry</span>
