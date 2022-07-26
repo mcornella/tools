@@ -18,6 +18,7 @@ impl FormatNodeRule<TsTemplateLiteralType> for FormatTsTemplateLiteralType {
         write![
             f,
             [
+                line_suffix_boundary(),
                 l_tick_token.format(),
                 elements.format(),
                 r_tick_token.format(),

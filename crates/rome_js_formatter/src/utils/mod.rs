@@ -26,11 +26,13 @@ use rome_formatter::{
     format_args, normalize_newlines, write, Buffer, Comments, CstFormatContext, VecBuffer,
 };
 use rome_js_syntax::{
-    JsAnyExpression, JsAnyFunction, JsAnyStatement, JsInitializerClause, JsLanguage,
-    JsTemplateElement, Modifiers, TsTemplateElement, TsType,
+    JsAnyExpression, JsAnyFunction, JsAnyStatement, JsComputedMemberExpression,
+    JsConditionalExpression, JsInitializerClause, JsLanguage, JsSequenceExpression,
+    JsStaticMemberExpression, JsTemplateElement, Modifiers, TsConditionalType, TsTemplateElement,
+    TsType,
 };
 use rome_js_syntax::{JsSyntaxKind, JsSyntaxNode, JsSyntaxToken};
-use rome_rowan::{AstNode, AstNodeList, Direction, SyntaxResult};
+use rome_rowan::{declare_node_union, AstNode, AstNodeList, Direction, SyntaxNode, SyntaxResult};
 
 pub(crate) use typescript::should_hug_type;
 
@@ -211,14 +213,6 @@ pub(crate) fn format_template_chunk(chunk: JsSyntaxToken, f: &mut JsFormatter) -
     )
 }
 
-/// Function to format template literals and template literal types
-pub(crate) fn format_template_literal(
-    literal: TemplateElement,
-    formatter: &mut JsFormatter,
-) -> FormatResult<()> {
-    write!(formatter, [literal])
-}
-
 pub(crate) enum TemplateElement {
     Js(JsTemplateElement),
     Ts(TsTemplateElement),
@@ -226,29 +220,50 @@ pub(crate) enum TemplateElement {
 
 impl Format<JsFormatContext> for TemplateElement {
     fn fmt(&self, f: &mut JsFormatter) -> FormatResult<()> {
-        let expression_is_plain = self.is_plain_expression(&f.context().comments())?;
-        // FIXME check if should hard group is still necessary
-        let has_comments = self.has_comments();
-        let should_hard_group = expression_is_plain && !has_comments;
+        let comments = f.context().comments();
+        let is_simple = self.is_plain_expression(&comments)?;
 
-        let content = format_with(|f| match self {
-            TemplateElement::Js(template) => {
-                write!(f, [template.expression().format()])
-            }
-            TemplateElement::Ts(template) => {
-                write!(f, [template.ty().format()])
-            }
-        });
+        write!(
+            f,
+            [group_elements(&format_args![
+                self.dollar_curly_token().format(),
+                format_with(|f: &mut JsFormatter| {
+                    let format_expression = format_with(|f| match self {
+                        TemplateElement::Js(template) => {
+                            write!(f, [template.expression().format()])
+                        }
+                        TemplateElement::Ts(template) => {
+                            write!(f, [template.ty().format()])
+                        }
+                    });
 
-        write!(f, [self.dollar_curly_token().format()])?;
+                    if !is_simple {
+                        let expression = self.expression()?;
 
-        if should_hard_group {
-            write!(f, [content])?;
-        } else {
-            write!(f, [soft_block_indent(&content)])?;
-        }
-
-        write!(f, [line_suffix_boundary(), self.r_curly_token().format()])
+                        if comments.has_comments(&expression)
+                            || matches!(
+                                expression.kind(),
+                                JsSyntaxKind::JS_STATIC_MEMBER_EXPRESSION
+                                    | JsSyntaxKind::JS_COMPUTED_MEMBER_EXPRESSION
+                                    | JsSyntaxKind::JS_CONDITIONAL_EXPRESSION
+                                    | JsSyntaxKind::JS_SEQUENCE_EXPRESSION
+                                    | JsSyntaxKind::TS_CONDITIONAL_TYPE
+                                    | JsSyntaxKind::TS_AS_EXPRESSION
+                            )
+                            || JsAnyBinaryLikeExpression::can_cast(expression.kind())
+                        {
+                            write!(f, [soft_block_indent(&format_expression)])
+                        } else {
+                            write!(f, [format_expression])
+                        }
+                    } else {
+                        write!(f, [format_expression])
+                    }
+                }),
+                line_suffix_boundary(),
+                self.r_curly_token().format()
+            ])]
+        )
     }
 }
 
@@ -277,10 +292,21 @@ impl TemplateElement {
         match self {
             TemplateElement::Js(template_element) => {
                 let current_expression = template_element.expression()?;
+
+                if comments.has_comments(current_expression.syntax()) {
+                    return Ok(false);
+                }
+
                 match current_expression {
-                    JsAnyExpression::JsStaticMemberExpression(_)
-                    | JsAnyExpression::JsComputedMemberExpression(_)
-                    | JsAnyExpression::JsIdentifierExpression(_)
+                    JsAnyExpression::JsStaticMemberExpression(expression) => {
+                        JsAnyMemberExpression::from(expression)
+                            .is_simple_template_expression(comments)
+                    }
+                    JsAnyExpression::JsComputedMemberExpression(expression) => {
+                        JsAnyMemberExpression::from(expression)
+                            .is_simple_template_expression(comments)
+                    }
+                    JsAnyExpression::JsIdentifierExpression(_)
                     | JsAnyExpression::JsAnyLiteralExpression(_)
                     | JsAnyExpression::JsCallExpression(_) => Ok(true),
 
@@ -306,21 +332,69 @@ impl TemplateElement {
                 }
             }
             TemplateElement::Ts(template_element) => {
+                if comments.has_comments(template_element.syntax()) {
+                    return Ok(false);
+                }
+
                 let is_mapped_type = matches!(template_element.ty()?, TsType::TsMappedType(_));
                 Ok(!is_mapped_type)
             }
         }
     }
 
-    fn has_comments(&self) -> bool {
+    fn expression(&self) -> SyntaxResult<SyntaxNode<JsLanguage>> {
         match self {
-            TemplateElement::Js(template_element) => {
-                template_element.syntax().has_comments_descendants()
+            TemplateElement::Js(template) => template.expression().map(|node| node.into_syntax()),
+            TemplateElement::Ts(template) => template.ty().map(|node| node.into_syntax()),
+        }
+    }
+
+    fn syntax(&self) -> &SyntaxNode<JsLanguage> {
+        match self {
+            TemplateElement::Js(template_element) => template_element.syntax(),
+            TemplateElement::Ts(template_element) => template_element.syntax(),
+        }
+    }
+}
+
+declare_node_union! {
+    JsAnyMemberExpression = JsStaticMemberExpression
+        | JsComputedMemberExpression
+}
+
+impl JsAnyMemberExpression {
+    fn object_syntax(&self) -> SyntaxResult<SyntaxNode<JsLanguage>> {
+        match self {
+            JsAnyMemberExpression::JsStaticMemberExpression(static_member) => {
+                static_member.object().map(|node| node.into_syntax())
             }
-            TemplateElement::Ts(template_element) => {
-                template_element.syntax().has_comments_descendants()
+            JsAnyMemberExpression::JsComputedMemberExpression(computed) => {
+                computed.object().map(|node| node.into_syntax())
             }
         }
+    }
+
+    fn is_simple_template_expression(&self, comments: &Comments<JsLanguage>) -> FormatResult<bool> {
+        if comments.has_comments(self.syntax()) {
+            return Ok(false);
+        }
+
+        let mut object = self.syntax().clone();
+
+        while JsAnyMemberExpression::can_cast(object.kind()) {
+            let member_expression = JsAnyMemberExpression::unwrap_cast(object);
+
+            object = member_expression.object_syntax()?;
+
+            if comments.has_trailing_comments(&object) {
+                return Ok(false);
+            }
+        }
+
+        Ok(matches!(
+            object.kind(),
+            JsSyntaxKind::JS_IDENTIFIER_EXPRESSION | JsSyntaxKind::JS_THIS_EXPRESSION
+        ))
     }
 }
 
