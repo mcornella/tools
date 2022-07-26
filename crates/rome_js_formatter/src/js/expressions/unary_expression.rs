@@ -2,8 +2,8 @@ use crate::prelude::*;
 use crate::utils::is_simple_expression;
 use rome_formatter::{write, CstFormatContext};
 
-use rome_js_syntax::JsPreUpdateOperator;
 use rome_js_syntax::{JsAnyExpression, JsUnaryExpression};
+use rome_js_syntax::{JsAnyLiteralExpression, JsPreUpdateOperator};
 use rome_js_syntax::{JsUnaryExpressionFields, JsUnaryOperator};
 
 #[derive(Debug, Clone, Default)]
@@ -35,7 +35,7 @@ impl FormatNodeRule<JsUnaryExpression> for FormatJsUnaryExpression {
 
         // Parenthesize the inner expression if it's a binary or pre-update
         // operation with an ambiguous operator (+ and ++ or - and --)
-        let is_ambiguous_expression = match &argument {
+        let parenthesize = match &argument {
             JsAnyExpression::JsUnaryExpression(expr) => {
                 let inner_op = expr.operator()?;
                 matches!(
@@ -52,10 +52,17 @@ impl FormatNodeRule<JsUnaryExpression> for FormatJsUnaryExpression {
                         | (JsUnaryOperator::Minus, JsPreUpdateOperator::Decrement)
                 )
             }
+            // Add parentheses around the number literal for `-/* comment */ 40;
+            JsAnyExpression::JsAnyLiteralExpression(
+                JsAnyLiteralExpression::JsNumberLiteralExpression(number_literal),
+            ) => f
+                .context()
+                .comments()
+                .has_leading_comments(number_literal.syntax()),
             _ => false,
         };
 
-        if is_ambiguous_expression {
+        if parenthesize {
             operator_token.format().fmt(f)?;
 
             let format_argument = argument.format();
