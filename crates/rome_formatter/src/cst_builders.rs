@@ -18,6 +18,9 @@ pub struct FormatLeadingNodeComments<'a, L: Language> {
     node: &'a SyntaxNode<L>,
 }
 
+struct Start;
+struct End;
+
 impl<Context> Format<Context> for FormatLeadingNodeComments<'_, Context::Language>
 where
     Context: CstFormatContext,
@@ -27,7 +30,13 @@ where
         let leading_comments = comments.leading_comments(self.node);
 
         for comment in leading_comments.iter() {
-            write!(f, [comment.piece()])?;
+            write!(
+                f,
+                [
+                    labelled(LabelId::of::<Start>(), &format_with(|f| Ok(()))),
+                    comment.piece()
+                ]
+            )?;
 
             match comment.kind() {
                 CommentKind::Block | CommentKind::InlineBlock => {
@@ -48,6 +57,10 @@ where
                     _ => write!(f, [empty_line()])?,
                 },
             }
+            write!(
+                f,
+                [labelled(LabelId::of::<End>(), &format_with(|f| Ok(()))),]
+            )?;
         }
 
         Ok(())

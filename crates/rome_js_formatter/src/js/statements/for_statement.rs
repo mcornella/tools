@@ -2,7 +2,6 @@ use crate::prelude::*;
 use rome_formatter::write;
 
 use crate::utils::FormatBodyStatement;
-use rome_js_syntax::JsAnyStatement;
 use rome_js_syntax::JsForStatement;
 use rome_js_syntax::JsForStatementFields;
 

@@ -7,16 +7,17 @@ use rome_js_syntax::suppression::{parse_suppression_comment, SuppressionCategory
 
 use crate::utils::JsAnyAssignmentLike;
 use rome_js_syntax::{
-    JsAnyClass, JsAnyExpression, JsAnyParameter, JsArrayExpression, JsArrayHole,
-    JsAssignmentExpression, JsBlockStatement, JsBreakStatement, JsCallArguments,
-    JsConditionalExpression, JsContinueStatement, JsDefaultClause, JsFormalParameter,
-    JsFunctionBody, JsImportAssertionEntry, JsInitializerClause, JsLanguage,
-    JsNamedImportSpecifiers, JsObjectExpression, JsObjectMemberList, JsParameters,
-    JsPropertyObjectMember, JsStaticMemberExpression, JsSyntaxKind, SourceType, TsConditionalType,
-    TsEnumDeclaration, TsInterfaceDeclaration,
+    JsAnyArrayElement, JsAnyClass, JsAnyExpression, JsArrayAssignmentPattern,
+    JsArrayBindingPattern, JsArrayBindingPatternElementList, JsArrayExpression, JsArrayHole,
+    JsAssignmentExpression, JsBlockStatement, JsCallArguments, JsConditionalExpression,
+    JsDefaultClause, JsFormalParameter, JsFunctionBody, JsImportAssertionEntry,
+    JsInitializerClause, JsLanguage, JsNamedImportSpecifiers, JsObjectExpression, JsParameters,
+    JsStaticMemberExpression, JsSyntaxKind, JsSyntaxNode, JsSyntaxToken, SourceType,
+    TsConditionalType, TsEnumDeclaration, TsInterfaceDeclaration,
 };
 use rome_rowan::{
-    AstNode, AstNodeList, AstSeparatedList, Direction, SyntaxElement, SyntaxTriviaPieceComments,
+    declare_node_union, AstNode, AstNodeList, AstSeparatedList, Direction, SyntaxElement,
+    SyntaxNode, SyntaxResult, SyntaxToken, SyntaxTriviaPieceComments,
 };
 use std::fmt;
 use std::fmt::Debug;
@@ -368,8 +369,6 @@ impl CommentStyle<JsLanguage> for JsCommentStyle {
             }
         }
 
-        dbg!(&comment);
-
         if let Some(preceding_node) = comment.preceding_node() {
             if JsArrayHole::can_cast(preceding_node.kind()) {
                 return CommentPosition::Leading {
@@ -379,72 +378,9 @@ impl CommentStyle<JsLanguage> for JsCommentStyle {
             }
         }
 
-        // Handle comments before the `}` token
-        //
-        // ```javascript
-        // import {
-        //  loooooooooooooooooooong2 as moreeeeeeloooooooooooooooooooong2,
-        //  // some other comment
-        // } from "test";
-        // ```
-        if JsNamedImportSpecifiers::can_cast(enclosing_node.kind()) {
-            let import_specifiers = JsNamedImportSpecifiers::unwrap_cast(enclosing_node.clone());
-
-            if import_specifiers.r_curly_token().as_ref() == Ok(comment.following_token()) {
-                if let Some(Ok(last_specifier)) = import_specifiers.specifiers().iter().last() {
-                    return CommentPosition::Trailing {
-                        node: last_specifier.into_syntax(),
-                        comment,
-                    };
-                }
-            }
-        }
-        // Handles comments before the `]` token
-        //
-        // ```javascript
-        // let example = [
-        // 	"FOO",
-        // 	"BAR",
-        // 	// Comment
-        // ];
-        // ```
-        // Makes the comment before the `]` a trailing comment of the last element.
-        else if JsArrayExpression::can_cast(enclosing_node.kind()) {
-            let array_expression = JsArrayExpression::unwrap_cast(enclosing_node.clone());
-
-            if array_expression.r_brack_token().as_ref() == Ok(comment.following_token()) {
-                if let Some(Ok(last_element)) = array_expression.elements().iter().last() {
-                    return CommentPosition::Trailing {
-                        node: last_element.into_syntax(),
-                        comment,
-                    };
-                }
-            }
-        }
-        // Handles comments before the `}` token
-        //
-        // ```javascript
-        // o = {
-        //   state,
-        //   // Comment
-        // };
-        // ```
-        // Makes the comment before the `}` a trailing comment of the last member.
-        else if JsObjectExpression::can_cast(enclosing_node.kind()) {
-            let object_expression = JsObjectExpression::unwrap_cast(enclosing_node.clone());
-
-            if object_expression.r_curly_token().as_ref() == Ok(comment.following_token()) {
-                if let Some(Ok(last_member)) = object_expression.members().iter().last() {
-                    return CommentPosition::Trailing {
-                        node: last_member.into_syntax(),
-                        comment,
-                    };
-                }
-            }
-        }
         // Push comments between `key` and `colon` or `colon` and `value` to the end to prevent that they
         // get formatted as dangling comments.
-        else if JsImportAssertionEntry::can_cast(enclosing_node.kind())
+        if JsImportAssertionEntry::can_cast(enclosing_node.kind())
             && comment.following_node().is_none()
         {
             return CommentPosition::Trailing {
@@ -470,38 +406,6 @@ impl CommentStyle<JsLanguage> for JsCommentStyle {
                 node: enclosing_node.clone(),
                 comment,
             };
-        } else if JsCallArguments::can_cast(enclosing_node.kind()) {
-            let arguments = JsCallArguments::unwrap_cast(enclosing_node.clone());
-
-            if arguments.r_paren_token().as_ref() == Ok(comment.following_token()) {
-                // Make line comments inside of an empty call arguments trailing comments of the call arguments
-                // so that they get moved out of the parentheses.
-                // ```javascript
-                // expect( // remains a dangling comment
-                //     // test
-                // )
-                // ```
-                // becomes
-                // ```javascript
-                // expect(); // remains a dangling comment
-                // // test
-                // ```
-                if arguments.args().is_empty() && comment.kind().is_line() {
-                    return CommentPosition::Trailing {
-                        node: arguments.into_syntax(),
-                        comment,
-                    };
-                }
-
-                // Makes the last comment in a non-empty call arguments list a trailing comemnt of the
-                // last argument
-                if let Some(Ok(last_argument)) = arguments.args().iter().last() {
-                    return CommentPosition::Trailing {
-                        node: last_argument.into_syntax(),
-                        comment,
-                    };
-                }
-            }
         }
         // Moves leading comments of `?` and `:` for conditional expressions to the following node if they are part of
         // the tokens leading trivia (not if they are on the same line as the trivia)
@@ -522,17 +426,6 @@ impl CommentStyle<JsLanguage> for JsCommentStyle {
                     node: consequent_or_alternate,
                     comment,
                 };
-            }
-        } else if JsParameters::can_cast(enclosing_node.kind()) {
-            let parameters = JsParameters::unwrap_cast(enclosing_node);
-
-            if parameters.r_paren_token().as_ref() == Ok(comment.following_token()) {
-                if let Some(Ok(last_parameter)) = parameters.items().iter().last() {
-                    return CommentPosition::Trailing {
-                        node: last_parameter.into_syntax(),
-                        comment,
-                    };
-                }
             }
         }
         // Adds comments trailing after the `:` of a default case as dangling comments EXCEPT if the body is
@@ -633,6 +526,163 @@ impl CommentStyle<JsLanguage> for JsCommentStyle {
             }
         }
 
+        match comment.following_token().kind() {
+            JsSyntaxKind::R_BRACK => {
+                // Handles comments before the `]` token of an array
+                //
+                // ```javascript
+                // let example = [
+                // 	"FOO",
+                // 	"BAR",
+                // 	// Comment
+                // ];
+                // ```
+                // Makes the comment before the `]` a trailing comment of the last element.
+                if !comment.is_trailing_token_trivia()
+                    && JsAnyArrayLike::can_cast(enclosing_node.kind())
+                {
+                    let array = JsAnyArrayLike::unwrap_cast(enclosing_node.clone());
+
+                    if let Some(Ok(last_element)) = array.last_element() {
+                        if last_element.kind() == JsSyntaxKind::JS_ARRAY_HOLE {
+                            return CommentPosition::Leading {
+                                node: last_element,
+                                comment,
+                            };
+                        } else {
+                            return CommentPosition::Trailing {
+                                node: last_element,
+                                comment,
+                            };
+                        }
+                    }
+                }
+                // Handles trailing comments after the last array element before the `]` token.
+                else if matches!(
+                    enclosing_node.kind(),
+                    JsSyntaxKind::JS_ARRAY_ELEMENT_LIST
+                        | JsSyntaxKind::JS_ARRAY_BINDING_PATTERN_ELEMENT_LIST
+                        | JsSyntaxKind::JS_ARRAY_ASSIGNMENT_PATTERN_ELEMENT_LIST
+                ) {
+                    if let Some(last_element) = enclosing_node.last_child() {
+                        if last_element.kind() == JsSyntaxKind::JS_ARRAY_HOLE {
+                            return CommentPosition::Leading {
+                                node: last_element,
+                                comment,
+                            };
+                        }
+                    }
+                }
+            }
+            JsSyntaxKind::R_CURLY => {
+                if JsCallArguments::can_cast(enclosing_node.kind()) {
+                    let arguments = JsCallArguments::unwrap_cast(enclosing_node.clone());
+
+                    // Make line comments inside of an empty call arguments trailing comments of the call arguments
+                    // so that they get moved out of the parentheses.
+                    // ```javascript
+                    // expect( // remains a dangling comment
+                    //     // test
+                    // )
+                    // ```
+                    // becomes
+                    // ```javascript
+                    // expect(); // remains a dangling comment
+                    // // test
+                    // ```
+                    if arguments.args().is_empty() && comment.kind().is_line() {
+                        return CommentPosition::Trailing {
+                            node: arguments.into_syntax(),
+                            comment,
+                        };
+                    }
+
+                    // Makes the last comment in a non-empty call arguments list a trailing comemnt of the
+                    // last argument
+                    if let Some(Ok(last_argument)) = arguments.args().iter().last() {
+                        return CommentPosition::Trailing {
+                            node: last_argument.into_syntax(),
+                            comment,
+                        };
+                    }
+                }
+                // Handles comments before the `}` token
+                //
+                // ```javascript
+                // o = {
+                //   state,
+                //   // Comment
+                // };
+                // ```
+                // Makes the comment before the `}` a trailing comment of the last member.
+                else if JsObjectExpression::can_cast(enclosing_node.kind()) {
+                    let object_expression = JsObjectExpression::unwrap_cast(enclosing_node.clone());
+
+                    if let Some(Ok(last_member)) = object_expression.members().iter().last() {
+                        return CommentPosition::Trailing {
+                            node: last_member.into_syntax(),
+                            comment,
+                        };
+                    }
+                }
+                // Handle comments before the `}` token
+                //
+                // ```javascript
+                // import {
+                //  loooooooooooooooooooong2 as moreeeeeeloooooooooooooooooooong2,
+                //  // some other comment
+                // } from "test";
+                // ```
+                else if JsNamedImportSpecifiers::can_cast(enclosing_node.kind()) {
+                    let import_specifiers =
+                        JsNamedImportSpecifiers::unwrap_cast(enclosing_node.clone());
+
+                    if let Some(Ok(last_specifier)) = import_specifiers.specifiers().iter().last() {
+                        return CommentPosition::Trailing {
+                            node: last_specifier.into_syntax(),
+                            comment,
+                        };
+                    }
+                }
+            }
+            JsSyntaxKind::R_PAREN => {
+                if JsParameters::can_cast(enclosing_node.kind()) {
+                    let parameters = JsParameters::unwrap_cast(enclosing_node.clone());
+
+                    if let Some(Ok(last_parameter)) = parameters.items().iter().last() {
+                        return CommentPosition::Trailing {
+                            node: last_parameter.into_syntax(),
+                            comment,
+                        };
+                    }
+                } else if JsCallArguments::can_cast(enclosing_node.kind()) {
+                    let arguments = JsCallArguments::unwrap_cast(enclosing_node.clone());
+
+                    if let Some(Ok(last_argument)) = arguments.args().iter().last() {
+                        return CommentPosition::Trailing {
+                            node: last_argument.into_syntax(),
+                            comment,
+                        };
+                    } else if comment.kind().is_line() {
+                        // Makes line comments of call expressions without arguments trailing comments of the
+                        // callee
+                        if let Some(parent) = enclosing_node.parent() {
+                            if matches!(
+                                parent.kind(),
+                                JsSyntaxKind::JS_NEW_EXPRESSION | JsSyntaxKind::JS_CALL_EXPRESSION
+                            ) {
+                                return CommentPosition::Trailing {
+                                    node: parent,
+                                    comment,
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            _ => {}
+        }
+
         CommentPosition::Default(comment)
     }
 
@@ -645,6 +695,35 @@ impl CommentStyle<JsLanguage> for JsCommentStyle {
             }
         } else {
             CommentKind::Line
+        }
+    }
+}
+
+declare_node_union! {
+    JsAnyArrayLike = JsArrayExpression
+        | JsArrayAssignmentPattern
+        | JsArrayBindingPattern
+}
+
+impl JsAnyArrayLike {
+    fn last_element(&self) -> Option<SyntaxResult<JsSyntaxNode>> {
+        match self {
+            JsAnyArrayLike::JsArrayExpression(array) => match array.elements().iter().last() {
+                Some(Ok(element)) => Some(Ok(element.into_syntax())),
+                Some(Err(error)) => Some(Err(error)),
+                None => None,
+            },
+            JsAnyArrayLike::JsArrayAssignmentPattern(array) => match array.elements().iter().last()
+            {
+                Some(Ok(element)) => Some(Ok(element.into_syntax())),
+                Some(Err(error)) => Some(Err(error)),
+                None => None,
+            },
+            JsAnyArrayLike::JsArrayBindingPattern(array) => match array.elements().iter().last() {
+                Some(Ok(element)) => Some(Ok(element.into_syntax())),
+                Some(Err(error)) => Some(Err(error)),
+                None => None,
+            },
         }
     }
 }

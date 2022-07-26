@@ -26,13 +26,12 @@ use rome_formatter::{
     format_args, normalize_newlines, write, Buffer, Comments, CstFormatContext, VecBuffer,
 };
 use rome_js_syntax::{
-    JsAnyExpression, JsAnyFunction, JsAnyStatement, JsCallArgumentList, JsCallArguments,
-    JsComputedMemberExpression, JsConditionalExpression, JsInitializerClause, JsLanguage,
-    JsSequenceExpression, JsStaticMemberExpression, JsTemplateElement, Modifiers,
-    TsConditionalType, TsTemplateElement, TsType,
+    JsAnyExpression, JsAnyFunction, JsAnyStatement, JsCallArgumentList, JsComputedMemberExpression,
+    JsInitializerClause, JsLanguage, JsStaticMemberExpression, JsTemplateElement, Modifiers,
+    TsTemplateElement, TsType,
 };
 use rome_js_syntax::{JsSyntaxKind, JsSyntaxNode, JsSyntaxToken};
-use rome_rowan::{declare_node_union, AstNode, AstNodeList, Direction, SyntaxNode, SyntaxResult};
+use rome_rowan::{declare_node_union, AstNode, AstNodeList, SyntaxNode, SyntaxResult};
 
 pub(crate) use typescript::should_hug_type;
 
@@ -106,42 +105,6 @@ impl Format<JsFormatContext> for FormatInterpreterToken<'_> {
             Ok(())
         }
     }
-}
-
-/// Returns true if this node contains "printable" trivias: comments
-/// or empty lines (2 consecutive newlines only separated by whitespace)
-pub(crate) fn has_formatter_trivia(node: &JsSyntaxNode) -> bool {
-    let mut line_count = 0;
-
-    for token in node.descendants_tokens(Direction::Next) {
-        for trivia in token.leading_trivia().pieces() {
-            if trivia.is_comments() {
-                return true;
-            } else if trivia.is_newline() {
-                line_count += 1;
-                if line_count >= 2 {
-                    return true;
-                }
-            }
-        }
-
-        // This is where the token would be,
-        // reset the consecutive newline counter
-        line_count = 0;
-
-        for trivia in token.trailing_trivia().pieces() {
-            if trivia.is_comments() {
-                return true;
-            } else if trivia.is_newline() {
-                line_count += 1;
-                if line_count >= 2 {
-                    return true;
-                }
-            }
-        }
-    }
-
-    false
 }
 
 /// Returns true if this node contains newlines in trivias.
@@ -346,13 +309,6 @@ impl TemplateElement {
         match self {
             TemplateElement::Js(template) => template.expression().map(|node| node.into_syntax()),
             TemplateElement::Ts(template) => template.ty().map(|node| node.into_syntax()),
-        }
-    }
-
-    fn syntax(&self) -> &SyntaxNode<JsLanguage> {
-        match self {
-            TemplateElement::Js(template_element) => template_element.syntax(),
-            TemplateElement::Ts(template_element) => template_element.syntax(),
         }
     }
 }

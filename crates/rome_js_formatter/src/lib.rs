@@ -701,21 +701,9 @@ mod test {
     // use this test check if your snippet prints as you wish, without using a snapshot
     fn quick_test() {
         let src = r#"
-function MyComponent(props) {
-  useEffect(
-    () => {
-      console.log("some code", props.foo);
-    },
-
-    // We need to disable the eslint warning here,
-    // because of some complicated reason.
-    // eslint-disable line react-hooks/exhaustive-deps
-    []
-  );
-
-  return null;
-}
-
+c = [
+  - /**/ 66, 66, 57, 45, 47, 33, 53, 82, 81, 76, 66, 57, 45, 47, 33, 53, 82, 81, 223323
+];
 "#;
         let syntax = SourceType::tsx();
         let tree = parse(src, 0, syntax);

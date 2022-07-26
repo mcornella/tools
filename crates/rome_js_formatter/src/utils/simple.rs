@@ -43,8 +43,7 @@ use rome_formatter::Comments;
 use rome_js_syntax::{
     JsAnyArrowFunctionParameters, JsAnyBinding, JsAnyBindingPattern, JsAnyExpression,
     JsAnyFormalParameter, JsAnyFunction, JsAnyParameter, JsFormalParameter,
-    JsFormalParameterFields, JsLanguage, JsObjectExpression, JsObjectExpressionFields,
-    JsParameters, JsParametersFields, JsSyntaxToken,
+    JsFormalParameterFields, JsLanguage, JsParameters,
 };
 use rome_rowan::{AstNode, AstSeparatedList, SyntaxResult};
 
@@ -55,7 +54,7 @@ pub(crate) fn is_simple_expression(
 ) -> SyntaxResult<bool> {
     match node {
         JsAnyExpression::JsArrayExpression(_) => Ok(true),
-        JsAnyExpression::JsObjectExpression(object) => Ok(true),
+        JsAnyExpression::JsObjectExpression(_) => Ok(true),
         node => {
             if let Some(func) = JsAnyFunction::cast(node.syntax().clone()) {
                 is_simple_function_expression(func, comments)
