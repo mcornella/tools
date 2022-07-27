@@ -87,7 +87,6 @@
 <span id="82">82</span>
 <span id="83">83</span>
 <span id="84">84</span>
-<span id="85">85</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::settings::FormatSettings</span>;
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">IndentStyle</span>, <span class="ident">LineWidth</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
@@ -100,7 +99,6 @@
 
     <span class="doccomment">/// Stores whether formatting should be allowed to proceed if a given file</span>
     <span class="doccomment">/// has syntax errors</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing</span>)]</span>
     <span class="kw">pub</span> <span class="ident">format_with_errors</span>: <span class="ident">bool</span>,
 
     <span class="doccomment">/// The indent style.</span>
@@ -139,7 +137,7 @@
             <span class="ident">enabled</span>: <span class="ident">conf</span>.<span class="ident">enabled</span>,
             <span class="ident">indent_style</span>: <span class="prelude-val">Some</span>(<span class="ident">indent_style</span>),
             <span class="ident">line_width</span>: <span class="prelude-val">Some</span>(<span class="ident">conf</span>.<span class="ident">line_width</span>),
-            <span class="ident">format_with_errors</span>: <span class="bool-val">false</span>,
+            <span class="ident">format_with_errors</span>: <span class="ident">conf</span>.<span class="ident">format_with_errors</span>,
         }
     }
 }
