@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use crate::AsFormat;
+use crate::{AsFormat, TextRange};
 use rome_formatter::cst_builders::{format_leading_comments, format_trailing_comments};
 use rome_formatter::{
     format_args, write, Argument, Arguments, CstFormatContext, GroupId, VecBuffer,
@@ -35,9 +35,9 @@ where
             Err(_) => {
                 f.restore_state_snapshot(snapshot);
 
-                // Lists that yield errors are formatted as they were unknown nodes.
+                // Recover by formatting the nodes as they are written in the source document.
                 // Doing so, the formatter formats the nodes/tokens as is.
-                format_unknown_node(self.node.syntax()).fmt(f)
+                format_verbatim_node(self.node.syntax()).fmt(f)
             }
         }
     }
@@ -119,6 +119,7 @@ pub fn format_verbatim_node(node: &JsSyntaxNode) -> FormatVerbatimNode {
         kind: VerbatimKind::Verbatim {
             length: node.text_range().len(),
         },
+        skip_comments: false,
     }
 }
 
@@ -126,7 +127,9 @@ pub fn format_verbatim_node(node: &JsSyntaxNode) -> FormatVerbatimNode {
 pub struct FormatVerbatimNode<'node> {
     node: &'node JsSyntaxNode,
     kind: VerbatimKind,
+    skip_comments: bool,
 }
+
 impl Format<JsFormatContext> for FormatVerbatimNode<'_> {
     fn fmt(&self, f: &mut JsFormatter) -> FormatResult<()> {
         for element in self.node.descendants_with_tokens(Direction::Next) {
@@ -138,46 +141,45 @@ impl Format<JsFormatContext> for FormatVerbatimNode<'_> {
             }
         }
 
-        fn skip_whitespace<L: Language>(piece: &SyntaxTriviaPiece<L>) -> bool {
-            piece.is_newline() || piece.is_whitespace()
-        }
-
-        fn write_trivia_token<L: Language>(
-            f: &mut JsFormatter,
-            piece: SyntaxTriviaPiece<L>,
-        ) -> FormatResult<()> {
-            syntax_token_cow_slice(
-                normalize_newlines(piece.text(), LINE_TERMINATORS),
-                &piece.token(),
-                piece.text_range().start(),
-            )
-            .fmt(f)
-        }
-
         let mut buffer = VecBuffer::new(f.state_mut());
 
         write!(
             buffer,
             [format_with(|f| {
-                write!(f, [format_leading_comments(self.node)])?;
+                if !self.skip_comments {
+                    write!(f, [format_leading_comments(self.node)])?;
+                }
 
-                for leading_trivia in self
+                let node_trimmed_range = self.node.text_trimmed_range();
+
+                let start = self
                     .node
                     .first_leading_trivia()
                     .into_iter()
                     .flat_map(|trivia| trivia.pieces())
-                    .skip_while(|piece| skip_whitespace(piece) || piece.is_comments())
-                {
-                    write_trivia_token(f, leading_trivia)?;
-                }
+                    .find(|piece| piece.is_skipped())
+                    .map(|piece| piece.text_range().start())
+                    .unwrap_or_else(|| node_trimmed_range.start());
+
+                let node_range = self.node.text_range();
+
+                let trimmed_range =
+                    TextRange::at(start - node_range.start(), node_trimmed_range.end() - start);
 
                 dynamic_token(
-                    &normalize_newlines(&self.node.text_trimmed().to_string(), LINE_TERMINATORS),
-                    self.node.text_trimmed_range().start(),
+                    &normalize_newlines(
+                        &self.node.text().slice(trimmed_range).to_string(),
+                        LINE_TERMINATORS,
+                    ),
+                    start,
                 )
                 .fmt(f)?;
 
-                write!(f, [format_trailing_comments(self.node)])
+                if !self.skip_comments {
+                    write!(f, [format_trailing_comments(self.node)])?;
+                }
+
+                Ok(())
             })]
         )?;
 
@@ -208,6 +210,8 @@ impl Format<JsFormatContext> for FormatUnknownNode<'_> {
         FormatVerbatimNode {
             node: self.node,
             kind: VerbatimKind::Unknown,
+            // Don't print comments because they get printed as part of the unknown node's `FormatNodeRule`
+            skip_comments: true,
         }
         .fmt(f)
     }
@@ -233,7 +237,8 @@ impl Format<JsFormatContext> for FormatSuppressedNode<'_> {
                 hard_line_break(),
                 FormatVerbatimNode {
                     node: self.node,
-                    kind: VerbatimKind::Suppressed
+                    kind: VerbatimKind::Suppressed,
+                    skip_comments: false
                 }
             ]
         )

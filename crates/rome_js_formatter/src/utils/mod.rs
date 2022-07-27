@@ -211,6 +211,7 @@ impl Format<JsFormatContext> for TemplateElement {
                                     | JsSyntaxKind::JS_CONDITIONAL_EXPRESSION
                                     | JsSyntaxKind::JS_SEQUENCE_EXPRESSION
                                     | JsSyntaxKind::TS_CONDITIONAL_TYPE
+                                    | JsSyntaxKind::JS_PARENTHESIZED_EXPRESSION
                                     | JsSyntaxKind::TS_AS_EXPRESSION
                             )
                             || JsAnyBinaryLikeExpression::can_cast(expression.kind())
@@ -254,7 +255,7 @@ impl TemplateElement {
     fn is_plain_expression(&self, comments: &Comments<JsLanguage>) -> FormatResult<bool> {
         match self {
             TemplateElement::Js(template_element) => {
-                let current_expression = template_element.expression()?;
+                let mut current_expression = template_element.expression()?;
 
                 if comments.has_comments(current_expression.syntax()) {
                     return Ok(false);

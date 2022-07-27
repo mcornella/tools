@@ -23,6 +23,7 @@ return list
 return list
  |> take(prefix.length, %)
  |> equals(%, prefix);
+
 // (The % token isn't final; it might instead be @ or ? or #.)
 
 ```
