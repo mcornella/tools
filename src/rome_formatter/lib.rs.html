@@ -1385,6 +1385,21 @@
 <span id="1380">1380</span>
 <span id="1381">1381</span>
 <span id="1382">1382</span>
+<span id="1383">1383</span>
+<span id="1384">1384</span>
+<span id="1385">1385</span>
+<span id="1386">1386</span>
+<span id="1387">1387</span>
+<span id="1388">1388</span>
+<span id="1389">1389</span>
+<span id="1390">1390</span>
+<span id="1391">1391</span>
+<span id="1392">1392</span>
+<span id="1393">1393</span>
+<span id="1394">1394</span>
+<span id="1395">1395</span>
+<span id="1396">1396</span>
+<span id="1397">1397</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Infrastructure for code formatting</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This module defines [FormatElement], an IR to format code documents and provides a mean to print</span>
@@ -1773,12 +1788,19 @@
     <span class="doccomment">/// In case a node can&#39;t be formatted because it either misses a require child element or</span>
     <span class="doccomment">/// a child is present that should not (e.g. a trailing comma after a rest element).</span>
     <span class="ident">SyntaxError</span>,
+    <span class="doccomment">/// In case range formatting failed because the provided range was larger</span>
+    <span class="doccomment">/// than the formatted syntax tree</span>
+    <span class="ident">RangeError</span> { <span class="ident">input</span>: <span class="ident">TextRange</span>, <span class="ident">tree</span>: <span class="ident">TextRange</span> },
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">FormatError</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">FormatError::SyntaxError</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;syntax error&quot;</span>),
+            <span class="ident">FormatError::RangeError</span> { <span class="ident">input</span>, <span class="ident">tree</span> } =&gt; <span class="macro">std::write!</span>(
+                <span class="ident">fmt</span>,
+                <span class="string">&quot;formatting range {input:?} is larger than syntax tree {tree:?}&quot;</span>
+            ),
         }
     }
 }
@@ -2238,6 +2260,14 @@
             <span class="ident">Vec::new</span>(),
             <span class="ident">Vec::new</span>(),
         ));
+    }
+
+    <span class="kw">let</span> <span class="ident">root_range</span> <span class="op">=</span> <span class="ident">root</span>.<span class="ident">text_range</span>();
+    <span class="kw">if</span> <span class="ident">range</span>.<span class="ident">start</span>() <span class="op">&lt;</span> <span class="ident">root_range</span>.<span class="ident">start</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">range</span>.<span class="ident">end</span>() <span class="op">&gt;</span> <span class="ident">root_range</span>.<span class="ident">end</span>() {
+        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FormatError::RangeError</span> {
+            <span class="ident">input</span>: <span class="ident">range</span>,
+            <span class="ident">tree</span>: <span class="ident">root_range</span>,
+        });
     }
 
     <span class="comment">// Find the tokens corresponding to the start and end of the range</span>

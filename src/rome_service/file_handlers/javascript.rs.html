@@ -339,9 +339,17 @@
 <span id="334">334</span>
 <span id="335">335</span>
 <span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_analyze</span>::{<span class="ident">AnalysisFilter</span>, <span class="ident">ControlFlow</span>, <span class="ident">Never</span>, <span class="ident">RuleCategories</span>, <span class="ident">RuleFilter</span>};
 <span class="kw">use</span> <span class="ident">rome_diagnostics</span>::{<span class="ident">Applicability</span>, <span class="ident">CodeSuggestion</span>, <span class="ident">Diagnostic</span>};
-<span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">IndentStyle</span>, <span class="ident">Printed</span>};
+<span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">FormatError</span>, <span class="ident">IndentStyle</span>, <span class="ident">Printed</span>};
 <span class="kw">use</span> <span class="ident">rome_fs::RomePath</span>;
 <span class="kw">use</span> <span class="ident">rome_js_analyze::analyze</span>;
 <span class="kw">use</span> <span class="ident">rome_js_analyze::utils::rename::RenameError</span>;
@@ -618,6 +626,14 @@
     <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">settings</span>.<span class="ident">format_context</span>::<span class="op">&lt;</span><span class="ident">JsLanguage</span><span class="op">&gt;</span>(<span class="ident">rome_path</span>);
 
     <span class="kw">let</span> <span class="ident">tree</span> <span class="op">=</span> <span class="ident">parse</span>.<span class="ident">syntax</span>();
+
+    <span class="kw">let</span> <span class="ident">range</span> <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">text_range</span>();
+    <span class="kw">if</span> <span class="ident">offset</span> <span class="op">&lt;</span> <span class="ident">range</span>.<span class="ident">start</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">offset</span> <span class="op">&gt;</span> <span class="ident">range</span>.<span class="ident">end</span>() {
+        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">RomeError::FormatError</span>(<span class="ident">FormatError::RangeError</span> {
+            <span class="ident">input</span>: <span class="ident">TextRange::at</span>(<span class="ident">offset</span>, <span class="ident">TextSize::from</span>(<span class="number">0</span>)),
+            <span class="ident">tree</span>: <span class="ident">range</span>,
+        }));
+    }
 
     <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tree</span>.<span class="ident">token_at_offset</span>(<span class="ident">offset</span>) {
         <span class="comment">// File is empty, do nothing</span>
