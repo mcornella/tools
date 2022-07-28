@@ -833,6 +833,10 @@
 <span id="828">828</span>
 <span id="829">829</span>
 <span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::comments::CommentStyle</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -940,12 +944,12 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// when inserting the &quot;(&quot; before the &quot;string&quot; token.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FormatInsertedOpenParen</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FormatInsertedOpenParen</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">L</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">L</span>: <span class="ident">Language</span>,
 {
     <span class="doccomment">/// The token before which the open paren must be inserted</span>
-    <span class="ident">before_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">before_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SyntaxToken</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// The token text of the open paren</span>
     <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
@@ -954,11 +958,15 @@
     <span class="ident">kind</span>: <span class="ident">L::Kind</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span> <span class="ident">FormatInsertedOpenParen</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">L</span><span class="op">&gt;</span> <span class="ident">FormatInsertedOpenParen</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">L</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">L</span>: <span class="ident">Language</span>,
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">before_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">kind</span>: <span class="ident">L::Kind</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
+        <span class="ident">before_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SyntaxToken</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">kind</span>: <span class="ident">L::Kind</span>,
+        <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
+    ) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">before_token</span>,
             <span class="ident">kind</span>,
@@ -967,7 +975,7 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Context</span>, <span class="ident">L</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FormatInsertedOpenParen</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Context</span>, <span class="ident">L</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FormatInsertedOpenParen</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">L</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">L</span>: <span class="ident">Language</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     <span class="ident">Context</span>: <span class="ident">CstFormatContext</span><span class="op">&lt;</span><span class="ident">Language</span> <span class="op">=</span> <span class="ident">L</span><span class="op">&gt;</span>,
@@ -1056,7 +1064,7 @@
     <span class="ident">L</span>: <span class="ident">Language</span>,
 {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">after_token</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>(
-        <span class="ident">after_token</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SyntaxToken</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">after_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SyntaxToken</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">kind</span>: <span class="ident">L::Kind</span>,
         <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
         <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>,

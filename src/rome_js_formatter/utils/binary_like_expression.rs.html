@@ -1124,9 +1124,9 @@
     <span class="ident">format_with</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
         <span class="kw">if</span> <span class="ident">needs_parens</span>(<span class="ident">parent_operator</span>, <span class="ident">sub_expression</span>)<span class="question-mark">?</span> {
             <span class="ident">format_parenthesize</span>(
-                <span class="ident">sub_expression</span>.<span class="ident">syntax</span>().<span class="ident">first_token</span>(),
+                <span class="ident">sub_expression</span>.<span class="ident">syntax</span>().<span class="ident">first_token</span>().<span class="ident">as_ref</span>(),
                 <span class="kw-2">&amp;</span><span class="ident">sub_expression</span>,
-                <span class="ident">sub_expression</span>.<span class="ident">syntax</span>().<span class="ident">last_token</span>(),
+                <span class="ident">sub_expression</span>.<span class="ident">syntax</span>().<span class="ident">last_token</span>().<span class="ident">as_ref</span>(),
             )
             .<span class="ident">grouped_with_soft_block_indent</span>()
             .<span class="ident">fmt</span>(<span class="ident">f</span>)
@@ -1479,7 +1479,7 @@
                     <span class="kw">let</span> <span class="ident">first_token</span> <span class="op">=</span> <span class="ident">current</span>.<span class="ident">syntax</span>().<span class="ident">first_token</span>();
                     <span class="kw">let</span> <span class="ident">last_token</span> <span class="op">=</span> <span class="ident">current</span>.<span class="ident">syntax</span>().<span class="ident">last_token</span>();
 
-                    <span class="ident">format_parenthesize</span>(<span class="ident">first_token</span>, <span class="kw-2">&amp;</span><span class="ident">content</span>, <span class="ident">last_token</span>)
+                    <span class="ident">format_parenthesize</span>(<span class="ident">first_token</span>.<span class="ident">as_ref</span>(), <span class="kw-2">&amp;</span><span class="ident">content</span>, <span class="ident">last_token</span>.<span class="ident">as_ref</span>())
                         .<span class="ident">grouped_with_soft_block_indent</span>()
                         .<span class="ident">fmt</span>(<span class="ident">f</span>)
                 } <span class="kw">else</span> {
