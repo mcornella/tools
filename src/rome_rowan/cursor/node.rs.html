@@ -956,6 +956,13 @@
 <span id="951">951</span>
 <span id="952">952</span>
 <span id="953">953</span>
+<span id="954">954</span>
+<span id="955">955</span>
+<span id="956">956</span>
+<span id="957">957</span>
+<span id="958">958</span>
+<span id="959">959</span>
+<span id="960">960</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cursor</span>::{<span class="ident">NodeData</span>, <span class="ident">SyntaxElement</span>, <span class="ident">SyntaxToken</span>, <span class="ident">SyntaxTrivia</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::green</span>::{<span class="ident">Child</span>, <span class="ident">Children</span>, <span class="ident">GreenElementRef</span>, <span class="ident">Slot</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -1372,6 +1379,13 @@
                 }),
             ),
         }
+    }
+
+    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;syntax elements are immutable, the result of update methods must be propagated to have any effect&quot;</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">replace_child</span>(<span class="self">self</span>, <span class="ident">prev_elem</span>: <span class="ident">SyntaxElement</span>, <span class="ident">next_elem</span>: <span class="ident">SyntaxElement</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="self">Self</span> {
+            <span class="ident">ptr</span>: <span class="self">self</span>.<span class="ident">ptr</span>.<span class="ident">replace_child</span>(<span class="ident">prev_elem</span>, <span class="ident">next_elem</span>)<span class="question-mark">?</span>,
+        })
     }
 }
 

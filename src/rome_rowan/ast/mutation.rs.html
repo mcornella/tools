@@ -236,6 +236,12 @@
 <span id="231">231</span>
 <span id="232">232</span>
 <span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::ops</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">AstNode</span>, <span class="ident">AstNodeList</span>, <span class="ident">AstSeparatedList</span>, <span class="ident">SyntaxToken</span>};
@@ -288,6 +294,8 @@
     ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>;
+
+    <span class="kw">fn</span> <span class="ident">detach</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AstNodeExt</span> <span class="kw">for</span> <span class="ident">T</span>
@@ -383,6 +391,10 @@
                         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">piece</span><span class="op">|</span> (<span class="ident">piece</span>.<span class="ident">kind</span>(), <span class="ident">piece</span>.<span class="ident">text</span>())),
                 ),
         )
+    }
+
+    <span class="kw">fn</span> <span class="ident">detach</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::unwrap_cast</span>(<span class="self">self</span>.<span class="ident">into_syntax</span>().<span class="ident">detach</span>())
     }
 }
 

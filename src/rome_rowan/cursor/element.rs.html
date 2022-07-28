@@ -129,8 +129,15 @@
 <span id="124">124</span>
 <span id="125">125</span>
 <span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cursor</span>::{<span class="ident">SyntaxNode</span>, <span class="ident">SyntaxToken</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::green::GreenElementRef</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::green</span>::{<span class="ident">GreenElement</span>, <span class="ident">GreenElementRef</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">NodeOrToken</span>, <span class="ident">RawSyntaxKind</span>, <span class="ident">TokenAtOffset</span>};
 <span class="kw">use</span> <span class="ident">std::iter</span>;
 <span class="kw">use</span> <span class="ident">text_size</span>::{<span class="ident">TextRange</span>, <span class="ident">TextSize</span>};
@@ -234,6 +241,13 @@
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">NodeOrToken::Node</span>(<span class="ident">it</span>) =&gt; <span class="ident"><span class="self">Self</span>::Node</span>(<span class="ident">it</span>.<span class="ident">detach</span>()),
             <span class="ident">NodeOrToken::Token</span>(<span class="ident">it</span>) =&gt; <span class="ident"><span class="self">Self</span>::Token</span>(<span class="ident">it</span>.<span class="ident">detach</span>()),
+        }
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_green</span>(<span class="self">self</span>) -&gt; <span class="ident">GreenElement</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">NodeOrToken::Node</span>(<span class="ident">it</span>) =&gt; <span class="ident">it</span>.<span class="ident">ptr</span>.<span class="ident">into_green</span>(),
+            <span class="ident">NodeOrToken::Token</span>(<span class="ident">it</span>) =&gt; <span class="ident">it</span>.<span class="ident">into_green</span>(),
         }
     }
 }

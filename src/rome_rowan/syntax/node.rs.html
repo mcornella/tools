@@ -791,24 +791,6 @@
 <span id="786">786</span>
 <span id="787">787</span>
 <span id="788">788</span>
-<span id="789">789</span>
-<span id="790">790</span>
-<span id="791">791</span>
-<span id="792">792</span>
-<span id="793">793</span>
-<span id="794">794</span>
-<span id="795">795</span>
-<span id="796">796</span>
-<span id="797">797</span>
-<span id="798">798</span>
-<span id="799">799</span>
-<span id="800">800</span>
-<span id="801">801</span>
-<span id="802">802</span>
-<span id="803">803</span>
-<span id="804">804</span>
-<span id="805">805</span>
-<span id="806">806</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::green::GreenElement</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::syntax::element::SyntaxElement</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::syntax::SyntaxTrivia</span>;
@@ -820,7 +802,7 @@
 <span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 <span class="kw">use</span> <span class="ident">std::any::TypeId</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Formatter</span>};
-<span class="kw">use</span> <span class="ident">std::iter</span>::{<span class="self">self</span>, <span class="ident">FusedIterator</span>};
+<span class="kw">use</span> <span class="ident">std::iter::FusedIterator</span>;
 <span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
 <span class="kw">use</span> <span class="ident">std::ptr::NonNull</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">ops</span>};
@@ -1253,28 +1235,10 @@
         <span class="ident">prev_elem</span>: <span class="ident">SyntaxElement</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>,
         <span class="ident">next_elem</span>: <span class="ident">SyntaxElement</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">depth</span>, <span class="ident">prev_parent</span>, <span class="ident">index</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">prev_elem</span> {
-            <span class="ident">NodeOrToken::Node</span>(<span class="ident">prev_node</span>) =&gt; (
-                <span class="ident">prev_node</span>
-                    .<span class="ident">ancestors</span>()
-                    .<span class="ident">position</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">node</span><span class="op">|</span> <span class="ident">node</span> <span class="op">==</span> <span class="self">self</span>)<span class="question-mark">?</span>
-                    .<span class="ident">checked_sub</span>(<span class="number">1</span>)<span class="question-mark">?</span>,
-                <span class="ident">prev_node</span>.<span class="ident">parent</span>()<span class="question-mark">?</span>,
-                <span class="ident">prev_node</span>.<span class="ident">index</span>(),
-            ),
-            <span class="ident">NodeOrToken::Token</span>(<span class="ident">prev_token</span>) =&gt; (
-                <span class="ident">prev_token</span>.<span class="ident">ancestors</span>().<span class="ident">position</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">node</span><span class="op">|</span> <span class="ident">node</span> <span class="op">==</span> <span class="self">self</span>)<span class="question-mark">?</span>,
-                <span class="ident">prev_token</span>.<span class="ident">parent</span>()<span class="question-mark">?</span>,
-                <span class="ident">prev_token</span>.<span class="ident">index</span>(),
-            ),
-        };
-
-        <span class="kw">let</span> <span class="ident">next_parent</span> <span class="op">=</span> <span class="ident">prev_parent</span>.<span class="ident">splice_slots</span>(<span class="ident">index</span>..<span class="op">=</span><span class="ident">index</span>, <span class="ident">iter::once</span>(<span class="prelude-val">Some</span>(<span class="ident">next_elem</span>)));
-
-        <span class="kw">match</span> <span class="ident">depth</span> {
-            <span class="number">0</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">next_parent</span>),
-            <span class="ident">index</span> =&gt; <span class="ident">next_parent</span>.<span class="ident">ancestors</span>().<span class="ident">nth</span>(<span class="ident">index</span>),
-        }
+        <span class="prelude-val">Some</span>(<span class="self">Self</span> {
+            <span class="ident">raw</span>: <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">replace_child</span>(<span class="ident">prev_elem</span>.<span class="ident">into</span>(), <span class="ident">next_elem</span>.<span class="ident">into</span>())<span class="question-mark">?</span>,
+            <span class="ident">_p</span>: <span class="ident">PhantomData</span>,
+        })
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_list</span>(<span class="self">self</span>) -&gt; <span class="ident">SyntaxList</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span> {
