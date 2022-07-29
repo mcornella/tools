@@ -601,6 +601,8 @@
 <span id="596">596</span>
 <span id="597">597</span>
 <span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rustdoc::broken_intra_doc_links</span>)]</span>
 
 <span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
@@ -622,9 +624,11 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::matcher</span>::{<span class="ident">QueryMatcher</span>, <span class="ident">RuleKey</span>, <span class="ident">SignalEntry</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::query</span>::{<span class="ident">Ast</span>, <span class="ident">QueryKey</span>, <span class="ident">QueryMatch</span>, <span class="ident">Queryable</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::registry</span>::{
-    <span class="ident">LanguageRoot</span>, <span class="ident">Phase</span>, <span class="ident">Phases</span>, <span class="ident">RuleMetadata</span>, <span class="ident">RuleRegistry</span>, <span class="ident">RuleSuppressions</span>,
+    <span class="ident">LanguageRoot</span>, <span class="ident">Phase</span>, <span class="ident">Phases</span>, <span class="ident">RegistryRuleMetadata</span>, <span class="ident">RuleRegistry</span>, <span class="ident">RuleSuppressions</span>,
 };
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rule</span>::{<span class="ident">GroupLanguage</span>, <span class="ident">Rule</span>, <span class="ident">RuleAction</span>, <span class="ident">RuleDiagnostic</span>, <span class="ident">RuleGroup</span>, <span class="ident">RuleMeta</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rule</span>::{
+    <span class="ident">GroupLanguage</span>, <span class="ident">Rule</span>, <span class="ident">RuleAction</span>, <span class="ident">RuleDiagnostic</span>, <span class="ident">RuleGroup</span>, <span class="ident">RuleMeta</span>, <span class="ident">RuleMetadata</span>,
+};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::services</span>::{<span class="ident">CannotCreateServicesError</span>, <span class="ident">FromServices</span>, <span class="ident">ServiceBag</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::signals::DiagnosticSignal</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::signals</span>::{<span class="ident">AnalyzerAction</span>, <span class="ident">AnalyzerSignal</span>};
@@ -1124,7 +1128,7 @@
     {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">RuleFilter::Group</span>(<span class="ident">group</span>) =&gt; <span class="ident">group</span> <span class="op">==</span> <span class="ident">G::NAME</span>,
-            <span class="ident">RuleFilter::Rule</span>(<span class="ident">group</span>, <span class="ident">rule</span>) =&gt; <span class="ident">group</span> <span class="op">==</span> <span class="ident">G::NAME</span> <span class="op">&amp;&amp;</span> <span class="ident">rule</span> <span class="op">==</span> <span class="ident">R::NAME</span>,
+            <span class="ident">RuleFilter::Rule</span>(<span class="ident">group</span>, <span class="ident">rule</span>) =&gt; <span class="ident">group</span> <span class="op">==</span> <span class="ident">G::NAME</span> <span class="op">&amp;&amp;</span> <span class="ident">rule</span> <span class="op">==</span> <span class="ident">R::METADATA</span>.<span class="ident">name</span>,
         }
     }
 }

@@ -287,8 +287,8 @@
         <span class="ident">R::diagnostic</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">diag</span><span class="op">|</span> {
             <span class="ident">diag</span>.<span class="ident">into_diagnostic</span>(
                 <span class="self">self</span>.<span class="ident">file_id</span>,
-                <span class="macro">format!</span>(<span class="string">&quot;{}/{}&quot;</span>, <span class="ident">G::NAME</span>, <span class="ident">R::NAME</span>),
-                <span class="macro">format!</span>(<span class="string">&quot;https://rome.tools/docs/lint/rules/{}/&quot;</span>, <span class="ident">R::NAME</span>),
+                <span class="macro">format!</span>(<span class="string">&quot;{}/{}&quot;</span>, <span class="ident">G::NAME</span>, <span class="ident">R::METADATA</span>.<span class="ident">name</span>),
+                <span class="macro">format!</span>(<span class="string">&quot;https://rome.tools/docs/lint/rules/{}/&quot;</span>, <span class="ident">R::METADATA</span>.<span class="ident">name</span>),
             )
         })
     }
@@ -298,7 +298,7 @@
 
         <span class="ident">R::action</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">action</span><span class="op">|</span> <span class="ident">AnalyzerAction</span> {
             <span class="ident">group_name</span>: <span class="ident">G::NAME</span>,
-            <span class="ident">rule_name</span>: <span class="ident">R::NAME</span>,
+            <span class="ident">rule_name</span>: <span class="ident">R::METADATA</span>.<span class="ident">name</span>,
             <span class="ident">file_id</span>: <span class="self">self</span>.<span class="ident">file_id</span>,
             <span class="ident">category</span>: <span class="ident">action</span>.<span class="ident">category</span>,
             <span class="ident">applicability</span>: <span class="ident">action</span>.<span class="ident">applicability</span>,

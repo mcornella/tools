@@ -499,6 +499,13 @@
 <span id="494">494</span>
 <span id="495">495</span>
 <span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_console::fmt::Display</span>;
 <span class="kw">use</span> <span class="ident">rome_console</span>::{<span class="ident">markup</span>, <span class="ident">MarkupBuf</span>};
 <span class="kw">use</span> <span class="ident">rome_diagnostics::file::FileSpan</span>;
@@ -511,17 +518,44 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::registry</span>::{<span class="ident">RuleLanguage</span>, <span class="ident">RuleSuppressions</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">AnalysisFilter</span>, <span class="ident">LanguageRoot</span>, <span class="ident">Phase</span>, <span class="ident">Phases</span>, <span class="ident">Queryable</span>, <span class="ident">RuleRegistry</span>};
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">RuleMeta</span> {
+<span class="doccomment">/// Static metadata containing information about a rule</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RuleMetadata</span> {
     <span class="doccomment">/// It marks if a rule is deprecated, and if so a reason has to be provided.</span>
-    <span class="kw">const</span> <span class="ident">DEPRECATED</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>;
+    <span class="kw">pub</span> <span class="ident">deprecated</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The version when the rule was implemented</span>
-    <span class="kw">const</span> <span class="ident">VERSION</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
+    <span class="kw">pub</span> <span class="ident">version</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
     <span class="doccomment">/// The name of this rule, displayed in the diagnostics it emits</span>
-    <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
+    <span class="kw">pub</span> <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
     <span class="doccomment">/// The content of the documentation comments for this rule</span>
-    <span class="kw">const</span> <span class="ident">DOCS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
+    <span class="kw">pub</span> <span class="ident">docs</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
     <span class="doccomment">/// Whether a rule is recommended or not</span>
-    <span class="kw">const</span> <span class="ident">RECOMMENDED</span>: <span class="ident">bool</span>;
+    <span class="kw">pub</span> <span class="ident">recommended</span>: <span class="ident">bool</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">RuleMetadata</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">version</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">docs</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">deprecated</span>: <span class="prelude-val">None</span>,
+            <span class="ident">version</span>,
+            <span class="ident">name</span>,
+            <span class="ident">docs</span>,
+            <span class="ident">recommended</span>: <span class="bool-val">false</span>,
+        }
+    }
+
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">recommended</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">recommended</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">recommended</span> <span class="op">=</span> <span class="ident">recommended</span>;
+        <span class="self">self</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">deprecated</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">deprecated</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">deprecated</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">deprecated</span>);
+        <span class="self">self</span>
+    }
+}
+
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">RuleMeta</span> {
+    <span class="kw">const</span> <span class="ident">METADATA</span>: <span class="ident">RuleMetadata</span>;
 }
 
 <span class="doccomment">/// This macro is used to declare an analyzer rule type, and implement the</span>
@@ -619,34 +653,14 @@
     ( $( <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">literal</span>]</span> )<span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">vis</span>:<span class="ident">vis</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>:<span class="ident">ident</span> {
         <span class="ident">version</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">version</span>:<span class="ident">literal</span>,
         <span class="ident">name</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">literal</span>,
-        <span class="ident">recommended</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">recommended</span>:<span class="ident">literal</span>
+        $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>, )<span class="op">*</span>
     } ) =&gt; {
         $( <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>]</span> )<span class="op">*</span>
         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">vis</span> <span class="kw">enum</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span> {}
 
         <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::RuleMeta</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span> {
-            <span class="kw">const</span> <span class="ident">DEPRECATED</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-            <span class="kw">const</span> <span class="ident">VERSION</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">version</span>;
-            <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>;
-            <span class="kw">const</span> <span class="ident">RECOMMENDED</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">recommended</span>;
-            <span class="kw">const</span> <span class="ident">DOCS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="macro">concat!</span>( $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>, <span class="string">&quot;\n&quot;</span>, )<span class="op">*</span> );
-        }
-    };
-    ( $( <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>:<span class="ident">literal</span>]</span> )<span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">vis</span>:<span class="ident">vis</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span>:<span class="ident">ident</span> {
-        <span class="ident">version</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">version</span>:<span class="ident">literal</span>,
-        <span class="ident">name</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">literal</span>,
-        <span class="ident">recommended</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">recommended</span>:<span class="ident">literal</span>,
-        <span class="ident">deprecated</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">deprecated</span>:<span class="ident">literal</span>
-    } ) =&gt; {
-        $( <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>]</span> )<span class="op">*</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">vis</span> <span class="kw">enum</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span> {}
-
-        <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::RuleMeta</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">id</span> {
-            <span class="kw">const</span> <span class="ident">DEPRECATED</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">deprecated</span>);
-            <span class="kw">const</span> <span class="ident">VERSION</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">version</span>;
-            <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>;
-            <span class="kw">const</span> <span class="ident">RECOMMENDED</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">recommended</span>;
-            <span class="kw">const</span> <span class="ident">DOCS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="macro">concat!</span>( $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>, <span class="string">&quot;\n&quot;</span>, )<span class="op">*</span> );
+            <span class="kw">const</span> <span class="ident">METADATA</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::RuleMetadata</span> <span class="op">=</span>
+                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::RuleMetadata::new</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">version</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>, <span class="macro">concat!</span>( $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc</span>, <span class="string">&quot;\n&quot;</span>, )<span class="op">*</span> )) $( .<span class="macro-nonterminal">$</span><span class="macro-nonterminal">key</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>) )<span class="kw-2">*</span>;
         }
     };
 }
