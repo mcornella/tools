@@ -12,6 +12,7 @@
 <span id="7">7</span>
 <span id="8">8</span>
 <span id="9">9</span>
+<span id="10">10</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Generated file, do not edit by hand, see `xtask/codegen`</span>
 
 <span class="kw">use</span> <span class="ident">rome_analyze::declare_group</span>;
@@ -20,7 +21,8 @@
 <span class="kw">mod</span> <span class="ident">no_function_assign</span>;
 <span class="kw">mod</span> <span class="ident">no_label_var</span>;
 <span class="kw">mod</span> <span class="ident">no_shouty_constants</span>;
-<span class="macro">declare_group!</span> { <span class="kw">pub</span> (<span class="kw">crate</span>) <span class="ident">Js</span> { <span class="ident">name</span> : <span class="string">&quot;js&quot;</span> , <span class="ident">rules</span> : [<span class="ident">no_arguments</span> :: <span class="ident">NoArguments</span> , <span class="ident">no_catch_assign</span> :: <span class="ident">NoCatchAssign</span> , <span class="ident">no_function_assign</span> :: <span class="ident">NoFunctionAssign</span> , <span class="ident">no_label_var</span> :: <span class="ident">NoLabelVar</span> , <span class="ident">no_shouty_constants</span> :: <span class="ident">NoShoutyConstants</span> ,] } }
+<span class="kw">mod</span> <span class="ident">use_camel_case</span>;
+<span class="macro">declare_group!</span> { <span class="kw">pub</span> (<span class="kw">crate</span>) <span class="ident">Js</span> { <span class="ident">name</span> : <span class="string">&quot;js&quot;</span> , <span class="ident">rules</span> : [<span class="ident">no_arguments</span> :: <span class="ident">NoArguments</span> , <span class="ident">no_catch_assign</span> :: <span class="ident">NoCatchAssign</span> , <span class="ident">no_function_assign</span> :: <span class="ident">NoFunctionAssign</span> , <span class="ident">no_label_var</span> :: <span class="ident">NoLabelVar</span> , <span class="ident">no_shouty_constants</span> :: <span class="ident">NoShoutyConstants</span> , <span class="ident">use_camel_case</span> :: <span class="ident">UseCamelCase</span> ,] } }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rome_js_analyze" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
 </body></html>
