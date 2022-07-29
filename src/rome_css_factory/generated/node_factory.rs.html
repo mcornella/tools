@@ -808,6 +808,15 @@
 <span id="803">803</span>
 <span id="804">804</span>
 <span id="805">805</span>
+<span id="806">806</span>
+<span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
+<span id="810">810</span>
+<span id="811">811</span>
+<span id="812">812</span>
+<span id="813">813</span>
+<span id="814">814</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Generated file, do not edit by hand, see `xtask/codegen`</span>
 
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::redundant_closure</span>)]</span>
@@ -1511,22 +1520,25 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">css_at_media_query_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">CssAtMediaQueryList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">css_at_media_query_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>, <span class="ident">separators</span>: <span class="ident">S</span>) -&gt; <span class="ident">CssAtMediaQueryList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">CssAtMediaQuery</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CssSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">CssAtMediaQuery</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">CssSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">CssAtMediaQueryList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">CssSyntaxKind::CSS_AT_MEDIA_QUERY_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">css_attribute_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">CssAttributeList</span>
@@ -1553,22 +1565,25 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">css_keyframes_selector_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">CssKeyframesSelectorList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">css_keyframes_selector_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>, <span class="ident">separators</span>: <span class="ident">S</span>) -&gt; <span class="ident">CssKeyframesSelectorList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">CssKeyframesSelector</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CssSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">CssKeyframesSelector</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">CssSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">CssKeyframesSelectorList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">CssSyntaxKind::CSS_KEYFRAMES_SELECTOR_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">css_parameter_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">CssParameterList</span>
@@ -1595,22 +1610,25 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">css_selector_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">CssSelectorList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">css_selector_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>, <span class="ident">separators</span>: <span class="ident">S</span>) -&gt; <span class="ident">CssSelectorList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">CssSelector</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CssSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">CssSelector</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">CssSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">CssSelectorList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">CssSyntaxKind::CSS_SELECTOR_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
 </code></pre></div>

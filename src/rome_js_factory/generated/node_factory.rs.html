@@ -6733,6 +6733,85 @@
 <span id="6728">6728</span>
 <span id="6729">6729</span>
 <span id="6730">6730</span>
+<span id="6731">6731</span>
+<span id="6732">6732</span>
+<span id="6733">6733</span>
+<span id="6734">6734</span>
+<span id="6735">6735</span>
+<span id="6736">6736</span>
+<span id="6737">6737</span>
+<span id="6738">6738</span>
+<span id="6739">6739</span>
+<span id="6740">6740</span>
+<span id="6741">6741</span>
+<span id="6742">6742</span>
+<span id="6743">6743</span>
+<span id="6744">6744</span>
+<span id="6745">6745</span>
+<span id="6746">6746</span>
+<span id="6747">6747</span>
+<span id="6748">6748</span>
+<span id="6749">6749</span>
+<span id="6750">6750</span>
+<span id="6751">6751</span>
+<span id="6752">6752</span>
+<span id="6753">6753</span>
+<span id="6754">6754</span>
+<span id="6755">6755</span>
+<span id="6756">6756</span>
+<span id="6757">6757</span>
+<span id="6758">6758</span>
+<span id="6759">6759</span>
+<span id="6760">6760</span>
+<span id="6761">6761</span>
+<span id="6762">6762</span>
+<span id="6763">6763</span>
+<span id="6764">6764</span>
+<span id="6765">6765</span>
+<span id="6766">6766</span>
+<span id="6767">6767</span>
+<span id="6768">6768</span>
+<span id="6769">6769</span>
+<span id="6770">6770</span>
+<span id="6771">6771</span>
+<span id="6772">6772</span>
+<span id="6773">6773</span>
+<span id="6774">6774</span>
+<span id="6775">6775</span>
+<span id="6776">6776</span>
+<span id="6777">6777</span>
+<span id="6778">6778</span>
+<span id="6779">6779</span>
+<span id="6780">6780</span>
+<span id="6781">6781</span>
+<span id="6782">6782</span>
+<span id="6783">6783</span>
+<span id="6784">6784</span>
+<span id="6785">6785</span>
+<span id="6786">6786</span>
+<span id="6787">6787</span>
+<span id="6788">6788</span>
+<span id="6789">6789</span>
+<span id="6790">6790</span>
+<span id="6791">6791</span>
+<span id="6792">6792</span>
+<span id="6793">6793</span>
+<span id="6794">6794</span>
+<span id="6795">6795</span>
+<span id="6796">6796</span>
+<span id="6797">6797</span>
+<span id="6798">6798</span>
+<span id="6799">6799</span>
+<span id="6800">6800</span>
+<span id="6801">6801</span>
+<span id="6802">6802</span>
+<span id="6803">6803</span>
+<span id="6804">6804</span>
+<span id="6805">6805</span>
+<span id="6806">6806</span>
+<span id="6807">6807</span>
+<span id="6808">6808</span>
+<span id="6809">6809</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Generated file, do not edit by hand, see `xtask/codegen`</span>
 
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::redundant_closure</span>)]</span>
@@ -12879,76 +12958,94 @@
         [<span class="prelude-val">Some</span>(<span class="ident">SyntaxElement::Token</span>(<span class="ident">void_token</span>))],
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_array_assignment_pattern_element_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsArrayAssignmentPatternElementList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_array_assignment_pattern_element_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(
+    <span class="ident">items</span>: <span class="ident">I</span>,
+    <span class="ident">separators</span>: <span class="ident">S</span>,
+) -&gt; <span class="ident">JsArrayAssignmentPatternElementList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">JsAnyArrayAssignmentPatternElement</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsAnyArrayAssignmentPatternElement</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">JsArrayAssignmentPatternElementList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">JsSyntaxKind::JS_ARRAY_ASSIGNMENT_PATTERN_ELEMENT_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_array_binding_pattern_element_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsArrayBindingPatternElementList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_array_binding_pattern_element_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(
+    <span class="ident">items</span>: <span class="ident">I</span>,
+    <span class="ident">separators</span>: <span class="ident">S</span>,
+) -&gt; <span class="ident">JsArrayBindingPatternElementList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">JsAnyArrayBindingPatternElement</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsAnyArrayBindingPatternElement</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">JsArrayBindingPatternElementList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">JsSyntaxKind::JS_ARRAY_BINDING_PATTERN_ELEMENT_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_array_element_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsArrayElementList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_array_element_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>, <span class="ident">separators</span>: <span class="ident">S</span>) -&gt; <span class="ident">JsArrayElementList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">JsAnyArrayElement</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsAnyArrayElement</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">JsArrayElementList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">JsSyntaxKind::JS_ARRAY_ELEMENT_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_call_argument_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsCallArgumentList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_call_argument_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>, <span class="ident">separators</span>: <span class="ident">S</span>) -&gt; <span class="ident">JsCallArgumentList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">JsAnyCallArgument</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsAnyCallArgument</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">JsCallArgumentList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">JsSyntaxKind::JS_CALL_ARGUMENT_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_class_member_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsClassMemberList</span>
@@ -12975,22 +13072,25 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_constructor_parameter_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsConstructorParameterList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_constructor_parameter_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>, <span class="ident">separators</span>: <span class="ident">S</span>) -&gt; <span class="ident">JsConstructorParameterList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">JsAnyConstructorParameter</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsAnyConstructorParameter</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">JsConstructorParameterList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">JsSyntaxKind::JS_CONSTRUCTOR_PARAMETER_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_directive_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsDirectiveList</span>
@@ -13005,58 +13105,70 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_export_named_from_specifier_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsExportNamedFromSpecifierList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_export_named_from_specifier_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(
+    <span class="ident">items</span>: <span class="ident">I</span>,
+    <span class="ident">separators</span>: <span class="ident">S</span>,
+) -&gt; <span class="ident">JsExportNamedFromSpecifierList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">JsExportNamedFromSpecifier</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsExportNamedFromSpecifier</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">JsExportNamedFromSpecifierList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">JsSyntaxKind::JS_EXPORT_NAMED_FROM_SPECIFIER_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_export_named_specifier_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsExportNamedSpecifierList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_export_named_specifier_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>, <span class="ident">separators</span>: <span class="ident">S</span>) -&gt; <span class="ident">JsExportNamedSpecifierList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">JsAnyExportNamedSpecifier</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsAnyExportNamedSpecifier</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">JsExportNamedSpecifierList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">JsSyntaxKind::JS_EXPORT_NAMED_SPECIFIER_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_import_assertion_entry_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsImportAssertionEntryList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_import_assertion_entry_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>, <span class="ident">separators</span>: <span class="ident">S</span>) -&gt; <span class="ident">JsImportAssertionEntryList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">JsAnyImportAssertionEntry</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsAnyImportAssertionEntry</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">JsImportAssertionEntryList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">JsSyntaxKind::JS_IMPORT_ASSERTION_ENTRY_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_method_modifier_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsMethodModifierList</span>
@@ -13083,96 +13195,115 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_named_import_specifier_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsNamedImportSpecifierList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_named_import_specifier_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>, <span class="ident">separators</span>: <span class="ident">S</span>) -&gt; <span class="ident">JsNamedImportSpecifierList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">JsAnyNamedImportSpecifier</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsAnyNamedImportSpecifier</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">JsNamedImportSpecifierList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">JsSyntaxKind::JS_NAMED_IMPORT_SPECIFIER_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_object_assignment_pattern_property_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_object_assignment_pattern_property_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(
     <span class="ident">items</span>: <span class="ident">I</span>,
+    <span class="ident">separators</span>: <span class="ident">S</span>,
 ) -&gt; <span class="ident">JsObjectAssignmentPatternPropertyList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">JsAnyObjectAssignmentPatternMember</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsAnyObjectAssignmentPatternMember</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">JsObjectAssignmentPatternPropertyList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">JsSyntaxKind::JS_OBJECT_ASSIGNMENT_PATTERN_PROPERTY_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_object_binding_pattern_property_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsObjectBindingPatternPropertyList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_object_binding_pattern_property_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(
+    <span class="ident">items</span>: <span class="ident">I</span>,
+    <span class="ident">separators</span>: <span class="ident">S</span>,
+) -&gt; <span class="ident">JsObjectBindingPatternPropertyList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">JsAnyObjectBindingPatternMember</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsAnyObjectBindingPatternMember</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">JsObjectBindingPatternPropertyList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">JsSyntaxKind::JS_OBJECT_BINDING_PATTERN_PROPERTY_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_object_member_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsObjectMemberList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_object_member_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>, <span class="ident">separators</span>: <span class="ident">S</span>) -&gt; <span class="ident">JsObjectMemberList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">JsAnyObjectMember</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsAnyObjectMember</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">JsObjectMemberList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">JsSyntaxKind::JS_OBJECT_MEMBER_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_parameter_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsParameterList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_parameter_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>, <span class="ident">separators</span>: <span class="ident">S</span>) -&gt; <span class="ident">JsParameterList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">JsAnyParameter</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsAnyParameter</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">JsParameterList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">JsSyntaxKind::JS_PARAMETER_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_property_modifier_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsPropertyModifierList</span>
@@ -13223,22 +13354,25 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_variable_declarator_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsVariableDeclaratorList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_variable_declarator_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>, <span class="ident">separators</span>: <span class="ident">S</span>) -&gt; <span class="ident">JsVariableDeclaratorList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">JsVariableDeclarator</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsVariableDeclarator</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">JsVariableDeclaratorList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">JsSyntaxKind::JS_VARIABLE_DECLARATOR_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">jsx_attribute_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsxAttributeList</span>
@@ -13265,22 +13399,25 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ts_enum_member_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">TsEnumMemberList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ts_enum_member_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>, <span class="ident">separators</span>: <span class="ident">S</span>) -&gt; <span class="ident">TsEnumMemberList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">TsEnumMember</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TsEnumMember</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">TsEnumMemberList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">JsSyntaxKind::TS_ENUM_MEMBER_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ts_index_signature_modifier_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">TsIndexSignatureModifierList</span>
@@ -13295,22 +13432,28 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ts_intersection_type_element_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">TsIntersectionTypeElementList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ts_intersection_type_element_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(
+    <span class="ident">items</span>: <span class="ident">I</span>,
+    <span class="ident">separators</span>: <span class="ident">S</span>,
+) -&gt; <span class="ident">TsIntersectionTypeElementList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">TsType</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TsType</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">TsIntersectionTypeElementList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">JsSyntaxKind::TS_INTERSECTION_TYPE_ELEMENT_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ts_method_signature_modifier_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">TsMethodSignatureModifierList</span>
@@ -13361,58 +13504,67 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ts_tuple_type_element_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">TsTupleTypeElementList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ts_tuple_type_element_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>, <span class="ident">separators</span>: <span class="ident">S</span>) -&gt; <span class="ident">TsTupleTypeElementList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">TsAnyTupleTypeElement</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TsAnyTupleTypeElement</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">TsTupleTypeElementList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">JsSyntaxKind::TS_TUPLE_TYPE_ELEMENT_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ts_type_argument_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">TsTypeArgumentList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ts_type_argument_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>, <span class="ident">separators</span>: <span class="ident">S</span>) -&gt; <span class="ident">TsTypeArgumentList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">TsType</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TsType</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">TsTypeArgumentList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">JsSyntaxKind::TS_TYPE_ARGUMENT_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ts_type_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">TsTypeList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ts_type_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>, <span class="ident">separators</span>: <span class="ident">S</span>) -&gt; <span class="ident">TsTypeList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">TsNameWithTypeArguments</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TsNameWithTypeArguments</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">TsTypeList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">JsSyntaxKind::TS_TYPE_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ts_type_member_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">TsTypeMemberList</span>
@@ -13427,40 +13579,46 @@
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ts_type_parameter_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">TsTypeParameterList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ts_type_parameter_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>, <span class="ident">separators</span>: <span class="ident">S</span>) -&gt; <span class="ident">TsTypeParameterList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">TsTypeParameter</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TsTypeParameter</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">TsTypeParameterList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">JsSyntaxKind::TS_TYPE_PARAMETER_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ts_union_type_variant_list</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">TsUnionTypeVariantList</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ts_union_type_variant_list</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>, <span class="ident">separators</span>: <span class="ident">S</span>) -&gt; <span class="ident">TsUnionTypeVariantList</span>
 <span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">TsType</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TsType</span><span class="op">&gt;</span>,
     <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+    <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">JsSyntaxToken</span><span class="op">&gt;</span>,
+    <span class="ident">S::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
 {
-    <span class="kw">let</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="ident">item</span>, <span class="ident">separator</span>)<span class="op">|</span> {
-        [
-            <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>()),
-            <span class="ident">separator</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">token</span><span class="op">|</span> <span class="ident">token</span>.<span class="ident">into</span>()),
-        ]
-    });
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">items</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">separators</span> <span class="op">=</span> <span class="ident">separators</span>.<span class="ident">into_iter</span>();
+    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">separators</span>.<span class="ident">len</span>();
     <span class="ident">TsUnionTypeVariantList::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
         <span class="ident">JsSyntaxKind::TS_UNION_TYPE_VARIANT_LIST</span>,
-        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>()),
+        (<span class="number">0</span>..<span class="ident">length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">items</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into_syntax</span>().<span class="ident">into</span>())
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+            }
+        }),
     ))
 }
 </code></pre></div>

@@ -165,10 +165,6 @@
 <span id="160">160</span>
 <span id="161">161</span>
 <span id="162">162</span>
-<span id="163">163</span>
-<span id="164">164</span>
-<span id="165">165</span>
-<span id="166">166</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_analyze</span>::{
     <span class="ident">context::RuleContext</span>, <span class="ident">declare_rule</span>, <span class="ident">ActionCategory</span>, <span class="ident">Ast</span>, <span class="ident">Rule</span>, <span class="ident">RuleCategory</span>, <span class="ident">RuleDiagnostic</span>,
 };
@@ -312,21 +308,17 @@
             }
             <span class="ident">length</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">ts_union_type_builder</span> <span class="op">=</span> <span class="ident">make::ts_union_type</span>(<span class="ident">make::ts_union_type_variant_list</span>(
-                    <span class="ident">types_array</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">item</span>)<span class="op">|</span> {
-                        (
-                            <span class="ident">item</span>,
-                            (<span class="ident">i</span> <span class="op">!</span><span class="op">=</span> <span class="ident">length</span> <span class="op">-</span> <span class="number">1</span>).<span class="ident">then</span>(<span class="op">|</span><span class="op">|</span> {
-                                <span class="ident">make::token</span>(<span class="macro">T!</span>[<span class="op">|</span>])
-                                    .<span class="ident">with_leading_trivia</span>(<span class="ident">std::iter::once</span>((
-                                        <span class="ident">TriviaPieceKind::Whitespace</span>,
-                                        <span class="string">&quot; &quot;</span>,
-                                    )))
-                                    .<span class="ident">with_trailing_trivia</span>(<span class="ident">std::iter::once</span>((
-                                        <span class="ident">TriviaPieceKind::Whitespace</span>,
-                                        <span class="string">&quot; &quot;</span>,
-                                    )))
-                            }),
-                        )
+                    <span class="ident">types_array</span>.<span class="ident">into_iter</span>(),
+                    (<span class="number">0</span>..<span class="ident">length</span> <span class="op">-</span> <span class="number">1</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
+                        <span class="ident">make::token</span>(<span class="macro">T!</span>[<span class="op">|</span>])
+                            .<span class="ident">with_leading_trivia</span>(<span class="ident">std::iter::once</span>((
+                                <span class="ident">TriviaPieceKind::Whitespace</span>,
+                                <span class="string">&quot; &quot;</span>,
+                            )))
+                            .<span class="ident">with_trailing_trivia</span>(<span class="ident">std::iter::once</span>((
+                                <span class="ident">TriviaPieceKind::Whitespace</span>,
+                                <span class="string">&quot; &quot;</span>,
+                            )))
                     }),
                 ));
                 <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">TsType::TsUnionType</span>(<span class="ident">ts_union_type_builder</span>.<span class="ident">build</span>()));
