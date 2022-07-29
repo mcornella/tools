@@ -425,12 +425,6 @@
 <span id="420">420</span>
 <span id="421">421</span>
 <span id="422">422</span>
-<span id="423">423</span>
-<span id="424">424</span>
-<span id="425">425</span>
-<span id="426">426</span>
-<span id="427">427</span>
-<span id="428">428</span>
 </pre><pre class="rust"><code><span class="doccomment">/// Constructs the parameters for other formatting macros.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This macro functions by taking a list of objects implementing [crate::Format]. It canonicalize the</span>
@@ -448,7 +442,7 @@
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let formatted = format!(SimpleFormatContext::default(), [</span>
-<span class="doccomment">///     format_args!(token(&quot;Hello World&quot;))</span>
+<span class="doccomment">///     format_args!(text(&quot;Hello World&quot;))</span>
 <span class="doccomment">/// ]).unwrap();</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(&quot;Hello World&quot;, formatted.print().as_code());</span>
@@ -482,15 +476,15 @@
 <span class="doccomment">/// fn main() -&gt; FormatResult&lt;()&gt; {</span>
 <span class="doccomment">///     let mut state = FormatState::new(SimpleFormatContext::default());</span>
 <span class="doccomment">///     let mut buffer = VecBuffer::new(&amp;mut state);</span>
-<span class="doccomment">///     write!(&amp;mut buffer, [token(&quot;Hello&quot;), space_token()])?;</span>
-<span class="doccomment">///     write!(&amp;mut buffer, [token(&quot;World&quot;)])?;</span>
+<span class="doccomment">///     write!(&amp;mut buffer, [text(&quot;Hello&quot;), space()])?;</span>
+<span class="doccomment">///     write!(&amp;mut buffer, [text(&quot;World&quot;)])?;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">///     assert_eq!(</span>
 <span class="doccomment">///         buffer.into_element(),</span>
 <span class="doccomment">///         FormatElement::from_iter([</span>
-<span class="doccomment">///             FormatElement::Token(Token::Static { text: &quot;Hello&quot; }),</span>
+<span class="doccomment">///             FormatElement::Text(Text::Static { text: &quot;Hello&quot; }),</span>
 <span class="doccomment">///             FormatElement::Space,</span>
-<span class="doccomment">///             FormatElement::Token(Token::Static { text: &quot;World&quot; }),</span>
+<span class="doccomment">///             FormatElement::Text(Text::Static { text: &quot;World&quot; }),</span>
 <span class="doccomment">///         ])</span>
 <span class="doccomment">///     );</span>
 <span class="doccomment">///</span>
@@ -515,10 +509,10 @@
 <span class="doccomment">/// let mut state = FormatState::new(SimpleFormatContext::default());</span>
 <span class="doccomment">/// let mut buffer = VecBuffer::new(&amp;mut state);</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// dbg_write!(buffer, [token(&quot;Hello&quot;)]).unwrap();</span>
+<span class="doccomment">/// dbg_write!(buffer, [text(&quot;Hello&quot;)]).unwrap();</span>
 <span class="doccomment">/// // ^-- prints: [src/main.rs:7][0] = StaticToken(&quot;Hello&quot;)</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(buffer.into_element(), FormatElement::Token(Token::Static { text: &quot;Hello&quot; }));</span>
+<span class="doccomment">/// assert_eq!(buffer.into_element(), FormatElement::Text(Text::Static { text: &quot;Hello&quot; }));</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Note that the macro is intended as debugging tool and therefore you should avoid having</span>
@@ -552,14 +546,14 @@
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">/// use rome_formatter::format;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let formatted = format!(SimpleFormatContext::default(), [token(&quot;(&quot;), token(&quot;a&quot;), token(&quot;)&quot;)]).unwrap();</span>
+<span class="doccomment">/// let formatted = format!(SimpleFormatContext::default(), [text(&quot;(&quot;), text(&quot;a&quot;), text(&quot;)&quot;)]).unwrap();</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(</span>
 <span class="doccomment">///     formatted.into_format_element(),</span>
 <span class="doccomment">///     FormatElement::from_iter([</span>
-<span class="doccomment">///         FormatElement::Token(Token::Static { text: &quot;(&quot; }),</span>
-<span class="doccomment">///         FormatElement::Token(Token::Static { text: &quot;a&quot; }),</span>
-<span class="doccomment">///         FormatElement::Token(Token::Static { text: &quot;)&quot; }),</span>
+<span class="doccomment">///         FormatElement::Text(Text::Static { text: &quot;(&quot; }),</span>
+<span class="doccomment">///         FormatElement::Text(Text::Static { text: &quot;a&quot; }),</span>
+<span class="doccomment">///         FormatElement::Text(Text::Static { text: &quot;)&quot; }),</span>
 <span class="doccomment">///     ])</span>
 <span class="doccomment">/// );</span>
 <span class="doccomment">/// ```</span>
@@ -585,49 +579,49 @@
 <span class="doccomment">/// let formatted = format!(</span>
 <span class="doccomment">///     SimpleFormatContext::default(),</span>
 <span class="doccomment">///     [</span>
-<span class="doccomment">///         token(&quot;aVeryLongIdentifier&quot;),</span>
+<span class="doccomment">///         text(&quot;aVeryLongIdentifier&quot;),</span>
 <span class="doccomment">///         best_fitting!(</span>
 <span class="doccomment">///             // Everything fits on a single line</span>
 <span class="doccomment">///             format_args!(</span>
-<span class="doccomment">///                 token(&quot;(&quot;),</span>
-<span class="doccomment">///                 group_elements(&amp;format_args![</span>
-<span class="doccomment">///                     token(&quot;[&quot;),</span>
+<span class="doccomment">///                 text(&quot;(&quot;),</span>
+<span class="doccomment">///                 group(&amp;format_args![</span>
+<span class="doccomment">///                     text(&quot;[&quot;),</span>
 <span class="doccomment">///                         soft_block_indent(&amp;format_args![</span>
-<span class="doccomment">///                         token(&quot;1,&quot;),</span>
+<span class="doccomment">///                         text(&quot;1,&quot;),</span>
 <span class="doccomment">///                         soft_line_break_or_space(),</span>
-<span class="doccomment">///                         token(&quot;2,&quot;),</span>
+<span class="doccomment">///                         text(&quot;2,&quot;),</span>
 <span class="doccomment">///                         soft_line_break_or_space(),</span>
-<span class="doccomment">///                         token(&quot;3&quot;),</span>
+<span class="doccomment">///                         text(&quot;3&quot;),</span>
 <span class="doccomment">///                     ]),</span>
-<span class="doccomment">///                     token(&quot;]&quot;)</span>
+<span class="doccomment">///                     text(&quot;]&quot;)</span>
 <span class="doccomment">///                 ]),</span>
-<span class="doccomment">///                 token(&quot;)&quot;)</span>
+<span class="doccomment">///                 text(&quot;)&quot;)</span>
 <span class="doccomment">///             ),</span>
 <span class="doccomment">///</span>
 <span class="doccomment">///             // Breaks after `[`, but prints all elements on a single line</span>
 <span class="doccomment">///             format_args!(</span>
-<span class="doccomment">///                 token(&quot;(&quot;),</span>
-<span class="doccomment">///                 token(&quot;[&quot;),</span>
-<span class="doccomment">///                 block_indent(&amp;token(&quot;1, 2, 3&quot;)),</span>
-<span class="doccomment">///                 token(&quot;]&quot;),</span>
-<span class="doccomment">///                 token(&quot;)&quot;),</span>
+<span class="doccomment">///                 text(&quot;(&quot;),</span>
+<span class="doccomment">///                 text(&quot;[&quot;),</span>
+<span class="doccomment">///                 block_indent(&amp;text(&quot;1, 2, 3&quot;)),</span>
+<span class="doccomment">///                 text(&quot;]&quot;),</span>
+<span class="doccomment">///                 text(&quot;)&quot;),</span>
 <span class="doccomment">///             ),</span>
 <span class="doccomment">///</span>
 <span class="doccomment">///             // Breaks after `[` and prints each element on a single line</span>
 <span class="doccomment">///             format_args!(</span>
-<span class="doccomment">///                 token(&quot;(&quot;),</span>
+<span class="doccomment">///                 text(&quot;(&quot;),</span>
 <span class="doccomment">///                 block_indent(&amp;format_args![</span>
-<span class="doccomment">///                     token(&quot;[&quot;),</span>
+<span class="doccomment">///                     text(&quot;[&quot;),</span>
 <span class="doccomment">///                     block_indent(&amp;format_args![</span>
-<span class="doccomment">///                         token(&quot;1,&quot;),</span>
+<span class="doccomment">///                         text(&quot;1,&quot;),</span>
 <span class="doccomment">///                         hard_line_break(),</span>
-<span class="doccomment">///                         token(&quot;2,&quot;),</span>
+<span class="doccomment">///                         text(&quot;2,&quot;),</span>
 <span class="doccomment">///                         hard_line_break(),</span>
-<span class="doccomment">///                         token(&quot;3&quot;),</span>
+<span class="doccomment">///                         text(&quot;3&quot;),</span>
 <span class="doccomment">///                     ]),</span>
-<span class="doccomment">///                     token(&quot;]&quot;),</span>
+<span class="doccomment">///                     text(&quot;]&quot;),</span>
 <span class="doccomment">///                 ]),</span>
-<span class="doccomment">///                 token(&quot;)&quot;)</span>
+<span class="doccomment">///                 text(&quot;)&quot;)</span>
 <span class="doccomment">///             )</span>
 <span class="doccomment">///         )</span>
 <span class="doccomment">///     ]</span>
@@ -700,7 +694,7 @@
 
     <span class="kw">impl</span> <span class="ident">Format</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TestFormat</span> {
         <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) -&gt; <span class="ident">FormatResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">token</span>(<span class="string">&quot;test&quot;</span>)])
+            <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">text</span>(<span class="string">&quot;test&quot;</span>)])
         }
     }
 
@@ -713,7 +707,7 @@
 
         <span class="macro">assert_eq!</span>(
             <span class="ident">buffer</span>.<span class="ident">into_element</span>(),
-            <span class="ident">FormatElement::Token</span>(<span class="ident">Token::Static</span> { <span class="ident">text</span>: <span class="string">&quot;test&quot;</span> })
+            <span class="ident">FormatElement::Text</span>(<span class="ident">Text::Static</span> { <span class="ident">text</span>: <span class="string">&quot;test&quot;</span> })
         );
     }
 
@@ -724,24 +718,18 @@
 
         <span class="macro">write!</span>[
             <span class="kw-2">&amp;mut</span> <span class="ident">buffer</span>,
-            [
-                <span class="ident">token</span>(<span class="string">&quot;a&quot;</span>),
-                <span class="ident">space_token</span>(),
-                <span class="ident">token</span>(<span class="string">&quot;simple&quot;</span>),
-                <span class="ident">space_token</span>(),
-                <span class="ident">TestFormat</span>
-            ]
+            [<span class="ident">text</span>(<span class="string">&quot;a&quot;</span>), <span class="ident">space</span>(), <span class="ident">text</span>(<span class="string">&quot;simple&quot;</span>), <span class="ident">space</span>(), <span class="ident">TestFormat</span>]
         ]
         .<span class="ident">unwrap</span>();
 
         <span class="macro">assert_eq!</span>(
             <span class="ident">buffer</span>.<span class="ident">into_element</span>(),
             <span class="ident">FormatElement::List</span>(<span class="ident">List::new</span>(<span class="macro">vec!</span>[
-                <span class="ident">FormatElement::Token</span>(<span class="ident">Token::Static</span> { <span class="ident">text</span>: <span class="string">&quot;a&quot;</span> }),
+                <span class="ident">FormatElement::Text</span>(<span class="ident">Text::Static</span> { <span class="ident">text</span>: <span class="string">&quot;a&quot;</span> }),
                 <span class="ident">FormatElement::Space</span>,
-                <span class="ident">FormatElement::Token</span>(<span class="ident">Token::Static</span> { <span class="ident">text</span>: <span class="string">&quot;simple&quot;</span> }),
+                <span class="ident">FormatElement::Text</span>(<span class="ident">Text::Static</span> { <span class="ident">text</span>: <span class="string">&quot;simple&quot;</span> }),
                 <span class="ident">FormatElement::Space</span>,
-                <span class="ident">FormatElement::Token</span>(<span class="ident">Token::Static</span> { <span class="ident">text</span>: <span class="string">&quot;test&quot;</span> })
+                <span class="ident">FormatElement::Text</span>(<span class="ident">Text::Static</span> { <span class="ident">text</span>: <span class="string">&quot;test&quot;</span> })
             ]))
         );
     }
@@ -755,40 +743,40 @@
         <span class="kw">let</span> <span class="ident">formatted_best_fitting</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="ident">SimpleFormatContext::default</span>(),
             [
-                <span class="ident">token</span>(<span class="string">&quot;aVeryLongIdentifier&quot;</span>),
+                <span class="ident">text</span>(<span class="string">&quot;aVeryLongIdentifier&quot;</span>),
                 <span class="ident">soft_line_break_or_space</span>(),
                 <span class="macro">best_fitting!</span>(
-                    <span class="macro">format_args!</span>(<span class="ident">token</span>(
+                    <span class="macro">format_args!</span>(<span class="ident">text</span>(
                         <span class="string">&quot;Something that will not fit on a 30 character print width.&quot;</span>
                     ),),
                     <span class="macro">format_args!</span>[
-                        <span class="ident">token</span>(<span class="string">&quot;Start&quot;</span>),
+                        <span class="ident">text</span>(<span class="string">&quot;Start&quot;</span>),
                         <span class="ident">soft_line_break</span>(),
-                        <span class="kw-2">&amp;</span><span class="ident">group_elements</span>(<span class="kw-2">&amp;</span><span class="ident">soft_block_indent</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
-                            <span class="ident">token</span>(<span class="string">&quot;1,&quot;</span>),
+                        <span class="kw-2">&amp;</span><span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="ident">soft_block_indent</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
+                            <span class="ident">text</span>(<span class="string">&quot;1,&quot;</span>),
                             <span class="ident">soft_line_break_or_space</span>(),
-                            <span class="ident">token</span>(<span class="string">&quot;2,&quot;</span>),
+                            <span class="ident">text</span>(<span class="string">&quot;2,&quot;</span>),
                             <span class="ident">soft_line_break_or_space</span>(),
-                            <span class="ident">token</span>(<span class="string">&quot;3&quot;</span>),
+                            <span class="ident">text</span>(<span class="string">&quot;3&quot;</span>),
                         ])),
                         <span class="ident">soft_line_break_or_space</span>(),
                         <span class="kw-2">&amp;</span><span class="ident">soft_block_indent</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
-                            <span class="ident">token</span>(<span class="string">&quot;1,&quot;</span>),
+                            <span class="ident">text</span>(<span class="string">&quot;1,&quot;</span>),
                             <span class="ident">soft_line_break_or_space</span>(),
-                            <span class="ident">token</span>(<span class="string">&quot;2,&quot;</span>),
+                            <span class="ident">text</span>(<span class="string">&quot;2,&quot;</span>),
                             <span class="ident">soft_line_break_or_space</span>(),
-                            <span class="ident">group_elements</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(
-                                <span class="ident">token</span>(<span class="string">&quot;A,&quot;</span>),
+                            <span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(
+                                <span class="ident">text</span>(<span class="string">&quot;A,&quot;</span>),
                                 <span class="ident">soft_line_break_or_space</span>(),
-                                <span class="ident">token</span>(<span class="string">&quot;B&quot;</span>)
+                                <span class="ident">text</span>(<span class="string">&quot;B&quot;</span>)
                             )),
                             <span class="ident">soft_line_break_or_space</span>(),
-                            <span class="ident">token</span>(<span class="string">&quot;3&quot;</span>)
+                            <span class="ident">text</span>(<span class="string">&quot;3&quot;</span>)
                         ]),
                         <span class="ident">soft_line_break_or_space</span>(),
-                        <span class="ident">token</span>(<span class="string">&quot;End&quot;</span>)
+                        <span class="ident">text</span>(<span class="string">&quot;End&quot;</span>)
                     ],
-                    <span class="macro">format_args!</span>(<span class="ident">token</span>(<span class="string">&quot;Most&quot;</span>), <span class="ident">hard_line_break</span>(), <span class="ident">token</span>(<span class="string">&quot;Expanded&quot;</span>))
+                    <span class="macro">format_args!</span>(<span class="ident">text</span>(<span class="string">&quot;Most&quot;</span>), <span class="ident">hard_line_break</span>(), <span class="ident">text</span>(<span class="string">&quot;Expanded&quot;</span>))
                 )
             ]
         )
@@ -799,34 +787,34 @@
         <span class="kw">let</span> <span class="ident">formatted_normal_list</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="ident">SimpleFormatContext::default</span>(),
             [
-                <span class="ident">token</span>(<span class="string">&quot;aVeryLongIdentifier&quot;</span>),
+                <span class="ident">text</span>(<span class="string">&quot;aVeryLongIdentifier&quot;</span>),
                 <span class="ident">soft_line_break_or_space</span>(),
                 <span class="macro">format_args!</span>[
-                    <span class="ident">token</span>(<span class="string">&quot;Start&quot;</span>),
+                    <span class="ident">text</span>(<span class="string">&quot;Start&quot;</span>),
                     <span class="ident">soft_line_break</span>(),
-                    <span class="kw-2">&amp;</span><span class="ident">group_elements</span>(<span class="kw-2">&amp;</span><span class="ident">soft_block_indent</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
-                        <span class="ident">token</span>(<span class="string">&quot;1,&quot;</span>),
+                    <span class="kw-2">&amp;</span><span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="ident">soft_block_indent</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
+                        <span class="ident">text</span>(<span class="string">&quot;1,&quot;</span>),
                         <span class="ident">soft_line_break_or_space</span>(),
-                        <span class="ident">token</span>(<span class="string">&quot;2,&quot;</span>),
+                        <span class="ident">text</span>(<span class="string">&quot;2,&quot;</span>),
                         <span class="ident">soft_line_break_or_space</span>(),
-                        <span class="ident">token</span>(<span class="string">&quot;3&quot;</span>),
+                        <span class="ident">text</span>(<span class="string">&quot;3&quot;</span>),
                     ])),
                     <span class="ident">soft_line_break_or_space</span>(),
                     <span class="kw-2">&amp;</span><span class="ident">soft_block_indent</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
-                        <span class="ident">token</span>(<span class="string">&quot;1,&quot;</span>),
+                        <span class="ident">text</span>(<span class="string">&quot;1,&quot;</span>),
                         <span class="ident">soft_line_break_or_space</span>(),
-                        <span class="ident">token</span>(<span class="string">&quot;2,&quot;</span>),
+                        <span class="ident">text</span>(<span class="string">&quot;2,&quot;</span>),
                         <span class="ident">soft_line_break_or_space</span>(),
-                        <span class="ident">group_elements</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(
-                            <span class="ident">token</span>(<span class="string">&quot;A,&quot;</span>),
+                        <span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(
+                            <span class="ident">text</span>(<span class="string">&quot;A,&quot;</span>),
                             <span class="ident">soft_line_break_or_space</span>(),
-                            <span class="ident">token</span>(<span class="string">&quot;B&quot;</span>)
+                            <span class="ident">text</span>(<span class="string">&quot;B&quot;</span>)
                         )),
                         <span class="ident">soft_line_break_or_space</span>(),
-                        <span class="ident">token</span>(<span class="string">&quot;3&quot;</span>)
+                        <span class="ident">text</span>(<span class="string">&quot;3&quot;</span>)
                     ]),
                     <span class="ident">soft_line_break_or_space</span>(),
-                    <span class="ident">token</span>(<span class="string">&quot;End&quot;</span>)
+                    <span class="ident">text</span>(<span class="string">&quot;End&quot;</span>)
                 ],
             ]
         )

@@ -13,7 +13,7 @@ It will call the <code>format</code> function for every of it’s objects.</p>
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">format</span>, <span class="ident">format_args</span>};
 
 <span class="kw">let</span> <span class="ident">formatted</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="ident">SimpleFormatContext::default</span>(), [
-    <span class="macro">format_args!</span>(<span class="ident">token</span>(<span class="string">&quot;a&quot;</span>), <span class="ident">space_token</span>(), <span class="ident">token</span>(<span class="string">&quot;b&quot;</span>))
+    <span class="macro">format_args!</span>(<span class="ident">text</span>(<span class="string">&quot;a&quot;</span>), <span class="ident">space</span>(), <span class="ident">text</span>(<span class="string">&quot;b&quot;</span>))
 ]).<span class="ident">unwrap</span>();
 
 <span class="macro">assert_eq!</span>(<span class="string">&quot;a b&quot;</span>, <span class="ident">formatted</span>.<span class="ident">print</span>().<span class="ident">as_code</span>());</code></pre></div>

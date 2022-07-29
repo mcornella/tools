@@ -69,7 +69,7 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::jsx::auxiliary::space::JsxSpace</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">format_args</span>, <span class="ident">write</span>};
-<span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">group_elements</span>, <span class="ident">CstFormatContext</span>, <span class="ident">FormatResult</span>};
+<span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">group</span>, <span class="ident">CstFormatContext</span>, <span class="ident">FormatResult</span>};
 <span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{
     <span class="ident">JsAnyExpression</span>, <span class="ident">JsAnyLiteralExpression</span>, <span class="ident">JsxExpressionChild</span>, <span class="ident">JsxExpressionChildFields</span>,
 };
@@ -120,7 +120,7 @@
 
         <span class="macro">write!</span>[
             <span class="ident">f</span>,
-            [<span class="ident">group_elements</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
+            [<span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
                 <span class="ident">l_curly_token</span>.<span class="ident">format</span>(),
                 <span class="ident">expression</span>.<span class="ident">format</span>(),
                 <span class="ident">line_suffix_boundary</span>(),

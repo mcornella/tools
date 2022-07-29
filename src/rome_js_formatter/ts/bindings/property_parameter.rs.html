@@ -21,9 +21,6 @@
 <span id="16">16</span>
 <span id="17">17</span>
 <span id="18">18</span>
-<span id="19">19</span>
-<span id="20">20</span>
-<span id="21">21</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="kw">use</span> <span class="ident">rome_formatter::write</span>;
@@ -39,10 +36,7 @@
             <span class="ident">formal_parameter</span>,
         } <span class="op">=</span> <span class="ident">node</span>.<span class="ident">as_fields</span>();
 
-        <span class="macro">write!</span>[
-            <span class="ident">f</span>,
-            [<span class="ident">modifiers</span>.<span class="ident">format</span>(), <span class="ident">space_token</span>(), <span class="ident">formal_parameter</span>.<span class="ident">format</span>()]
-        ]
+        <span class="macro">write!</span>[<span class="ident">f</span>, [<span class="ident">modifiers</span>.<span class="ident">format</span>(), <span class="ident">space</span>(), <span class="ident">formal_parameter</span>.<span class="ident">format</span>()]]
     }
 }
 </code></pre></div>

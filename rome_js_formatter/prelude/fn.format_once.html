@@ -17,8 +17,8 @@ An example of this is if you want to nest a <code>FormatElement</code> or non-cl
 
 <span class="kw">struct</span> <span class="ident">MyFormat</span>;
 
-<span class="kw">fn</span> <span class="ident">generate_values</span>() -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">StaticToken</span><span class="op">&gt;</span> {
-    <span class="macro">vec!</span>[<span class="ident">token</span>(<span class="string">&quot;1&quot;</span>), <span class="ident">token</span>(<span class="string">&quot;2&quot;</span>), <span class="ident">token</span>(<span class="string">&quot;3&quot;</span>), <span class="ident">token</span>(<span class="string">&quot;4&quot;</span>)].<span class="ident">into_iter</span>()
+<span class="kw">fn</span> <span class="ident">generate_values</span>() -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">StaticText</span><span class="op">&gt;</span> {
+    <span class="macro">vec!</span>[<span class="ident">text</span>(<span class="string">&quot;1&quot;</span>), <span class="ident">text</span>(<span class="string">&quot;2&quot;</span>), <span class="ident">text</span>(<span class="string">&quot;3&quot;</span>), <span class="ident">text</span>(<span class="string">&quot;4&quot;</span>)].<span class="ident">into_iter</span>()
 }
 
 <span class="kw">impl</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">SimpleFormatContext</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MyFormat</span> {

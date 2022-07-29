@@ -113,8 +113,6 @@
 <span id="108">108</span>
 <span id="109">109</span>
 <span id="110">110</span>
-<span id="111">111</span>
-<span id="112">112</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::is_simple_expression</span>;
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">format_args</span>, <span class="ident">write</span>};
@@ -130,7 +128,7 @@
 
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">JsAnyFunction</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">JsFormatter</span>) -&gt; <span class="ident">FormatResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">async_token</span>) <span class="op">=</span> <span class="ident">node</span>.<span class="ident">async_token</span>() {
-            <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">async_token</span>.<span class="ident">format</span>(), <span class="ident">space_token</span>()])<span class="question-mark">?</span>;
+            <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">async_token</span>.<span class="ident">format</span>(), <span class="ident">space</span>()])<span class="question-mark">?</span>;
         }
 
         <span class="macro">write!</span>(
@@ -141,10 +139,10 @@
         <span class="kw">if</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">node</span>, <span class="ident">JsAnyFunction::JsArrowFunctionExpression</span>(<span class="kw">_</span>)) {
             <span class="kw">match</span> <span class="ident">node</span>.<span class="ident">id</span>()<span class="question-mark">?</span> {
                 <span class="prelude-val">Some</span>(<span class="ident">id</span>) =&gt; {
-                    <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">space_token</span>(), <span class="ident">id</span>.<span class="ident">format</span>()])<span class="question-mark">?</span>;
+                    <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">space</span>(), <span class="ident">id</span>.<span class="ident">format</span>()])<span class="question-mark">?</span>;
                 }
                 <span class="prelude-val">None</span> =&gt; {
-                    <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">space_token</span>()])<span class="question-mark">?</span>;
+                    <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">space</span>()])<span class="question-mark">?</span>;
                 }
             }
         }
@@ -156,7 +154,7 @@
                 <span class="ident">f</span>,
                 [<span class="ident">format_parenthesize</span>(
                     <span class="ident">binding</span>.<span class="ident">syntax</span>().<span class="ident">first_token</span>().<span class="ident">as_ref</span>(),
-                    <span class="kw-2">&amp;</span><span class="macro">format_args!</span>[<span class="ident">binding</span>.<span class="ident">format</span>(), <span class="ident">if_group_breaks</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>(<span class="string">&quot;,&quot;</span>)),],
+                    <span class="kw-2">&amp;</span><span class="macro">format_args!</span>[<span class="ident">binding</span>.<span class="ident">format</span>(), <span class="ident">if_group_breaks</span>(<span class="kw-2">&amp;</span><span class="ident">text</span>(<span class="string">&quot;,&quot;</span>)),],
                     <span class="ident">binding</span>.<span class="ident">syntax</span>().<span class="ident">last_token</span>().<span class="ident">as_ref</span>(),
                 )
                 .<span class="ident">grouped_with_soft_block_indent</span>()]
@@ -164,7 +162,7 @@
             <span class="ident">JsAnyArrowFunctionParameters::JsParameters</span>(<span class="ident">params</span>) =&gt; <span class="macro">write!</span>[<span class="ident">f</span>, [<span class="ident">params</span>.<span class="ident">format</span>()]]<span class="question-mark">?</span>,
         }
 
-        <span class="macro">write!</span>[<span class="ident">f</span>, [<span class="ident">node</span>.<span class="ident">return_type_annotation</span>().<span class="ident">format</span>(), <span class="ident">space_token</span>()]]<span class="question-mark">?</span>;
+        <span class="macro">write!</span>[<span class="ident">f</span>, [<span class="ident">node</span>.<span class="ident">return_type_annotation</span>().<span class="ident">format</span>(), <span class="ident">space</span>()]]<span class="question-mark">?</span>;
 
         <span class="comment">// We create a new group for everything after the parameters. That way if the parameters</span>
         <span class="comment">// get broken, we don&#39;t line break the arrow and the body if they can fit on the same line.</span>
@@ -179,7 +177,7 @@
         <span class="comment">// The line break for `a + b` is not necessary</span>
         <span class="comment">//</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">JsAnyFunction::JsArrowFunctionExpression</span>(<span class="ident">arrow</span>) <span class="op">=</span> <span class="ident">node</span> {
-            <span class="macro">write!</span>[<span class="ident">f</span>, [<span class="ident">arrow</span>.<span class="ident">fat_arrow_token</span>().<span class="ident">format</span>(), <span class="ident">space_token</span>()]]<span class="question-mark">?</span>;
+            <span class="macro">write!</span>[<span class="ident">f</span>, [<span class="ident">arrow</span>.<span class="ident">fat_arrow_token</span>().<span class="ident">format</span>(), <span class="ident">space</span>()]]<span class="question-mark">?</span>;
         }
 
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">body</span>()<span class="question-mark">?</span>;
@@ -218,9 +216,7 @@
         } <span class="kw">else</span> {
             <span class="macro">write!</span>(
                 <span class="ident">f</span>,
-                [<span class="ident">group_elements</span>(<span class="kw-2">&amp;</span><span class="ident">soft_line_indent_or_space</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">node</span>.<span class="ident">body</span>().<span class="ident">format</span>()
-                ))]
+                [<span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="ident">soft_line_indent_or_space</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>.<span class="ident">body</span>().<span class="ident">format</span>()))]
             )<span class="question-mark">?</span>;
         }
 

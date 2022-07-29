@@ -686,14 +686,14 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use rome_formatter::{Buffer, FormatElement, FormatState, SimpleFormatContext, Token, VecBuffer};</span>
+    <span class="doccomment">/// use rome_formatter::{Buffer, FormatElement, FormatState, SimpleFormatContext, Text, VecBuffer};</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut state = FormatState::new(SimpleFormatContext::default());</span>
     <span class="doccomment">/// let mut buffer = VecBuffer::new(&amp;mut state);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// buffer.write_element(FormatElement::Token( Token::Static { text: &quot;test&quot;})).unwrap();</span>
+    <span class="doccomment">/// buffer.write_element(FormatElement::Text( Text::Static { text: &quot;test&quot;})).unwrap();</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(buffer.into_element(), FormatElement::Token( Token::Static { text: &quot;test&quot;}));</span>
+    <span class="doccomment">/// assert_eq!(buffer.into_element(), FormatElement::Text( Text::Static { text: &quot;test&quot;}));</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="kw">fn</span> <span class="ident">write_element</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">element</span>: <span class="ident">FormatElement</span>) -&gt; <span class="ident">FormatResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
@@ -706,14 +706,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// use rome_formatter::prelude::*;</span>
-    <span class="doccomment">/// use rome_formatter::{Buffer, FormatState, SimpleFormatContext, Token, VecBuffer, format_args};</span>
+    <span class="doccomment">/// use rome_formatter::{Buffer, FormatState, SimpleFormatContext, Text, VecBuffer, format_args};</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let mut state = FormatState::new(SimpleFormatContext::default());</span>
     <span class="doccomment">/// let mut buffer = VecBuffer::new(&amp;mut state);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// buffer.write_fmt(format_args!(token(&quot;Hello World&quot;))).unwrap();</span>
+    <span class="doccomment">/// buffer.write_fmt(format_args!(text(&quot;Hello World&quot;))).unwrap();</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(buffer.into_element(), FormatElement::Token( Token::Static { text: &quot;Hello World&quot;}));</span>
+    <span class="doccomment">/// assert_eq!(buffer.into_element(), FormatElement::Text( Text::Static { text: &quot;Hello World&quot;}));</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">fn</span> <span class="ident">write_fmt</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="kw-2">&amp;mut</span> <span class="self">Self</span>, <span class="ident">arguments</span>: <span class="ident">Arguments</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Context</span><span class="op">&gt;</span>) -&gt; <span class="ident">FormatResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">arguments</span>)
@@ -934,13 +934,13 @@ Make sure that you take and restore the snapshot in order and that this snapshot
 <span class="doccomment">///</span>
 <span class="doccomment">/// impl Format&lt;SimpleFormatContext&gt; for Preamble {</span>
 <span class="doccomment">///     fn fmt(&amp;self, f: &amp;mut Formatter&lt;SimpleFormatContext&gt;) -&gt; FormatResult&lt;()&gt; {</span>
-<span class="doccomment">///         write!(f, [token(&quot;# heading&quot;), hard_line_break()])</span>
+<span class="doccomment">///         write!(f, [text(&quot;# heading&quot;), hard_line_break()])</span>
 <span class="doccomment">///     }</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let mut with_preamble = PreambleBuffer::new(&amp;mut buffer, Preamble);</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// write!(&amp;mut with_preamble, [token(&quot;this text will be on a new line&quot;)]).unwrap();</span>
+<span class="doccomment">/// write!(&amp;mut with_preamble, [text(&quot;this text will be on a new line&quot;)]).unwrap();</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// drop(with_preamble);</span>
 <span class="doccomment">///</span>
@@ -961,7 +961,7 @@ Make sure that you take and restore the snapshot in order and that this snapshot
 <span class="doccomment">///</span>
 <span class="doccomment">/// impl Format&lt;SimpleFormatContext&gt; for Preamble {</span>
 <span class="doccomment">///     fn fmt(&amp;self, f: &amp;mut Formatter&lt;SimpleFormatContext&gt;) -&gt; FormatResult&lt;()&gt; {</span>
-<span class="doccomment">///         write!(f, [token(&quot;# heading&quot;), hard_line_break()])</span>
+<span class="doccomment">///         write!(f, [text(&quot;# heading&quot;), hard_line_break()])</span>
 <span class="doccomment">///     }</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
@@ -1129,9 +1129,9 @@ Make sure that you take and restore the snapshot in order and that this snapshot
     <span class="doccomment">///</span>
     <span class="doccomment">///     let element = format_with(|f| {</span>
     <span class="doccomment">///         write!(f, [</span>
-    <span class="doccomment">///             token(&quot;hello&quot;),</span>
+    <span class="doccomment">///             text(&quot;hello&quot;),</span>
     <span class="doccomment">///             hard_line_break(),</span>
-    <span class="doccomment">///             token(&quot;world!&quot;)</span>
+    <span class="doccomment">///             text(&quot;world!&quot;)</span>
     <span class="doccomment">///         ])</span>
     <span class="doccomment">///     });</span>
     <span class="doccomment">///     let mut buffer = f.inspect_will_break();</span>
@@ -1139,9 +1139,9 @@ Make sure that you take and restore the snapshot in order and that this snapshot
     <span class="doccomment">///     let does_element_break = buffer.will_break();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///     if does_element_break {</span>
-    <span class="doccomment">///         write!(f, [hard_line_break(), token(&quot;break&quot;)])</span>
+    <span class="doccomment">///         write!(f, [hard_line_break(), text(&quot;break&quot;)])</span>
     <span class="doccomment">///     } else {</span>
-    <span class="doccomment">///         write!(f, [token(&quot;did not break&quot;)])</span>
+    <span class="doccomment">///         write!(f, [text(&quot;did not break&quot;)])</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// })]).unwrap();</span>
@@ -1189,16 +1189,16 @@ Make sure that you take and restore the snapshot in order and that this snapshot
     <span class="doccomment">///         write!(buffer, [</span>
     <span class="doccomment">///             labelled(</span>
     <span class="doccomment">///                 LabelId::of::&lt;SomeLabelId&gt;(),</span>
-    <span class="doccomment">///                 &amp;token(&quot;&#39;I have a label&#39;&quot;)</span>
+    <span class="doccomment">///                 &amp;text(&quot;&#39;I have a label&#39;&quot;)</span>
     <span class="doccomment">///             )</span>
     <span class="doccomment">///         ])?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///         let is_labelled = buffer.has_label();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///         if is_labelled {</span>
-    <span class="doccomment">///             write!(f, [token(&quot; has label SomeLabelId&quot;)])</span>
+    <span class="doccomment">///             write!(f, [text(&quot; has label SomeLabelId&quot;)])</span>
     <span class="doccomment">///         } else {</span>
-    <span class="doccomment">///             write!(f, [token(&quot; doesn&#39;t have label SomeLabelId&quot;)])</span>
+    <span class="doccomment">///             write!(f, [text(&quot; doesn&#39;t have label SomeLabelId&quot;)])</span>
     <span class="doccomment">///         }</span>
     <span class="doccomment">///     })]</span>
     <span class="doccomment">/// )</span>

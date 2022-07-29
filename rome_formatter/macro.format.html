@@ -14,14 +14,14 @@ Additional parameters passed get formatted by using their <a href="trait.Format.
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">rome_formatter::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">rome_formatter::format</span>;
 
-<span class="kw">let</span> <span class="ident">formatted</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="ident">SimpleFormatContext::default</span>(), [<span class="ident">token</span>(<span class="string">&quot;(&quot;</span>), <span class="ident">token</span>(<span class="string">&quot;a&quot;</span>), <span class="ident">token</span>(<span class="string">&quot;)&quot;</span>)]).<span class="ident">unwrap</span>();
+<span class="kw">let</span> <span class="ident">formatted</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="ident">SimpleFormatContext::default</span>(), [<span class="ident">text</span>(<span class="string">&quot;(&quot;</span>), <span class="ident">text</span>(<span class="string">&quot;a&quot;</span>), <span class="ident">text</span>(<span class="string">&quot;)&quot;</span>)]).<span class="ident">unwrap</span>();
 
 <span class="macro">assert_eq!</span>(
     <span class="ident">formatted</span>.<span class="ident">into_format_element</span>(),
     <span class="ident">FormatElement::from_iter</span>([
-        <span class="ident">FormatElement::Token</span>(<span class="ident">Token::Static</span> { <span class="ident">text</span>: <span class="string">&quot;(&quot;</span> }),
-        <span class="ident">FormatElement::Token</span>(<span class="ident">Token::Static</span> { <span class="ident">text</span>: <span class="string">&quot;a&quot;</span> }),
-        <span class="ident">FormatElement::Token</span>(<span class="ident">Token::Static</span> { <span class="ident">text</span>: <span class="string">&quot;)&quot;</span> }),
+        <span class="ident">FormatElement::Text</span>(<span class="ident">Text::Static</span> { <span class="ident">text</span>: <span class="string">&quot;(&quot;</span> }),
+        <span class="ident">FormatElement::Text</span>(<span class="ident">Text::Static</span> { <span class="ident">text</span>: <span class="string">&quot;a&quot;</span> }),
+        <span class="ident">FormatElement::Text</span>(<span class="ident">Text::Static</span> { <span class="ident">text</span>: <span class="string">&quot;)&quot;</span> }),
     ])
 );</code></pre></div>
 </div></details></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="rome_formatter" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>

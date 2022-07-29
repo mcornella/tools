@@ -227,16 +227,6 @@
 <span id="222">222</span>
 <span id="223">223</span>
 <span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
-<span id="231">231</span>
-<span id="232">232</span>
-<span id="233">233</span>
-<span id="234">234</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">format_args</span>, <span class="ident">write</span>, <span class="ident">CstFormatContext</span>};
 <span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{<span class="ident">JsAnyExpression</span>, <span class="ident">JsConditionalExpression</span>, <span class="ident">TsConditionalType</span>, <span class="ident">TsType</span>};
@@ -273,7 +263,7 @@
                 <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">context</span>().<span class="ident">comments</span>().<span class="ident">is_suppressed</span>(<span class="ident">expr</span>.<span class="ident">syntax</span>()) {
                     <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">format_suppressed_node</span>(<span class="ident">expr</span>.<span class="ident">syntax</span>())])
                 } <span class="kw">else</span> {
-                    <span class="macro">write!</span>[<span class="ident">f</span>, [<span class="ident">expr</span>.<span class="ident">test</span>()<span class="question-mark">?</span>.<span class="ident">format</span>(), <span class="ident">space_token</span>(),]]
+                    <span class="macro">write!</span>[<span class="ident">f</span>, [<span class="ident">expr</span>.<span class="ident">test</span>()<span class="question-mark">?</span>.<span class="ident">format</span>(), <span class="ident">space</span>(),]]
                 }
             }
             <span class="ident">Conditional::Type</span>(<span class="ident">t</span>) =&gt; {
@@ -284,11 +274,11 @@
                         <span class="ident">f</span>,
                         [
                             <span class="ident">t</span>.<span class="ident">check_type</span>()<span class="question-mark">?</span>.<span class="ident">format</span>(),
-                            <span class="ident">space_token</span>(),
+                            <span class="ident">space</span>(),
                             <span class="ident">t</span>.<span class="ident">extends_token</span>()<span class="question-mark">?</span>.<span class="ident">format</span>(),
-                            <span class="ident">space_token</span>(),
+                            <span class="ident">space</span>(),
                             <span class="ident">t</span>.<span class="ident">extends_type</span>()<span class="question-mark">?</span>.<span class="ident">format</span>(),
-                            <span class="ident">space_token</span>(),
+                            <span class="ident">space</span>(),
                         ]
                     ]
                 }
@@ -340,10 +330,10 @@
         } <span class="kw">else</span> {
             <span class="macro">write!</span>(
                 <span class="ident">f</span>,
-                [<span class="ident">group_elements</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
-                    <span class="ident">space_token</span>(),
+                [<span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
+                    <span class="ident">space</span>(),
                     <span class="ident">format_consequent</span>,
-                    <span class="ident">space_token</span>(),
+                    <span class="ident">space</span>(),
                     <span class="ident">format_alternate</span>
                 ])]
             )<span class="question-mark">?</span>;
@@ -367,7 +357,7 @@
                             <span class="ident">f</span>,
                             [
                                 <span class="ident">expr</span>.<span class="ident">question_mark_token</span>().<span class="ident">format</span>(),
-                                <span class="ident">space_token</span>(),
+                                <span class="ident">space</span>(),
                                 <span class="ident">format_consequent</span>
                             ]
                         ]
@@ -377,7 +367,7 @@
                             <span class="ident">f</span>,
                             [
                                 <span class="ident">ty</span>.<span class="ident">question_mark_token</span>().<span class="ident">format</span>(),
-                                <span class="ident">space_token</span>(),
+                                <span class="ident">space</span>(),
                                 <span class="ident">format_consequent</span>
                             ]
                         ]
@@ -390,7 +380,7 @@
                         <span class="ident">f</span>,
                         [
                             <span class="ident">expr</span>.<span class="ident">question_mark_token</span>().<span class="ident">format</span>(),
-                            <span class="ident">space_token</span>(),
+                            <span class="ident">space</span>(),
                             <span class="ident">expr</span>.<span class="ident">consequent</span>().<span class="ident">format</span>()
                         ]
                     ]
@@ -400,7 +390,7 @@
                         <span class="ident">f</span>,
                         [
                             <span class="ident">ty</span>.<span class="ident">question_mark_token</span>().<span class="ident">format</span>(),
-                            <span class="ident">space_token</span>(),
+                            <span class="ident">space</span>(),
                             <span class="ident">ty</span>.<span class="ident">true_type</span>().<span class="ident">format</span>()
                         ]
                     ]
@@ -420,16 +410,10 @@
 
                 <span class="kw">match</span> <span class="self">self</span> {
                     <span class="ident">Conditional::Expression</span>(<span class="ident">expr</span>) =&gt; {
-                        <span class="macro">write!</span>[
-                            <span class="ident">f</span>,
-                            [<span class="ident">expr</span>.<span class="ident">colon_token</span>().<span class="ident">format</span>(), <span class="ident">space_token</span>(), <span class="ident">format_alternate</span>]
-                        ]
+                        <span class="macro">write!</span>[<span class="ident">f</span>, [<span class="ident">expr</span>.<span class="ident">colon_token</span>().<span class="ident">format</span>(), <span class="ident">space</span>(), <span class="ident">format_alternate</span>]]
                     }
                     <span class="ident">Conditional::Type</span>(<span class="ident">ty</span>) =&gt; {
-                        <span class="macro">write!</span>[
-                            <span class="ident">f</span>,
-                            [<span class="ident">ty</span>.<span class="ident">colon_token</span>().<span class="ident">format</span>(), <span class="ident">space_token</span>(), <span class="ident">format_alternate</span>]
-                        ]
+                        <span class="macro">write!</span>[<span class="ident">f</span>, [<span class="ident">ty</span>.<span class="ident">colon_token</span>().<span class="ident">format</span>(), <span class="ident">space</span>(), <span class="ident">format_alternate</span>]]
                     }
                 }
             }
@@ -439,17 +423,13 @@
                     <span class="ident">f</span>,
                     [
                         <span class="ident">expr</span>.<span class="ident">colon_token</span>().<span class="ident">format</span>(),
-                        <span class="ident">space_token</span>(),
+                        <span class="ident">space</span>(),
                         <span class="ident">expr</span>.<span class="ident">alternate</span>().<span class="ident">format</span>()
                     ]
                 ],
                 <span class="ident">Conditional::Type</span>(<span class="ident">ty</span>) =&gt; <span class="macro">write!</span>[
                     <span class="ident">f</span>,
-                    [
-                        <span class="ident">ty</span>.<span class="ident">colon_token</span>().<span class="ident">format</span>(),
-                        <span class="ident">space_token</span>(),
-                        <span class="ident">ty</span>.<span class="ident">false_type</span>().<span class="ident">format</span>()
-                    ]
+                    [<span class="ident">ty</span>.<span class="ident">colon_token</span>().<span class="ident">format</span>(), <span class="ident">space</span>(), <span class="ident">ty</span>.<span class="ident">false_type</span>().<span class="ident">format</span>()]
                 ],
             },
         }

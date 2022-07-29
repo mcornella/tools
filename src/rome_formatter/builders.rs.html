@@ -1966,7 +1966,7 @@
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(SimpleFormatContext::default(), [</span>
-<span class="doccomment">///     group_elements(&amp;format_args![token(&quot;a,&quot;), soft_line_break(), token(&quot;b&quot;)])</span>
+<span class="doccomment">///     group(&amp;format_args![text(&quot;a,&quot;), soft_line_break(), text(&quot;b&quot;)])</span>
 <span class="doccomment">/// ]).unwrap();</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(</span>
@@ -1988,10 +1988,10 @@
 <span class="doccomment">/// };</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(context, [</span>
-<span class="doccomment">///     group_elements(&amp;format_args![</span>
-<span class="doccomment">///         token(&quot;a long word,&quot;),</span>
+<span class="doccomment">///     group(&amp;format_args![</span>
+<span class="doccomment">///         text(&quot;a long word,&quot;),</span>
 <span class="doccomment">///         soft_line_break(),</span>
-<span class="doccomment">///         token(&quot;so that the group doesn&#39;t fit on a single line&quot;),</span>
+<span class="doccomment">///         text(&quot;so that the group doesn&#39;t fit on a single line&quot;),</span>
 <span class="doccomment">///     ])</span>
 <span class="doccomment">/// ]).unwrap();</span>
 <span class="doccomment">///</span>
@@ -2016,10 +2016,10 @@
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(SimpleFormatContext::default(), [</span>
-<span class="doccomment">///     group_elements(&amp;format_args![</span>
-<span class="doccomment">///         token(&quot;a,&quot;),</span>
+<span class="doccomment">///     group(&amp;format_args![</span>
+<span class="doccomment">///         text(&quot;a,&quot;),</span>
 <span class="doccomment">///         hard_line_break(),</span>
-<span class="doccomment">///         token(&quot;b&quot;),</span>
+<span class="doccomment">///         text(&quot;b&quot;),</span>
 <span class="doccomment">///         hard_line_break()</span>
 <span class="doccomment">///     ])</span>
 <span class="doccomment">/// ]).unwrap();</span>
@@ -2045,10 +2045,10 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(</span>
 <span class="doccomment">///     SimpleFormatContext::default(), [</span>
-<span class="doccomment">///     group_elements(&amp;format_args![</span>
-<span class="doccomment">///         token(&quot;a,&quot;),</span>
+<span class="doccomment">///     group(&amp;format_args![</span>
+<span class="doccomment">///         text(&quot;a,&quot;),</span>
 <span class="doccomment">///         empty_line(),</span>
-<span class="doccomment">///         token(&quot;b&quot;),</span>
+<span class="doccomment">///         text(&quot;b&quot;),</span>
 <span class="doccomment">///         empty_line()</span>
 <span class="doccomment">///     ])</span>
 <span class="doccomment">/// ]).unwrap();</span>
@@ -2073,10 +2073,10 @@
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(SimpleFormatContext::default(), [</span>
-<span class="doccomment">///     group_elements(&amp;format_args![</span>
-<span class="doccomment">///         token(&quot;a,&quot;),</span>
+<span class="doccomment">///     group(&amp;format_args![</span>
+<span class="doccomment">///         text(&quot;a,&quot;),</span>
 <span class="doccomment">///         soft_line_break_or_space(),</span>
-<span class="doccomment">///         token(&quot;b&quot;),</span>
+<span class="doccomment">///         text(&quot;b&quot;),</span>
 <span class="doccomment">///     ])</span>
 <span class="doccomment">/// ]).unwrap();</span>
 <span class="doccomment">///</span>
@@ -2097,10 +2097,10 @@
 <span class="doccomment">/// };</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(context, [</span>
-<span class="doccomment">///     group_elements(&amp;format_args![</span>
-<span class="doccomment">///         token(&quot;a long word,&quot;),</span>
+<span class="doccomment">///     group(&amp;format_args![</span>
+<span class="doccomment">///         text(&quot;a long word,&quot;),</span>
 <span class="doccomment">///         soft_line_break_or_space(),</span>
-<span class="doccomment">///         token(&quot;so that the group doesn&#39;t fit on a single line&quot;),</span>
+<span class="doccomment">///         text(&quot;so that the group doesn&#39;t fit on a single line&quot;),</span>
 <span class="doccomment">///     ])</span>
 <span class="doccomment">/// ]).unwrap();</span>
 <span class="doccomment">///</span>
@@ -2150,7 +2150,7 @@
 <span class="doccomment">/// use rome_formatter::format;</span>
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let elements = format!(SimpleFormatContext::default(), [token(&quot;Hello World&quot;)]).unwrap();</span>
+<span class="doccomment">/// let elements = format!(SimpleFormatContext::default(), [text(&quot;Hello World&quot;)]).unwrap();</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(</span>
 <span class="doccomment">///     &quot;Hello World&quot;,</span>
@@ -2166,57 +2166,57 @@
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // the tab must be encoded as \\t to not literally print a tab character (&quot;Hello{tab}World&quot; vs &quot;Hello\tWorld&quot;)</span>
-<span class="doccomment">/// let elements = format!(SimpleFormatContext::default(), [token(&quot;\&quot;Hello\\tWorld\&quot;&quot;)]).unwrap();</span>
+<span class="doccomment">/// let elements = format!(SimpleFormatContext::default(), [text(&quot;\&quot;Hello\\tWorld\&quot;&quot;)]).unwrap();</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(r#&quot;&quot;Hello\tWorld&quot;&quot;#, elements.print().as_code());</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">token</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident">StaticToken</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">text</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident">StaticText</span> {
     <span class="ident">debug_assert_no_newlines</span>(<span class="ident">text</span>);
 
-    <span class="ident">StaticToken</span> { <span class="ident">text</span> }
+    <span class="ident">StaticText</span> { <span class="ident">text</span> }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StaticToken</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StaticText</span> {
     <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StaticToken</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StaticText</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>) -&gt; <span class="ident">FormatResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">write_element</span>(<span class="ident">FormatElement::Token</span>(<span class="ident">Token::Static</span> { <span class="ident">text</span>: <span class="self">self</span>.<span class="ident">text</span> }))
+        <span class="ident">f</span>.<span class="ident">write_element</span>(<span class="ident">FormatElement::Text</span>(<span class="ident">Text::Static</span> { <span class="ident">text</span>: <span class="self">self</span>.<span class="ident">text</span> }))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">StaticToken</span> {
+<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">StaticText</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="macro">std::write!</span>(<span class="ident">f</span>, <span class="string">&quot;StaticToken({})&quot;</span>, <span class="self">self</span>.<span class="ident">text</span>)
     }
 }
 
-<span class="doccomment">/// Create a token from a dynamic string and a range of the input source</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dynamic_token</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">position</span>: <span class="ident">TextSize</span>) -&gt; <span class="ident">DynamicToken</span> {
+<span class="doccomment">/// Creates a text from a dynamic string and a range of the input source</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dynamic_text</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">position</span>: <span class="ident">TextSize</span>) -&gt; <span class="ident">DynamicText</span> {
     <span class="ident">debug_assert_no_newlines</span>(<span class="ident">text</span>);
 
-    <span class="ident">DynamicToken</span> { <span class="ident">text</span>, <span class="ident">position</span> }
+    <span class="ident">DynamicText</span> { <span class="ident">text</span>, <span class="ident">position</span> }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DynamicToken</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DynamicText</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
     <span class="ident">position</span>: <span class="ident">TextSize</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DynamicToken</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DynamicText</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>) -&gt; <span class="ident">FormatResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">write_element</span>(<span class="ident">FormatElement::Token</span>(<span class="ident">Token::Dynamic</span> {
+        <span class="ident">f</span>.<span class="ident">write_element</span>(<span class="ident">FormatElement::Text</span>(<span class="ident">Text::Dynamic</span> {
             <span class="ident">text</span>: <span class="self">self</span>.<span class="ident">text</span>.<span class="ident">to_string</span>().<span class="ident">into_boxed_str</span>(),
             <span class="ident">source_position</span>: <span class="self">self</span>.<span class="ident">position</span>,
         }))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">DynamicToken</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">DynamicText</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="macro">std::write!</span>(<span class="ident">f</span>, <span class="string">&quot;DynamicToken({})&quot;</span>, <span class="self">self</span>.<span class="ident">text</span>)
     }
@@ -2254,12 +2254,12 @@
                 <span class="kw">let</span> <span class="ident">relative_range</span> <span class="op">=</span> <span class="ident">range</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">text_range</span>().<span class="ident">start</span>();
                 <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">token_text</span>().<span class="ident">slice</span>(<span class="ident">relative_range</span>);
 
-                <span class="ident">f</span>.<span class="ident">write_element</span>(<span class="ident">FormatElement::Token</span>(<span class="ident">Token::SyntaxTokenSlice</span> {
+                <span class="ident">f</span>.<span class="ident">write_element</span>(<span class="ident">FormatElement::Text</span>(<span class="ident">Text::SyntaxTokenTextSlice</span> {
                     <span class="ident">slice</span>,
                     <span class="ident">source_position</span>: <span class="self">self</span>.<span class="ident">start</span>,
                 }))
             }
-            <span class="ident">Cow::Owned</span>(<span class="ident">text</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_element</span>(<span class="ident">FormatElement::Token</span>(<span class="ident">Token::Dynamic</span> {
+            <span class="ident">Cow::Owned</span>(<span class="ident">text</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_element</span>(<span class="ident">FormatElement::Text</span>(<span class="ident">Text::Dynamic</span> {
                 <span class="ident">text</span>: <span class="ident">text</span>.<span class="ident">to_string</span>().<span class="ident">into_boxed_str</span>(),
                 <span class="ident">source_position</span>: <span class="self">self</span>.<span class="ident">start</span>,
             })),
@@ -2296,7 +2296,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SyntaxTokenTextSlice</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>) -&gt; <span class="ident">FormatResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">write_element</span>(<span class="ident">FormatElement::Token</span>(<span class="ident">Token::SyntaxTokenSlice</span> {
+        <span class="ident">f</span>.<span class="ident">write_element</span>(<span class="ident">FormatElement::Text</span>(<span class="ident">Text::SyntaxTokenTextSlice</span> {
             <span class="ident">slice</span>: <span class="self">self</span>.<span class="ident">text</span>.<span class="ident">clone</span>(),
             <span class="ident">source_position</span>: <span class="self">self</span>.<span class="ident">source_position</span>,
         }))
@@ -2310,7 +2310,7 @@
 }
 
 <span class="kw">fn</span> <span class="ident">debug_assert_no_newlines</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-    <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="ident">text</span>.<span class="ident">contains</span>(<span class="string">&#39;\r&#39;</span>), <span class="string">&quot;The content &#39;{}&#39; contains an unsupported &#39;\\r&#39; line terminator character but string tokens must only use line feeds &#39;\\n&#39; as line separator. Use &#39;\\n&#39; instead of &#39;\\r&#39; and &#39;\\r\\n&#39; to insert a line break in strings.&quot;</span>, <span class="ident">text</span>);
+    <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="ident">text</span>.<span class="ident">contains</span>(<span class="string">&#39;\r&#39;</span>), <span class="string">&quot;The content &#39;{}&#39; contains an unsupported &#39;\\r&#39; line terminator character but text must only use line feeds &#39;\\n&#39; as line separator. Use &#39;\\n&#39; instead of &#39;\\r&#39; and &#39;\\r\\n&#39; to insert a line break in strings.&quot;</span>, <span class="ident">text</span>);
 }
 
 <span class="doccomment">/// Pushes some content to the end of the current line</span>
@@ -2322,9 +2322,9 @@
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(SimpleFormatContext::default(), [</span>
-<span class="doccomment">///     token(&quot;a&quot;),</span>
-<span class="doccomment">///     line_suffix(&amp;token(&quot;c&quot;)),</span>
-<span class="doccomment">///     token(&quot;b&quot;)</span>
+<span class="doccomment">///     text(&quot;a&quot;),</span>
+<span class="doccomment">///     line_suffix(&amp;text(&quot;c&quot;)),</span>
+<span class="doccomment">///     text(&quot;b&quot;)</span>
 <span class="doccomment">/// ]).unwrap();</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(</span>
@@ -2374,11 +2374,11 @@
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(SimpleFormatContext::default(), [</span>
-<span class="doccomment">///     token(&quot;a&quot;),</span>
-<span class="doccomment">///     line_suffix(&amp;token(&quot;c&quot;)),</span>
-<span class="doccomment">///     token(&quot;b&quot;),</span>
+<span class="doccomment">///     text(&quot;a&quot;),</span>
+<span class="doccomment">///     line_suffix(&amp;text(&quot;c&quot;)),</span>
+<span class="doccomment">///     text(&quot;b&quot;),</span>
 <span class="doccomment">///     line_suffix_boundary(),</span>
-<span class="doccomment">///     token(&quot;d&quot;)</span>
+<span class="doccomment">///     text(&quot;d&quot;)</span>
 <span class="doccomment">/// ]).unwrap();</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(</span>
@@ -2413,18 +2413,18 @@
 <span class="doccomment">/// let elements = format!(</span>
 <span class="doccomment">///     SimpleFormatContext::default(),</span>
 <span class="doccomment">///     [</span>
-<span class="doccomment">///         group_elements(&amp;format_args![</span>
-<span class="doccomment">///             comment(&amp;format_args![token(&quot;// test&quot;), hard_line_break()]),</span>
+<span class="doccomment">///         group(&amp;format_args![</span>
+<span class="doccomment">///             comment(&amp;format_args![text(&quot;// test&quot;), hard_line_break()]),</span>
 <span class="doccomment">///             format_with(|f| {</span>
 <span class="doccomment">///                 write!(f, [</span>
-<span class="doccomment">///                     comment(&amp;format_args![token(&quot;/* inline */&quot;), hard_line_break()]).memoized(),</span>
-<span class="doccomment">///                     token(&quot;a&quot;),</span>
+<span class="doccomment">///                     comment(&amp;format_args![text(&quot;/* inline */&quot;), hard_line_break()]).memoized(),</span>
+<span class="doccomment">///                     text(&quot;a&quot;),</span>
 <span class="doccomment">///                     soft_line_break_or_space(),</span>
 <span class="doccomment">///                 ])</span>
 <span class="doccomment">///             }).memoized(),</span>
-<span class="doccomment">///             token(&quot;b&quot;),</span>
+<span class="doccomment">///             text(&quot;b&quot;),</span>
 <span class="doccomment">///             soft_line_break_or_space(),</span>
-<span class="doccomment">///             token(&quot;c&quot;)</span>
+<span class="doccomment">///             text(&quot;c&quot;)</span>
 <span class="doccomment">///         ])</span>
 <span class="doccomment">///     ]</span>
 <span class="doccomment">/// ).unwrap();</span>
@@ -2521,12 +2521,12 @@
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// // the tab must be encoded as \\t to not literally print a tab character (&quot;Hello{tab}World&quot; vs &quot;Hello\tWorld&quot;)</span>
-<span class="doccomment">/// let elements = format!(SimpleFormatContext::default(), [token(&quot;a&quot;), space_token(), token(&quot;b&quot;)]).unwrap();</span>
+<span class="doccomment">/// let elements = format!(SimpleFormatContext::default(), [text(&quot;a&quot;), space(), text(&quot;b&quot;)]).unwrap();</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(&quot;a b&quot;, elements.print().as_code());</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">space_token</span>() -&gt; <span class="ident">Space</span> {
+<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">space</span>() -&gt; <span class="ident">Space</span> {
     <span class="ident">Space</span>
 }
 
@@ -2554,16 +2554,16 @@
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let block = format!(SimpleFormatContext::default(), [</span>
-<span class="doccomment">///     token(&quot;switch {&quot;),</span>
+<span class="doccomment">///     text(&quot;switch {&quot;),</span>
 <span class="doccomment">///     block_indent(&amp;format_args![</span>
-<span class="doccomment">///         token(&quot;default:&quot;),</span>
+<span class="doccomment">///         text(&quot;default:&quot;),</span>
 <span class="doccomment">///         indent(&amp;format_args![</span>
 <span class="doccomment">///             // this is where we want to use a</span>
 <span class="doccomment">///             hard_line_break(),</span>
-<span class="doccomment">///             token(&quot;break;&quot;),</span>
+<span class="doccomment">///             text(&quot;break;&quot;),</span>
 <span class="doccomment">///         ])</span>
 <span class="doccomment">///     ]),</span>
-<span class="doccomment">///     token(&quot;}&quot;),</span>
+<span class="doccomment">///     text(&quot;}&quot;),</span>
 <span class="doccomment">/// ]).unwrap();</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(</span>
@@ -2623,13 +2623,13 @@
 <span class="doccomment">/// let block = format![</span>
 <span class="doccomment">///     SimpleFormatContext::default(),</span>
 <span class="doccomment">///     [</span>
-<span class="doccomment">///         token(&quot;{&quot;),</span>
+<span class="doccomment">///         text(&quot;{&quot;),</span>
 <span class="doccomment">///         block_indent(&amp;format_args![</span>
-<span class="doccomment">///             token(&quot;let a = 10;&quot;),</span>
+<span class="doccomment">///             text(&quot;let a = 10;&quot;),</span>
 <span class="doccomment">///             hard_line_break(),</span>
-<span class="doccomment">///             token(&quot;let c = a + 5;&quot;),</span>
+<span class="doccomment">///             text(&quot;let c = a + 5;&quot;),</span>
 <span class="doccomment">///         ]),</span>
-<span class="doccomment">///         token(&quot;}&quot;),</span>
+<span class="doccomment">///         text(&quot;}&quot;),</span>
 <span class="doccomment">///     ]</span>
 <span class="doccomment">/// ].unwrap();</span>
 <span class="doccomment">///</span>
@@ -2664,14 +2664,14 @@
 <span class="doccomment">/// };</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(context, [</span>
-<span class="doccomment">///     group_elements(&amp;format_args![</span>
-<span class="doccomment">///         token(&quot;[&quot;),</span>
+<span class="doccomment">///     group(&amp;format_args![</span>
+<span class="doccomment">///         text(&quot;[&quot;),</span>
 <span class="doccomment">///         soft_block_indent(&amp;format_args![</span>
-<span class="doccomment">///             token(&quot;&#39;First string&#39;,&quot;),</span>
+<span class="doccomment">///             text(&quot;&#39;First string&#39;,&quot;),</span>
 <span class="doccomment">///             soft_line_break_or_space(),</span>
-<span class="doccomment">///             token(&quot;&#39;second string&#39;,&quot;),</span>
+<span class="doccomment">///             text(&quot;&#39;second string&#39;,&quot;),</span>
 <span class="doccomment">///         ]),</span>
-<span class="doccomment">///         token(&quot;]&quot;),</span>
+<span class="doccomment">///         text(&quot;]&quot;),</span>
 <span class="doccomment">///     ])</span>
 <span class="doccomment">/// ]).unwrap();</span>
 <span class="doccomment">///</span>
@@ -2687,14 +2687,14 @@
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(SimpleFormatContext::default(), [</span>
-<span class="doccomment">///     group_elements(&amp;format_args![</span>
-<span class="doccomment">///         token(&quot;[&quot;),</span>
+<span class="doccomment">///     group(&amp;format_args![</span>
+<span class="doccomment">///         text(&quot;[&quot;),</span>
 <span class="doccomment">///         soft_block_indent(&amp;format_args![</span>
-<span class="doccomment">///             token(&quot;5,&quot;),</span>
+<span class="doccomment">///             text(&quot;5,&quot;),</span>
 <span class="doccomment">///             soft_line_break_or_space(),</span>
-<span class="doccomment">///             token(&quot;10&quot;),</span>
+<span class="doccomment">///             text(&quot;10&quot;),</span>
 <span class="doccomment">///         ]),</span>
-<span class="doccomment">///         token(&quot;]&quot;),</span>
+<span class="doccomment">///         text(&quot;]&quot;),</span>
 <span class="doccomment">///     ])</span>
 <span class="doccomment">/// ]).unwrap();</span>
 <span class="doccomment">///</span>
@@ -2732,16 +2732,16 @@
 <span class="doccomment">/// };</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(context, [</span>
-<span class="doccomment">///     group_elements(&amp;format_args![</span>
-<span class="doccomment">///         token(&quot;name&quot;),</span>
-<span class="doccomment">///         space_token(),</span>
-<span class="doccomment">///         token(&quot;=&quot;),</span>
+<span class="doccomment">///     group(&amp;format_args![</span>
+<span class="doccomment">///         text(&quot;name&quot;),</span>
+<span class="doccomment">///         space(),</span>
+<span class="doccomment">///         text(&quot;=&quot;),</span>
 <span class="doccomment">///         soft_line_indent_or_space(&amp;format_args![</span>
-<span class="doccomment">///             token(&quot;firstName&quot;),</span>
-<span class="doccomment">///             space_token(),</span>
-<span class="doccomment">///             token(&quot;+&quot;),</span>
-<span class="doccomment">///             space_token(),</span>
-<span class="doccomment">///             token(&quot;lastName&quot;),</span>
+<span class="doccomment">///             text(&quot;firstName&quot;),</span>
+<span class="doccomment">///             space(),</span>
+<span class="doccomment">///             text(&quot;+&quot;),</span>
+<span class="doccomment">///             space(),</span>
+<span class="doccomment">///             text(&quot;lastName&quot;),</span>
 <span class="doccomment">///         ]),</span>
 <span class="doccomment">///     ])</span>
 <span class="doccomment">/// ]).unwrap();</span>
@@ -2758,11 +2758,11 @@
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(SimpleFormatContext::default(), [</span>
-<span class="doccomment">///     group_elements(&amp;format_args![</span>
-<span class="doccomment">///         token(&quot;a&quot;),</span>
-<span class="doccomment">///         space_token(),</span>
-<span class="doccomment">///         token(&quot;=&quot;),</span>
-<span class="doccomment">///         soft_line_indent_or_space(&amp;token(&quot;10&quot;)),</span>
+<span class="doccomment">///     group(&amp;format_args![</span>
+<span class="doccomment">///         text(&quot;a&quot;),</span>
+<span class="doccomment">///         space(),</span>
+<span class="doccomment">///         text(&quot;=&quot;),</span>
+<span class="doccomment">///         soft_line_indent_or_space(&amp;text(&quot;10&quot;)),</span>
 <span class="doccomment">///     ])</span>
 <span class="doccomment">/// ]).unwrap();</span>
 <span class="doccomment">///</span>
@@ -2853,16 +2853,16 @@
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(SimpleFormatContext::default(), [</span>
-<span class="doccomment">///     group_elements(&amp;format_args![</span>
-<span class="doccomment">///         token(&quot;[&quot;),</span>
+<span class="doccomment">///     group(&amp;format_args![</span>
+<span class="doccomment">///         text(&quot;[&quot;),</span>
 <span class="doccomment">///         soft_block_indent(&amp;format_args![</span>
-<span class="doccomment">///             token(&quot;1,&quot;),</span>
+<span class="doccomment">///             text(&quot;1,&quot;),</span>
 <span class="doccomment">///             soft_line_break_or_space(),</span>
-<span class="doccomment">///             token(&quot;2,&quot;),</span>
+<span class="doccomment">///             text(&quot;2,&quot;),</span>
 <span class="doccomment">///             soft_line_break_or_space(),</span>
-<span class="doccomment">///             token(&quot;3&quot;),</span>
+<span class="doccomment">///             text(&quot;3&quot;),</span>
 <span class="doccomment">///         ]),</span>
-<span class="doccomment">///         token(&quot;]&quot;),</span>
+<span class="doccomment">///         text(&quot;]&quot;),</span>
 <span class="doccomment">///     ])</span>
 <span class="doccomment">/// ]).unwrap();</span>
 <span class="doccomment">///</span>
@@ -2883,16 +2883,16 @@
 <span class="doccomment">/// };</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(context, [</span>
-<span class="doccomment">///     group_elements(&amp;format_args![</span>
-<span class="doccomment">///         token(&quot;[&quot;),</span>
+<span class="doccomment">///     group(&amp;format_args![</span>
+<span class="doccomment">///         text(&quot;[&quot;),</span>
 <span class="doccomment">///         soft_block_indent(&amp;format_args![</span>
-<span class="doccomment">///             token(&quot;&#39;Good morning! How are you today?&#39;,&quot;),</span>
+<span class="doccomment">///             text(&quot;&#39;Good morning! How are you today?&#39;,&quot;),</span>
 <span class="doccomment">///             soft_line_break_or_space(),</span>
-<span class="doccomment">///             token(&quot;2,&quot;),</span>
+<span class="doccomment">///             text(&quot;2,&quot;),</span>
 <span class="doccomment">///             soft_line_break_or_space(),</span>
-<span class="doccomment">///             token(&quot;3&quot;),</span>
+<span class="doccomment">///             text(&quot;3&quot;),</span>
 <span class="doccomment">///         ]),</span>
-<span class="doccomment">///         token(&quot;]&quot;),</span>
+<span class="doccomment">///         text(&quot;]&quot;),</span>
 <span class="doccomment">///     ])</span>
 <span class="doccomment">/// ]).unwrap();</span>
 <span class="doccomment">///</span>
@@ -2902,29 +2902,29 @@
 <span class="doccomment">/// );</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group_elements</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>(<span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>) -&gt; <span class="ident">GroupElements</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> {
-    <span class="ident">GroupElements</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>(<span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>) -&gt; <span class="ident">Group</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> {
+    <span class="ident">Group</span> {
         <span class="ident">content</span>: <span class="ident">Argument::new</span>(<span class="ident">content</span>),
         <span class="ident">group_id</span>: <span class="prelude-val">None</span>,
     }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GroupElements</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Context</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Group</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Context</span><span class="op">&gt;</span> {
     <span class="ident">content</span>: <span class="ident">Argument</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Context</span><span class="op">&gt;</span>,
     <span class="ident">group_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GroupId</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">GroupElements</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Context</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">Group</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Context</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_group_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">group_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GroupId</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">group_id</span> <span class="op">=</span> <span class="ident">group_id</span>;
         <span class="self">self</span>
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GroupElements</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Context</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Group</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Context</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>) -&gt; <span class="ident">FormatResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">GroupElementsBuffer::new</span>(<span class="ident">f</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">GroupBuffer::new</span>(<span class="ident">f</span>);
         <span class="ident">buffer</span>.<span class="ident">write_fmt</span>(<span class="ident">Arguments::from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">content</span>))<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">buffer</span>.<span class="ident">into_vec</span>();
 
@@ -2932,7 +2932,7 @@
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
         }
 
-        <span class="kw">let</span> <span class="ident">group</span> <span class="op">=</span> <span class="ident">Group::new</span>(<span class="ident">content</span>).<span class="ident">with_id</span>(<span class="self">self</span>.<span class="ident">group_id</span>);
+        <span class="kw">let</span> <span class="ident">group</span> <span class="op">=</span> <span class="ident">format_element::Group::new</span>(<span class="ident">content</span>).<span class="ident">with_id</span>(<span class="self">self</span>.<span class="ident">group_id</span>);
 
         <span class="ident">f</span>.<span class="ident">write_element</span>(<span class="ident">FormatElement::Group</span>(<span class="ident">group</span>))<span class="question-mark">?</span>;
 
@@ -2940,7 +2940,7 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">GroupElements</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Context</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Group</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Context</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;GroupElements&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;group_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">group_id</span>)
@@ -2962,14 +2962,14 @@
 <span class="doccomment">/// The `/* a comment */` belongs to the `[` group token that is part of a group wrapping the whole</span>
 <span class="doccomment">/// `[1]` expression. It&#39;s important that the comment `/* a comment */` gets moved out of the group element</span>
 <span class="doccomment">/// to avoid that the `[1]` group expands because of the line break inserted by the comment.</span>
-<span class="kw">struct</span> <span class="ident">GroupElementsBuffer</span><span class="op">&lt;</span><span class="lifetime">&#39;inner</span>, <span class="ident">Context</span><span class="op">&gt;</span> {
+<span class="kw">struct</span> <span class="ident">GroupBuffer</span><span class="op">&lt;</span><span class="lifetime">&#39;inner</span>, <span class="ident">Context</span><span class="op">&gt;</span> {
     <span class="ident">inner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;inner</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Buffer</span><span class="op">&lt;</span><span class="ident">Context</span> <span class="op">=</span> <span class="ident">Context</span><span class="op">&gt;</span>,
 
     <span class="doccomment">/// The group inner content</span>
     <span class="ident">content</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FormatElement</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;inner</span>, <span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">GroupElementsBuffer</span><span class="op">&lt;</span><span class="lifetime">&#39;inner</span>, <span class="ident">Context</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;inner</span>, <span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">GroupBuffer</span><span class="op">&lt;</span><span class="lifetime">&#39;inner</span>, <span class="ident">Context</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;inner</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Buffer</span><span class="op">&lt;</span><span class="ident">Context</span> <span class="op">=</span> <span class="ident">Context</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">inner</span>,
@@ -3036,7 +3036,7 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">Buffer</span> <span class="kw">for</span> <span class="ident">GroupElementsBuffer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Context</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">Buffer</span> <span class="kw">for</span> <span class="ident">GroupBuffer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Context</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Context</span> <span class="op">=</span> <span class="ident">Context</span>;
 
     <span class="kw">fn</span> <span class="ident">write_element</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">element</span>: <span class="ident">FormatElement</span>) -&gt; <span class="ident">FormatResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
@@ -3104,17 +3104,17 @@
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(SimpleFormatContext::default(), [</span>
-<span class="doccomment">///     group_elements(&amp;format_args![</span>
-<span class="doccomment">///         token(&quot;[&quot;),</span>
+<span class="doccomment">///     group(&amp;format_args![</span>
+<span class="doccomment">///         text(&quot;[&quot;),</span>
 <span class="doccomment">///         soft_block_indent(&amp;format_args![</span>
-<span class="doccomment">///             token(&quot;&#39;Good morning! How are you today?&#39;,&quot;),</span>
+<span class="doccomment">///             text(&quot;&#39;Good morning! How are you today?&#39;,&quot;),</span>
 <span class="doccomment">///             soft_line_break_or_space(),</span>
-<span class="doccomment">///             token(&quot;2,&quot;),</span>
+<span class="doccomment">///             text(&quot;2,&quot;),</span>
 <span class="doccomment">///             expand_parent(), // Forces the parent to expand</span>
 <span class="doccomment">///             soft_line_break_or_space(),</span>
-<span class="doccomment">///             token(&quot;3&quot;),</span>
+<span class="doccomment">///             text(&quot;3&quot;),</span>
 <span class="doccomment">///         ]),</span>
-<span class="doccomment">///         token(&quot;]&quot;),</span>
+<span class="doccomment">///         text(&quot;]&quot;),</span>
 <span class="doccomment">///     ])</span>
 <span class="doccomment">/// ]).unwrap();</span>
 <span class="doccomment">///</span>
@@ -3155,17 +3155,17 @@
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(SimpleFormatContext::default(), [</span>
-<span class="doccomment">///     group_elements(&amp;format_args![</span>
-<span class="doccomment">///         token(&quot;[&quot;),</span>
+<span class="doccomment">///     group(&amp;format_args![</span>
+<span class="doccomment">///         text(&quot;[&quot;),</span>
 <span class="doccomment">///         soft_block_indent(&amp;format_args![</span>
-<span class="doccomment">///             token(&quot;1,&quot;),</span>
+<span class="doccomment">///             text(&quot;1,&quot;),</span>
 <span class="doccomment">///             soft_line_break_or_space(),</span>
-<span class="doccomment">///             token(&quot;2,&quot;),</span>
+<span class="doccomment">///             text(&quot;2,&quot;),</span>
 <span class="doccomment">///             soft_line_break_or_space(),</span>
-<span class="doccomment">///             token(&quot;3&quot;),</span>
-<span class="doccomment">///             if_group_breaks(&amp;token(&quot;,&quot;))</span>
+<span class="doccomment">///             text(&quot;3&quot;),</span>
+<span class="doccomment">///             if_group_breaks(&amp;text(&quot;,&quot;))</span>
 <span class="doccomment">///         ]),</span>
-<span class="doccomment">///         token(&quot;]&quot;),</span>
+<span class="doccomment">///         text(&quot;]&quot;),</span>
 <span class="doccomment">///     ])</span>
 <span class="doccomment">/// ]).unwrap();</span>
 <span class="doccomment">///</span>
@@ -3186,17 +3186,17 @@
 <span class="doccomment">/// };</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(context, [</span>
-<span class="doccomment">///     group_elements(&amp;format_args![</span>
-<span class="doccomment">///         token(&quot;[&quot;),</span>
+<span class="doccomment">///     group(&amp;format_args![</span>
+<span class="doccomment">///         text(&quot;[&quot;),</span>
 <span class="doccomment">///         soft_block_indent(&amp;format_args![</span>
-<span class="doccomment">///             token(&quot;&#39;A somewhat longer string to force a line break&#39;,&quot;),</span>
+<span class="doccomment">///             text(&quot;&#39;A somewhat longer string to force a line break&#39;,&quot;),</span>
 <span class="doccomment">///             soft_line_break_or_space(),</span>
-<span class="doccomment">///             token(&quot;2,&quot;),</span>
+<span class="doccomment">///             text(&quot;2,&quot;),</span>
 <span class="doccomment">///             soft_line_break_or_space(),</span>
-<span class="doccomment">///             token(&quot;3&quot;),</span>
-<span class="doccomment">///             if_group_breaks(&amp;token(&quot;,&quot;))</span>
+<span class="doccomment">///             text(&quot;3&quot;),</span>
+<span class="doccomment">///             if_group_breaks(&amp;text(&quot;,&quot;))</span>
 <span class="doccomment">///         ]),</span>
-<span class="doccomment">///         token(&quot;]&quot;),</span>
+<span class="doccomment">///         text(&quot;]&quot;),</span>
 <span class="doccomment">///     ])</span>
 <span class="doccomment">/// ]).unwrap();</span>
 <span class="doccomment">///</span>
@@ -3234,17 +3234,17 @@
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let formatted = format!(SimpleFormatContext::default(), [</span>
-<span class="doccomment">///     group_elements(&amp;format_args![</span>
-<span class="doccomment">///         token(&quot;[&quot;),</span>
+<span class="doccomment">///     group(&amp;format_args![</span>
+<span class="doccomment">///         text(&quot;[&quot;),</span>
 <span class="doccomment">///         soft_block_indent(&amp;format_args![</span>
-<span class="doccomment">///             token(&quot;1,&quot;),</span>
+<span class="doccomment">///             text(&quot;1,&quot;),</span>
 <span class="doccomment">///             soft_line_break_or_space(),</span>
-<span class="doccomment">///             token(&quot;2,&quot;),</span>
+<span class="doccomment">///             text(&quot;2,&quot;),</span>
 <span class="doccomment">///             soft_line_break_or_space(),</span>
-<span class="doccomment">///             token(&quot;3&quot;),</span>
-<span class="doccomment">///             if_group_fits_on_line(&amp;token(&quot;,&quot;))</span>
+<span class="doccomment">///             text(&quot;3&quot;),</span>
+<span class="doccomment">///             if_group_fits_on_line(&amp;text(&quot;,&quot;))</span>
 <span class="doccomment">///         ]),</span>
-<span class="doccomment">///         token(&quot;]&quot;),</span>
+<span class="doccomment">///         text(&quot;]&quot;),</span>
 <span class="doccomment">///     ])</span>
 <span class="doccomment">/// ]).unwrap();</span>
 <span class="doccomment">///</span>
@@ -3265,17 +3265,17 @@
 <span class="doccomment">/// };</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let formatted = format!(context, [</span>
-<span class="doccomment">///     group_elements(&amp;format_args![</span>
-<span class="doccomment">///         token(&quot;[&quot;),</span>
+<span class="doccomment">///     group(&amp;format_args![</span>
+<span class="doccomment">///         text(&quot;[&quot;),</span>
 <span class="doccomment">///         soft_block_indent(&amp;format_args![</span>
-<span class="doccomment">///             token(&quot;&#39;A somewhat longer string to force a line break&#39;,&quot;),</span>
+<span class="doccomment">///             text(&quot;&#39;A somewhat longer string to force a line break&#39;,&quot;),</span>
 <span class="doccomment">///             soft_line_break_or_space(),</span>
-<span class="doccomment">///             token(&quot;2,&quot;),</span>
+<span class="doccomment">///             text(&quot;2,&quot;),</span>
 <span class="doccomment">///             soft_line_break_or_space(),</span>
-<span class="doccomment">///             token(&quot;3&quot;),</span>
-<span class="doccomment">///             if_group_fits_on_line(&amp;token(&quot;,&quot;))</span>
+<span class="doccomment">///             text(&quot;3&quot;),</span>
+<span class="doccomment">///             if_group_fits_on_line(&amp;text(&quot;,&quot;))</span>
 <span class="doccomment">///         ]),</span>
-<span class="doccomment">///         token(&quot;]&quot;),</span>
+<span class="doccomment">///         text(&quot;]&quot;),</span>
 <span class="doccomment">///     ])</span>
 <span class="doccomment">/// ]).unwrap();</span>
 <span class="doccomment">///</span>
@@ -3327,23 +3327,23 @@
     <span class="doccomment">///     let group_id = f.group_id(&quot;array&quot;);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///     write!(f, [</span>
-    <span class="doccomment">///         group_elements(</span>
+    <span class="doccomment">///         group(</span>
     <span class="doccomment">///             &amp;format_args![</span>
-    <span class="doccomment">///                 token(&quot;[&quot;),</span>
+    <span class="doccomment">///                 text(&quot;[&quot;),</span>
     <span class="doccomment">///                 soft_block_indent(&amp;format_with(|f| {</span>
     <span class="doccomment">///                     f.fill(soft_line_break_or_space())</span>
-    <span class="doccomment">///                         .entry(&amp;token(&quot;1,&quot;))</span>
-    <span class="doccomment">///                         .entry(&amp;token(&quot;234568789,&quot;))</span>
-    <span class="doccomment">///                         .entry(&amp;token(&quot;3456789,&quot;))</span>
+    <span class="doccomment">///                         .entry(&amp;text(&quot;1,&quot;))</span>
+    <span class="doccomment">///                         .entry(&amp;text(&quot;234568789,&quot;))</span>
+    <span class="doccomment">///                         .entry(&amp;text(&quot;3456789,&quot;))</span>
     <span class="doccomment">///                         .entry(&amp;format_args!(</span>
-    <span class="doccomment">///                             token(&quot;[&quot;),</span>
-    <span class="doccomment">///                             soft_block_indent(&amp;token(&quot;4&quot;)),</span>
-    <span class="doccomment">///                             token(&quot;]&quot;),</span>
-    <span class="doccomment">///                             if_group_breaks(&amp;token(&quot;,&quot;)).with_group_id(Some(group_id))</span>
+    <span class="doccomment">///                             text(&quot;[&quot;),</span>
+    <span class="doccomment">///                             soft_block_indent(&amp;text(&quot;4&quot;)),</span>
+    <span class="doccomment">///                             text(&quot;]&quot;),</span>
+    <span class="doccomment">///                             if_group_breaks(&amp;text(&quot;,&quot;)).with_group_id(Some(group_id))</span>
     <span class="doccomment">///                         ))</span>
     <span class="doccomment">///                         .finish()</span>
     <span class="doccomment">///                 })),</span>
-    <span class="doccomment">///                 token(&quot;]&quot;)</span>
+    <span class="doccomment">///                 text(&quot;]&quot;)</span>
     <span class="doccomment">///             ],</span>
     <span class="doccomment">///         ).with_group_id(Some(group_id))</span>
     <span class="doccomment">///     ])</span>
@@ -3431,17 +3431,17 @@
 <span class="doccomment">/// impl Format&lt;SimpleFormatContext&gt; for MyFormat {</span>
 <span class="doccomment">///     fn fmt(&amp;self, f: &amp;mut Formatter&lt;SimpleFormatContext&gt;) -&gt; FormatResult&lt;()&gt; {</span>
 <span class="doccomment">///         write!(f, [</span>
-<span class="doccomment">///             token(&quot;(&quot;),</span>
+<span class="doccomment">///             text(&quot;(&quot;),</span>
 <span class="doccomment">///             block_indent(&amp;format_with(|f| {</span>
-<span class="doccomment">///                 let separator = space_token();</span>
+<span class="doccomment">///                 let separator = space();</span>
 <span class="doccomment">///                 let mut join = f.join_with(&amp;separator);</span>
 <span class="doccomment">///</span>
 <span class="doccomment">///                 for item in &amp;self.items {</span>
-<span class="doccomment">///                     join.entry(&amp;format_with(|f| write!(f, [dynamic_token(item, TextSize::default())])));</span>
+<span class="doccomment">///                     join.entry(&amp;format_with(|f| write!(f, [dynamic_text(item, TextSize::default())])));</span>
 <span class="doccomment">///                 }</span>
 <span class="doccomment">///                 join.finish()</span>
 <span class="doccomment">///             })),</span>
-<span class="doccomment">///             token(&quot;)&quot;)</span>
+<span class="doccomment">///             text(&quot;)&quot;)</span>
 <span class="doccomment">///         ])</span>
 <span class="doccomment">///     }</span>
 <span class="doccomment">/// }</span>
@@ -3479,8 +3479,8 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// struct MyFormat;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// fn generate_values() -&gt; impl Iterator&lt;Item=StaticToken&gt; {</span>
-<span class="doccomment">///     vec![token(&quot;1&quot;), token(&quot;2&quot;), token(&quot;3&quot;), token(&quot;4&quot;)].into_iter()</span>
+<span class="doccomment">/// fn generate_values() -&gt; impl Iterator&lt;Item=StaticText&gt; {</span>
+<span class="doccomment">///     vec![text(&quot;1&quot;), text(&quot;2&quot;), text(&quot;3&quot;), text(&quot;4&quot;)].into_iter()</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// impl Format&lt;SimpleFormatContext&gt; for MyFormat {</span>

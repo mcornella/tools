@@ -14,18 +14,18 @@ parts of the formatter may chose to handle this element in a specific way</p>
 <span class="kw">let</span> <span class="ident">elements</span> <span class="op">=</span> <span class="macro">format!</span>(
     <span class="ident">SimpleFormatContext::default</span>(),
     [
-        <span class="ident">group_elements</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
-            <span class="ident">comment</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[<span class="ident">token</span>(<span class="string">&quot;// test&quot;</span>), <span class="ident">hard_line_break</span>()]),
+        <span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
+            <span class="ident">comment</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[<span class="ident">text</span>(<span class="string">&quot;// test&quot;</span>), <span class="ident">hard_line_break</span>()]),
             <span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
                 <span class="macro">write!</span>(<span class="ident">f</span>, [
-                    <span class="ident">comment</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[<span class="ident">token</span>(<span class="string">&quot;/* inline */&quot;</span>), <span class="ident">hard_line_break</span>()]).<span class="ident">memoized</span>(),
-                    <span class="ident">token</span>(<span class="string">&quot;a&quot;</span>),
+                    <span class="ident">comment</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[<span class="ident">text</span>(<span class="string">&quot;/* inline */&quot;</span>), <span class="ident">hard_line_break</span>()]).<span class="ident">memoized</span>(),
+                    <span class="ident">text</span>(<span class="string">&quot;a&quot;</span>),
                     <span class="ident">soft_line_break_or_space</span>(),
                 ])
             }).<span class="ident">memoized</span>(),
-            <span class="ident">token</span>(<span class="string">&quot;b&quot;</span>),
+            <span class="ident">text</span>(<span class="string">&quot;b&quot;</span>),
             <span class="ident">soft_line_break_or_space</span>(),
-            <span class="ident">token</span>(<span class="string">&quot;c&quot;</span>)
+            <span class="ident">text</span>(<span class="string">&quot;c&quot;</span>)
         ])
     ]
 ).<span class="ident">unwrap</span>();

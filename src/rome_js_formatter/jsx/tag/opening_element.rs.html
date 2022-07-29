@@ -37,9 +37,6 @@
 <span id="32">32</span>
 <span id="33">33</span>
 <span id="34">34</span>
-<span id="35">35</span>
-<span id="36">36</span>
-<span id="37">37</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="kw">use</span> <span class="ident">rome_formatter::write</span>;
@@ -68,10 +65,7 @@
         )<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="op">!</span><span class="ident">attributes</span>.<span class="ident">is_empty</span>() {
-            <span class="macro">write!</span>(
-                <span class="ident">f</span>,
-                [<span class="ident">space_token</span>(), <span class="ident">attributes</span>.<span class="ident">format</span>(), <span class="ident">line_suffix_boundary</span>()]
-            )<span class="question-mark">?</span>;
+            <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">space</span>(), <span class="ident">attributes</span>.<span class="ident">format</span>(), <span class="ident">line_suffix_boundary</span>()])<span class="question-mark">?</span>;
         }
 
         <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">r_angle_token</span>.<span class="ident">format</span>()])

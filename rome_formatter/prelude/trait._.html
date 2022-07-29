@@ -21,7 +21,7 @@ formats the object and passes it to the closure.</p>
 
 <span class="kw">impl</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">SimpleFormatContext</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MyFormat</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="ident">SimpleFormatContext</span><span class="op">&gt;</span>) -&gt; <span class="ident">FormatResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">token</span>(<span class="string">&quot;MyToken&quot;</span>)])
+        <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">text</span>(<span class="string">&quot;MyToken&quot;</span>)])
     }
 }
 
@@ -35,11 +35,11 @@ formats the object and passes it to the closure.</p>
 
 <span class="kw">let</span> <span class="ident">some_token</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">MyFormat</span>);
 <span class="macro">assert_eq!</span>(
-    <span class="macro">format!</span>[<span class="ident">SimpleFormatContext::default</span>(), [<span class="ident">space_token</span>(), <span class="ident">token</span>(<span class="string">&quot;MyToken&quot;</span>)]],
+    <span class="macro">format!</span>[<span class="ident">SimpleFormatContext::default</span>(), [<span class="ident">space</span>(), <span class="ident">text</span>(<span class="string">&quot;MyToken&quot;</span>)]],
     <span class="macro">format!</span>(
         <span class="ident">SimpleFormatContext::default</span>(), [
             <span class="ident">some_token</span>.<span class="ident">with_or_empty</span>(<span class="op">|</span><span class="ident">token</span>, <span class="ident">f</span><span class="op">|</span> {
-                <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">space_token</span>(), <span class="ident">token</span>])
+                <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">space</span>(), <span class="ident">token</span>])
             })
         ]
     )

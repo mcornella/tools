@@ -48,7 +48,7 @@
 
         <span class="macro">write!</span>(
             <span class="ident">f</span>,
-            [<span class="kw-2">&amp;</span><span class="ident">group_elements</span>(<span class="kw-2">&amp;</span><span class="ident">soft_block_indent</span>(<span class="kw-2">&amp;</span><span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
+            [<span class="kw-2">&amp;</span><span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="ident">soft_block_indent</span>(<span class="kw-2">&amp;</span><span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">separated</span> <span class="op">=</span> <span class="ident">node</span>
                     .<span class="ident">format_separated</span>(<span class="ident">JsSyntaxKind::COMMA</span>)
                     .<span class="ident">with_trailing_separator</span>(<span class="ident">TrailingSeparator::Omit</span>);

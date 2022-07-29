@@ -33,7 +33,7 @@ used inside of <code>if_group_breaks</code> or <code>if_group_fits_single_line</
         <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">get</span>();
         <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">set</span>(<span class="ident">value</span> <span class="op">+</span> <span class="number">1</span>);
 
-        <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">dynamic_token</span>(<span class="kw-2">&amp;</span><span class="macro">std::format!</span>(<span class="string">&quot;Formatted {value} times.&quot;</span>), <span class="ident">TextSize::from</span>(<span class="number">0</span>))])
+        <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">dynamic_text</span>(<span class="kw-2">&amp;</span><span class="macro">std::format!</span>(<span class="string">&quot;Formatted {value} times.&quot;</span>), <span class="ident">TextSize::from</span>(<span class="number">0</span>))])
     }
 }
 
@@ -42,14 +42,14 @@ used inside of <code>if_group_breaks</code> or <code>if_group_fits_single_line</
 <span class="comment">// Calls `format` for everytime the object gets formatted</span>
 <span class="macro">assert_eq!</span>(
     <span class="string">&quot;Formatted 1 times. Formatted 2 times.&quot;</span>,
-    <span class="macro">format!</span>(<span class="ident">SimpleFormatContext::default</span>(), [<span class="ident">normal</span>, <span class="ident">space_token</span>(), <span class="ident">normal</span>]).<span class="ident">unwrap</span>().<span class="ident">print</span>().<span class="ident">as_code</span>()
+    <span class="macro">format!</span>(<span class="ident">SimpleFormatContext::default</span>(), [<span class="ident">normal</span>, <span class="ident">space</span>(), <span class="ident">normal</span>]).<span class="ident">unwrap</span>().<span class="ident">print</span>().<span class="ident">as_code</span>()
 );
 
 <span class="comment">// Memoized memoizes the result and calls `format` only once.</span>
 <span class="kw">let</span> <span class="ident">memoized</span> <span class="op">=</span> <span class="ident">normal</span>.<span class="ident">memoized</span>();
 <span class="macro">assert_eq!</span>(
     <span class="string">&quot;Formatted 3 times. Formatted 3 times.&quot;</span>,
-    <span class="macro">format!</span>[<span class="ident">SimpleFormatContext::default</span>(), [<span class="ident">memoized</span>, <span class="ident">space_token</span>(), <span class="ident">memoized</span>]].<span class="ident">unwrap</span>().<span class="ident">print</span>().<span class="ident">as_code</span>()
+    <span class="macro">format!</span>[<span class="ident">SimpleFormatContext::default</span>(), [<span class="ident">memoized</span>, <span class="ident">space</span>(), <span class="ident">memoized</span>]].<span class="ident">unwrap</span>().<span class="ident">print</span>().<span class="ident">as_code</span>()
 );</code></pre></div>
 </div></details></div><h2 id="implementors" class="small-section-header">Implementors<a href="#implementors" class="anchor"></a></h2><div class="item-list" id="implementors-list"><section id="impl-MemoizeFormat%3CContext%3E" class="impl has-srclink"><span class="rightside"><a class="srclink" href="../../src/rome_formatter/format_extensions.rs.html#139">source</a></span><a href="#impl-MemoizeFormat%3CContext%3E" class="anchor"></a><h3 class="code-header in-band">impl&lt;T, Context&gt; <a class="trait" href="trait.MemoizeFormat.html" title="trait rome_js_formatter::prelude::MemoizeFormat">MemoizeFormat</a>&lt;Context&gt; for T <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: <a class="trait" href="trait._.html" title="trait rome_js_formatter::prelude::_">Format</a>&lt;Context&gt;,&nbsp;</span></h3></section></div><script type="text/javascript" src="../../implementors/rome_formatter/format_extensions/trait.MemoizeFormat.js" data-ignore-extern-crates="" async></script></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rome_js_formatter" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
 </body></html>

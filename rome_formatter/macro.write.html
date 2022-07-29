@@ -18,15 +18,15 @@ generally this comes from an implementation of the <a href="prelude/trait._.html
 <span class="kw">fn</span> <span class="ident">main</span>() -&gt; <span class="ident">FormatResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">FormatState::new</span>(<span class="ident">SimpleFormatContext::default</span>());
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">VecBuffer::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">state</span>);
-    <span class="macro">write!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buffer</span>, [<span class="ident">token</span>(<span class="string">&quot;Hello&quot;</span>), <span class="ident">space_token</span>()])<span class="question-mark">?</span>;
-    <span class="macro">write!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buffer</span>, [<span class="ident">token</span>(<span class="string">&quot;World&quot;</span>)])<span class="question-mark">?</span>;
+    <span class="macro">write!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buffer</span>, [<span class="ident">text</span>(<span class="string">&quot;Hello&quot;</span>), <span class="ident">space</span>()])<span class="question-mark">?</span>;
+    <span class="macro">write!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buffer</span>, [<span class="ident">text</span>(<span class="string">&quot;World&quot;</span>)])<span class="question-mark">?</span>;
 
     <span class="macro">assert_eq!</span>(
         <span class="ident">buffer</span>.<span class="ident">into_element</span>(),
         <span class="ident">FormatElement::from_iter</span>([
-            <span class="ident">FormatElement::Token</span>(<span class="ident">Token::Static</span> { <span class="ident">text</span>: <span class="string">&quot;Hello&quot;</span> }),
+            <span class="ident">FormatElement::Text</span>(<span class="ident">Text::Static</span> { <span class="ident">text</span>: <span class="string">&quot;Hello&quot;</span> }),
             <span class="ident">FormatElement::Space</span>,
-            <span class="ident">FormatElement::Token</span>(<span class="ident">Token::Static</span> { <span class="ident">text</span>: <span class="string">&quot;World&quot;</span> }),
+            <span class="ident">FormatElement::Text</span>(<span class="ident">Text::Static</span> { <span class="ident">text</span>: <span class="string">&quot;World&quot;</span> }),
         ])
     );
 

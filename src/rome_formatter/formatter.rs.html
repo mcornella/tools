@@ -294,11 +294,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let formatted = format!(SimpleFormatContext::default(), [format_with(|f| {</span>
     <span class="doccomment">///     f.join()</span>
-    <span class="doccomment">///         .entry(&amp;token(&quot;a&quot;))</span>
-    <span class="doccomment">///         .entry(&amp;space_token())</span>
-    <span class="doccomment">///         .entry(&amp;token(&quot;+&quot;))</span>
-    <span class="doccomment">///         .entry(&amp;space_token())</span>
-    <span class="doccomment">///         .entry(&amp;token(&quot;b&quot;))</span>
+    <span class="doccomment">///         .entry(&amp;text(&quot;a&quot;))</span>
+    <span class="doccomment">///         .entry(&amp;space())</span>
+    <span class="doccomment">///         .entry(&amp;text(&quot;+&quot;))</span>
+    <span class="doccomment">///         .entry(&amp;space())</span>
+    <span class="doccomment">///         .entry(&amp;text(&quot;b&quot;))</span>
     <span class="doccomment">///         .finish()</span>
     <span class="doccomment">/// })]).unwrap();</span>
     <span class="doccomment">///</span>
@@ -322,11 +322,11 @@
     <span class="doccomment">/// use rome_formatter::prelude::*;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let formatted = format!(SimpleFormatContext::default(), [format_with(|f| {</span>
-    <span class="doccomment">///     f.join_with(&amp;format_args!(token(&quot;,&quot;), space_token()))</span>
-    <span class="doccomment">///         .entry(&amp;token(&quot;1&quot;))</span>
-    <span class="doccomment">///         .entry(&amp;token(&quot;2&quot;))</span>
-    <span class="doccomment">///         .entry(&amp;token(&quot;3&quot;))</span>
-    <span class="doccomment">///         .entry(&amp;token(&quot;4&quot;))</span>
+    <span class="doccomment">///     f.join_with(&amp;format_args!(text(&quot;,&quot;), space()))</span>
+    <span class="doccomment">///         .entry(&amp;text(&quot;1&quot;))</span>
+    <span class="doccomment">///         .entry(&amp;text(&quot;2&quot;))</span>
+    <span class="doccomment">///         .entry(&amp;text(&quot;3&quot;))</span>
+    <span class="doccomment">///         .entry(&amp;text(&quot;4&quot;))</span>
     <span class="doccomment">///         .finish()</span>
     <span class="doccomment">/// })]).unwrap();</span>
     <span class="doccomment">///</span>
@@ -379,10 +379,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let formatted = format!(SimpleFormatContext::default(), [format_with(|f| {</span>
     <span class="doccomment">///     f.fill(soft_line_break_or_space())</span>
-    <span class="doccomment">///         .entry(&amp;token(&quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;))</span>
-    <span class="doccomment">///         .entry(&amp;token(&quot;bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb&quot;))</span>
-    <span class="doccomment">///         .entry(&amp;token(&quot;cccccccccccccccccccccccccccccc&quot;))</span>
-    <span class="doccomment">///         .entry(&amp;token(&quot;dddddddddddddddddddddddddddddd&quot;))</span>
+    <span class="doccomment">///         .entry(&amp;text(&quot;aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&quot;))</span>
+    <span class="doccomment">///         .entry(&amp;text(&quot;bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb&quot;))</span>
+    <span class="doccomment">///         .entry(&amp;text(&quot;cccccccccccccccccccccccccccccc&quot;))</span>
+    <span class="doccomment">///         .entry(&amp;text(&quot;dddddddddddddddddddddddddddddd&quot;))</span>
     <span class="doccomment">///         .finish()</span>
     <span class="doccomment">/// })]).unwrap();</span>
     <span class="doccomment">///</span>
@@ -397,10 +397,10 @@
     <span class="doccomment">/// use rome_formatter::{format, format_args};</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let entries = vec![</span>
-    <span class="doccomment">///     token(&quot;&lt;b&gt;Important: &lt;/b&gt;&quot;),</span>
-    <span class="doccomment">///     token(&quot;Please do not commit memory bugs such as segfaults, buffer overflows, etc. otherwise you &quot;),</span>
-    <span class="doccomment">///     token(&quot;&lt;em&gt;will&lt;/em&gt;&quot;),</span>
-    <span class="doccomment">///     token(&quot; be reprimanded&quot;)</span>
+    <span class="doccomment">///     text(&quot;&lt;b&gt;Important: &lt;/b&gt;&quot;),</span>
+    <span class="doccomment">///     text(&quot;Please do not commit memory bugs such as segfaults, buffer overflows, etc. otherwise you &quot;),</span>
+    <span class="doccomment">///     text(&quot;&lt;em&gt;will&lt;/em&gt;&quot;),</span>
+    <span class="doccomment">///     text(&quot; be reprimanded&quot;)</span>
     <span class="doccomment">/// ];</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let formatted = format!(SimpleFormatContext::default(), [format_with(|f| {</span>

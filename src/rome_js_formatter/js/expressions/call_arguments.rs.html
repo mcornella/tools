@@ -811,7 +811,7 @@
                     .<span class="ident">format_separated</span>(<span class="ident">JsSyntaxKind::COMMA</span>)
                     .<span class="ident">with_trailing_separator</span>(<span class="ident">TrailingSeparator::Omit</span>);
 
-                <span class="ident">f</span>.<span class="ident">join_with</span>(<span class="ident">space_token</span>()).<span class="ident">entries</span>(<span class="ident">separated</span>).<span class="ident">finish</span>()<span class="question-mark">?</span>;
+                <span class="ident">f</span>.<span class="ident">join_with</span>(<span class="ident">space</span>()).<span class="ident">entries</span>(<span class="ident">separated</span>).<span class="ident">finish</span>()<span class="question-mark">?</span>;
                 <span class="kw">return</span> <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">r_paren_token</span>.<span class="ident">format</span>()]);
             }
         };
@@ -885,7 +885,7 @@
                     [
                         <span class="kw-2">&amp;</span><span class="ident">l_leading_trivia</span>,
                         <span class="kw-2">&amp;</span><span class="ident">l_paren</span>,
-                        <span class="kw-2">&amp;</span><span class="ident">group_elements</span>(<span class="kw-2">&amp;</span><span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
+                        <span class="kw-2">&amp;</span><span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
                             <span class="macro">write!</span>(
                                 <span class="ident">f</span>,
                                 [
@@ -925,7 +925,7 @@
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">separated</span>.<span class="ident">iter</span>();
                     <span class="comment">// SAFETY: check on the existence of at least one argument are done before</span>
                     <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
-                    <span class="ident">f</span>.<span class="ident">join_with</span>(<span class="kw-2">&amp;</span><span class="ident">space_token</span>())
+                    <span class="ident">f</span>.<span class="ident">join_with</span>(<span class="kw-2">&amp;</span><span class="ident">space</span>())
                         .<span class="ident">entry</span>(<span class="kw-2">&amp;</span><span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
                             <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[<span class="ident">first</span>, <span class="ident">expand_parent</span>()]])
                         }))
@@ -937,7 +937,7 @@
                     <span class="comment">// SAFETY: check on the existence of at least one argument are done before</span>
                     <span class="kw">let</span> <span class="ident">last</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next_back</span>().<span class="ident">unwrap</span>();
 
-                    <span class="ident">f</span>.<span class="ident">join_with</span>(<span class="kw-2">&amp;</span><span class="ident">space_token</span>())
+                    <span class="ident">f</span>.<span class="ident">join_with</span>(<span class="kw-2">&amp;</span><span class="ident">space</span>())
                         .<span class="ident">entries</span>(<span class="ident">iter</span>)
                         .<span class="ident">entry</span>(<span class="kw-2">&amp;</span><span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
                             <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[<span class="ident">last</span>, <span class="ident">expand_parent</span>()]])
@@ -954,7 +954,7 @@
                         <span class="ident">l_leading_trivia</span>,
                         <span class="ident">l_paren</span>,
                         <span class="ident">l_trailing_trivia</span>,
-                        <span class="ident">group_elements</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[<span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
+                        <span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[<span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
                             <span class="ident">write_arguments_multi_line</span>(<span class="ident">separated</span>.<span class="ident">iter</span>(), <span class="ident">f</span>)
                         })]),
                         <span class="ident">r_leading_trivia</span>,
@@ -970,7 +970,7 @@
                 <span class="ident">f</span>,
                 [
                     <span class="ident">l_leading_trivia</span>,
-                    <span class="kw-2">&amp;</span><span class="ident">group_elements</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
+                    <span class="kw-2">&amp;</span><span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
                         <span class="ident">l_paren</span>,
                         <span class="ident">l_trailing_trivia</span>,
                         <span class="kw-2">&amp;</span><span class="ident">soft_block_indent</span>(<span class="kw-2">&amp;</span><span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {

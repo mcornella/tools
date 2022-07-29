@@ -17,13 +17,13 @@
 
 <span class="kw">impl</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">SimpleFormatContext</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Preamble</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="ident">SimpleFormatContext</span><span class="op">&gt;</span>) -&gt; <span class="ident">FormatResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">token</span>(<span class="string">&quot;# heading&quot;</span>), <span class="ident">hard_line_break</span>()])
+        <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">text</span>(<span class="string">&quot;# heading&quot;</span>), <span class="ident">hard_line_break</span>()])
     }
 }
 
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">with_preamble</span> <span class="op">=</span> <span class="ident">PreambleBuffer::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buffer</span>, <span class="ident">Preamble</span>);
 
-<span class="macro">write!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">with_preamble</span>, [<span class="ident">token</span>(<span class="string">&quot;this text will be on a new line&quot;</span>)]).<span class="ident">unwrap</span>();
+<span class="macro">write!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">with_preamble</span>, [<span class="ident">text</span>(<span class="string">&quot;this text will be on a new line&quot;</span>)]).<span class="ident">unwrap</span>();
 
 <span class="ident">drop</span>(<span class="ident">with_preamble</span>);
 
@@ -41,7 +41,7 @@
 
 <span class="kw">impl</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">SimpleFormatContext</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Preamble</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="ident">SimpleFormatContext</span><span class="op">&gt;</span>) -&gt; <span class="ident">FormatResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">token</span>(<span class="string">&quot;# heading&quot;</span>), <span class="ident">hard_line_break</span>()])
+        <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">text</span>(<span class="string">&quot;# heading&quot;</span>), <span class="ident">hard_line_break</span>()])
     }
 }
 

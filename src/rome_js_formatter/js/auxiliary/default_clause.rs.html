@@ -43,9 +43,6 @@
 <span id="38">38</span>
 <span id="39">39</span>
 <span id="40">40</span>
-<span id="41">41</span>
-<span id="42">42</span>
-<span id="43">43</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">format_args</span>, <span class="ident">write</span>};
 <span class="kw">use</span> <span class="ident">rome_js_syntax::JsDefaultClause</span>;
@@ -68,15 +65,12 @@
             <span class="prelude-val">Some</span>(<span class="ident">JsAnyStatement::JsBlockStatement</span>(<span class="kw">_</span>))
         );
 
-        <span class="macro">write!</span>(
-            <span class="ident">f</span>,
-            [<span class="ident">default_token</span>.<span class="ident">format</span>(), <span class="ident">colon_token</span>.<span class="ident">format</span>(), <span class="ident">space_token</span>()]
-        )<span class="question-mark">?</span>;
+        <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">default_token</span>.<span class="ident">format</span>(), <span class="ident">colon_token</span>.<span class="ident">format</span>(), <span class="ident">space</span>()])<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="ident">consequent</span>.<span class="ident">is_empty</span>() {
             <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">hard_line_break</span>()])
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">first_child_is_block_stmt</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">space_token</span>(), <span class="ident">consequent</span>.<span class="ident">format</span>()])
+            <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">space</span>(), <span class="ident">consequent</span>.<span class="ident">format</span>()])
         } <span class="kw">else</span> {
             <span class="comment">// no line break needed after because it is added by the indent in the switch statement</span>
             <span class="macro">write!</span>(

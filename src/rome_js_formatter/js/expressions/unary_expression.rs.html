@@ -77,9 +77,6 @@
 <span id="72">72</span>
 <span id="73">73</span>
 <span id="74">74</span>
-<span id="75">75</span>
-<span id="76">76</span>
-<span id="77">77</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::is_simple_expression</span>;
 <span class="kw">use</span> <span class="ident">rome_formatter::write</span>;
@@ -109,10 +106,7 @@
         );
 
         <span class="kw">if</span> <span class="ident">is_keyword_operator</span> {
-            <span class="kw">return</span> <span class="macro">write!</span>[
-                <span class="ident">f</span>,
-                [<span class="ident">operator_token</span>.<span class="ident">format</span>(), <span class="ident">space_token</span>(), <span class="ident">argument</span>.<span class="ident">format</span>(),]
-            ];
+            <span class="kw">return</span> <span class="macro">write!</span>[<span class="ident">f</span>, [<span class="ident">operator_token</span>.<span class="ident">format</span>(), <span class="ident">space</span>(), <span class="ident">argument</span>.<span class="ident">format</span>(),]];
         }
 
         <span class="comment">// Parenthesize the inner expression if it&#39;s a binary or pre-update</span>

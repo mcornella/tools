@@ -273,7 +273,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// impl Format&lt;SimpleFormatContext&gt; for MyFormat {</span>
     <span class="doccomment">///     fn fmt(&amp;self, f: &amp;mut Formatter&lt;SimpleFormatContext&gt;) -&gt; FormatResult&lt;()&gt; {</span>
-    <span class="doccomment">///         write!(f, [token(&quot;MyToken&quot;)])</span>
+    <span class="doccomment">///         write!(f, [text(&quot;MyToken&quot;)])</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
@@ -287,11 +287,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let some_token = Some(MyFormat);</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     format![SimpleFormatContext::default(), [space_token(), token(&quot;MyToken&quot;)]],</span>
+    <span class="doccomment">///     format![SimpleFormatContext::default(), [space(), text(&quot;MyToken&quot;)]],</span>
     <span class="doccomment">///     format!(</span>
     <span class="doccomment">///         SimpleFormatContext::default(), [</span>
     <span class="doccomment">///             some_token.with_or_empty(|token, f| {</span>
-    <span class="doccomment">///                 write!(f, [space_token(), token])</span>
+    <span class="doccomment">///                 write!(f, [space(), token])</span>
     <span class="doccomment">///             })</span>
     <span class="doccomment">///         ]</span>
     <span class="doccomment">///     )</span>
@@ -357,7 +357,7 @@
     <span class="doccomment">///         let value = self.value.get();</span>
     <span class="doccomment">///         self.value.set(value + 1);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///         write!(f, [dynamic_token(&amp;std::format!(&quot;Formatted {value} times.&quot;), TextSize::from(0))])</span>
+    <span class="doccomment">///         write!(f, [dynamic_text(&amp;std::format!(&quot;Formatted {value} times.&quot;), TextSize::from(0))])</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
@@ -366,14 +366,14 @@
     <span class="doccomment">/// // Calls `format` for everytime the object gets formatted</span>
     <span class="doccomment">/// assert_eq!(</span>
     <span class="doccomment">///     &quot;Formatted 1 times. Formatted 2 times.&quot;,</span>
-    <span class="doccomment">///     format!(SimpleFormatContext::default(), [normal, space_token(), normal]).unwrap().print().as_code()</span>
+    <span class="doccomment">///     format!(SimpleFormatContext::default(), [normal, space(), normal]).unwrap().print().as_code()</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// // Memoized memoizes the result and calls `format` only once.</span>
     <span class="doccomment">/// let memoized = normal.memoized();</span>
     <span class="doccomment">/// assert_eq!(</span>
     <span class="doccomment">///     &quot;Formatted 3 times. Formatted 3 times.&quot;,</span>
-    <span class="doccomment">///     format![SimpleFormatContext::default(), [memoized, space_token(), memoized]].unwrap().print().as_code()</span>
+    <span class="doccomment">///     format![SimpleFormatContext::default(), [memoized, space(), memoized]].unwrap().print().as_code()</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
@@ -431,9 +431,9 @@
     <span class="doccomment">///         let current = self.value.get();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///         write!(f, [</span>
-    <span class="doccomment">///             token(&quot;Count:&quot;),</span>
-    <span class="doccomment">///             space_token(),</span>
-    <span class="doccomment">///             dynamic_token(&amp;std::format!(&quot;{current}&quot;), TextSize::default()),</span>
+    <span class="doccomment">///             text(&quot;Count:&quot;),</span>
+    <span class="doccomment">///             space(),</span>
+    <span class="doccomment">///             dynamic_text(&amp;std::format!(&quot;{current}&quot;), TextSize::default()),</span>
     <span class="doccomment">///             hard_line_break()</span>
     <span class="doccomment">///         ])?;</span>
     <span class="doccomment">///</span>
@@ -447,9 +447,9 @@
     <span class="doccomment">///     let counter_content = counter.inspect(f)?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///     if counter_content.will_break() {</span>
-    <span class="doccomment">///         write!(f, [token(&quot;Counter:&quot;), block_indent(&amp;counter)])</span>
+    <span class="doccomment">///         write!(f, [text(&quot;Counter:&quot;), block_indent(&amp;counter)])</span>
     <span class="doccomment">///     } else {</span>
-    <span class="doccomment">///         write!(f, [token(&quot;Counter:&quot;), counter])</span>
+    <span class="doccomment">///         write!(f, [text(&quot;Counter:&quot;), counter])</span>
     <span class="doccomment">///     }?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///     write!(f, [counter])</span>

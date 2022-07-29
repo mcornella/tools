@@ -12,10 +12,10 @@ the previous and next element to be separated by an empty line.</p>
 
 <span class="kw">let</span> <span class="ident">elements</span> <span class="op">=</span> <span class="macro">format!</span>(
     <span class="ident">SimpleFormatContext::default</span>(), [
-    <span class="ident">group_elements</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
-        <span class="ident">token</span>(<span class="string">&quot;a,&quot;</span>),
+    <span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
+        <span class="ident">text</span>(<span class="string">&quot;a,&quot;</span>),
         <span class="ident">empty_line</span>(),
-        <span class="ident">token</span>(<span class="string">&quot;b&quot;</span>),
+        <span class="ident">text</span>(<span class="string">&quot;b&quot;</span>),
         <span class="ident">empty_line</span>()
     ])
 ]).<span class="ident">unwrap</span>();

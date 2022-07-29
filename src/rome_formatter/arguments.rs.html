@@ -226,7 +226,7 @@
 <span class="doccomment">/// use rome_formatter::{format, format_args};</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let formatted = format!(SimpleFormatContext::default(), [</span>
-<span class="doccomment">///     format_args!(token(&quot;a&quot;), space_token(), token(&quot;b&quot;))</span>
+<span class="doccomment">///     format_args!(text(&quot;a&quot;), space(), text(&quot;b&quot;))</span>
 <span class="doccomment">/// ]).unwrap();</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(&quot;a b&quot;, formatted.print().as_code());</span>
@@ -277,7 +277,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">format_args</span>, <span class="ident">write</span>, <span class="ident">FormatState</span>, <span class="ident">VecBuffer</span>};
+    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">format_args</span>, <span class="ident">format_element</span>, <span class="ident">write</span>, <span class="ident">FormatState</span>, <span class="ident">VecBuffer</span>};
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_nesting</span>() {
@@ -287,11 +287,11 @@
         <span class="macro">write!</span>(
             <span class="kw-2">&amp;mut</span> <span class="ident">buffer</span>,
             [
-                <span class="ident">token</span>(<span class="string">&quot;function&quot;</span>),
-                <span class="ident">space_token</span>(),
-                <span class="ident">token</span>(<span class="string">&quot;a&quot;</span>),
-                <span class="ident">space_token</span>(),
-                <span class="ident">group_elements</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="ident">token</span>(<span class="string">&quot;(&quot;</span>), <span class="ident">token</span>(<span class="string">&quot;)&quot;</span>)))
+                <span class="ident">text</span>(<span class="string">&quot;function&quot;</span>),
+                <span class="ident">space</span>(),
+                <span class="ident">text</span>(<span class="string">&quot;a&quot;</span>),
+                <span class="ident">space</span>(),
+                <span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="ident">text</span>(<span class="string">&quot;(&quot;</span>), <span class="ident">text</span>(<span class="string">&quot;)&quot;</span>)))
             ]
         )
         .<span class="ident">unwrap</span>();
@@ -299,13 +299,13 @@
         <span class="macro">assert_eq!</span>(
             <span class="ident">buffer</span>.<span class="ident">into_element</span>(),
             <span class="ident">FormatElement::List</span>(<span class="ident">List::new</span>(<span class="macro">vec!</span>[
-                <span class="ident">FormatElement::Token</span>(<span class="ident">Token::Static</span> { <span class="ident">text</span>: <span class="string">&quot;function&quot;</span> }),
+                <span class="ident">FormatElement::Text</span>(<span class="ident">Text::Static</span> { <span class="ident">text</span>: <span class="string">&quot;function&quot;</span> }),
                 <span class="ident">FormatElement::Space</span>,
-                <span class="ident">FormatElement::Token</span>(<span class="ident">Token::Static</span> { <span class="ident">text</span>: <span class="string">&quot;a&quot;</span> }),
+                <span class="ident">FormatElement::Text</span>(<span class="ident">Text::Static</span> { <span class="ident">text</span>: <span class="string">&quot;a&quot;</span> }),
                 <span class="ident">FormatElement::Space</span>,
-                <span class="ident">FormatElement::Group</span>(<span class="ident">Group::new</span>(<span class="macro">vec!</span>[
-                    <span class="ident">FormatElement::Token</span>(<span class="ident">Token::Static</span> { <span class="ident">text</span>: <span class="string">&quot;(&quot;</span> }),
-                    <span class="ident">FormatElement::Token</span>(<span class="ident">Token::Static</span> { <span class="ident">text</span>: <span class="string">&quot;)&quot;</span> }),
+                <span class="ident">FormatElement::Group</span>(<span class="ident">format_element::Group::new</span>(<span class="macro">vec!</span>[
+                    <span class="ident">FormatElement::Text</span>(<span class="ident">Text::Static</span> { <span class="ident">text</span>: <span class="string">&quot;(&quot;</span> }),
+                    <span class="ident">FormatElement::Text</span>(<span class="ident">Text::Static</span> { <span class="ident">text</span>: <span class="string">&quot;)&quot;</span> }),
                 ]))
             ]))
         );

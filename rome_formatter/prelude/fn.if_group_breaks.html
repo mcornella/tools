@@ -16,17 +16,17 @@ array element only if the array doesn’t fit on a single line.</p>
 <span class="kw">use</span> <span class="ident">rome_formatter::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="kw">let</span> <span class="ident">elements</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="ident">SimpleFormatContext::default</span>(), [
-    <span class="ident">group_elements</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
-        <span class="ident">token</span>(<span class="string">&quot;[&quot;</span>),
+    <span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
+        <span class="ident">text</span>(<span class="string">&quot;[&quot;</span>),
         <span class="ident">soft_block_indent</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
-            <span class="ident">token</span>(<span class="string">&quot;1,&quot;</span>),
+            <span class="ident">text</span>(<span class="string">&quot;1,&quot;</span>),
             <span class="ident">soft_line_break_or_space</span>(),
-            <span class="ident">token</span>(<span class="string">&quot;2,&quot;</span>),
+            <span class="ident">text</span>(<span class="string">&quot;2,&quot;</span>),
             <span class="ident">soft_line_break_or_space</span>(),
-            <span class="ident">token</span>(<span class="string">&quot;3&quot;</span>),
-            <span class="ident">if_group_breaks</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>(<span class="string">&quot;,&quot;</span>))
+            <span class="ident">text</span>(<span class="string">&quot;3&quot;</span>),
+            <span class="ident">if_group_breaks</span>(<span class="kw-2">&amp;</span><span class="ident">text</span>(<span class="string">&quot;,&quot;</span>))
         ]),
-        <span class="ident">token</span>(<span class="string">&quot;]&quot;</span>),
+        <span class="ident">text</span>(<span class="string">&quot;]&quot;</span>),
     ])
 ]).<span class="ident">unwrap</span>();
 
@@ -45,17 +45,17 @@ array element only if the array doesn’t fit on a single line.</p>
 };
 
 <span class="kw">let</span> <span class="ident">elements</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="ident">context</span>, [
-    <span class="ident">group_elements</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
-        <span class="ident">token</span>(<span class="string">&quot;[&quot;</span>),
+    <span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
+        <span class="ident">text</span>(<span class="string">&quot;[&quot;</span>),
         <span class="ident">soft_block_indent</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
-            <span class="ident">token</span>(<span class="string">&quot;&#39;A somewhat longer string to force a line break&#39;,&quot;</span>),
+            <span class="ident">text</span>(<span class="string">&quot;&#39;A somewhat longer string to force a line break&#39;,&quot;</span>),
             <span class="ident">soft_line_break_or_space</span>(),
-            <span class="ident">token</span>(<span class="string">&quot;2,&quot;</span>),
+            <span class="ident">text</span>(<span class="string">&quot;2,&quot;</span>),
             <span class="ident">soft_line_break_or_space</span>(),
-            <span class="ident">token</span>(<span class="string">&quot;3&quot;</span>),
-            <span class="ident">if_group_breaks</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>(<span class="string">&quot;,&quot;</span>))
+            <span class="ident">text</span>(<span class="string">&quot;3&quot;</span>),
+            <span class="ident">if_group_breaks</span>(<span class="kw-2">&amp;</span><span class="ident">text</span>(<span class="string">&quot;,&quot;</span>))
         ]),
-        <span class="ident">token</span>(<span class="string">&quot;]&quot;</span>),
+        <span class="ident">text</span>(<span class="string">&quot;]&quot;</span>),
     ])
 ]).<span class="ident">unwrap</span>();
 
