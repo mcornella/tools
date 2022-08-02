@@ -636,6 +636,17 @@
 <span id="631">631</span>
 <span id="632">632</span>
 <span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">cursor</span>, <span class="ident">Language</span>, <span class="ident">SyntaxToken</span>};
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
@@ -1237,6 +1248,17 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">last</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SyntaxTriviaPiece</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">piece</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">last</span>()<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Some</span>(<span class="ident">SyntaxTriviaPiece</span> {
+            <span class="ident">raw</span>: <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">clone</span>(),
+            <span class="ident">offset</span>: <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">text_range</span>().<span class="ident">end</span>() <span class="op">-</span> <span class="ident">piece</span>.<span class="ident">length</span>,
+            <span class="ident">trivia</span>: <span class="kw-2">*</span><span class="ident">piece</span>,
+            <span class="ident">_p</span>: <span class="ident">Default::default</span>(),
+        })
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SyntaxTriviaPiece</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">piece</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">first</span>()<span class="question-mark">?</span>;
 
         <span class="prelude-val">Some</span>(<span class="ident">SyntaxTriviaPiece</span> {
             <span class="ident">raw</span>: <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">clone</span>(),
