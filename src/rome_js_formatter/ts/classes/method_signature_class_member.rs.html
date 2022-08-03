@@ -38,22 +38,12 @@
 <span id="33">33</span>
 <span id="34">34</span>
 <span id="35">35</span>
-<span id="36">36</span>
-<span id="37">37</span>
-<span id="38">38</span>
-<span id="39">39</span>
-<span id="40">40</span>
-<span id="41">41</span>
-<span id="42">42</span>
-<span id="43">43</span>
-<span id="44">44</span>
-<span id="45">45</span>
-<span id="46">46</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::FormatWithSemicolon</span>;
 
-<span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">format_args</span>, <span class="ident">write</span>};
-<span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{<span class="ident">TsMethodSignatureClassMember</span>, <span class="ident">TsMethodSignatureClassMemberFields</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::js::classes::method_class_member::FormatJsAnyMethodMember</span>;
+<span class="kw">use</span> <span class="ident">rome_formatter::write</span>;
+<span class="kw">use</span> <span class="ident">rome_js_syntax::TsMethodSignatureClassMember</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FormatTsMethodSignatureClassMember</span>;
@@ -64,33 +54,21 @@
         <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">TsMethodSignatureClassMember</span>,
         <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">JsFormatter</span>,
     ) -&gt; <span class="ident">FormatResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">TsMethodSignatureClassMemberFields</span> {
-            <span class="ident">modifiers</span>,
-            <span class="ident">async_token</span>,
-            <span class="ident">name</span>,
-            <span class="ident">question_mark_token</span>,
-            <span class="ident">type_parameters</span>,
-            <span class="ident">parameters</span>,
-            <span class="ident">return_type_annotation</span>,
-            <span class="ident">semicolon_token</span>,
-        } <span class="op">=</span> <span class="ident">node</span>.<span class="ident">as_fields</span>();
+        <span class="kw">let</span> <span class="ident">format_inner</span> <span class="op">=</span> <span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">modifiers</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">modifiers</span>();
+
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">modifiers</span>.<span class="ident">is_empty</span>() {
+                <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">modifiers</span>.<span class="ident">format</span>(), <span class="ident">space</span>()])<span class="question-mark">?</span>;
+            }
+
+            <span class="ident">FormatJsAnyMethodMember::from</span>(<span class="ident">node</span>.<span class="ident">clone</span>()).<span class="ident">fmt</span>(<span class="ident">f</span>)
+        });
 
         <span class="macro">write!</span>(
             <span class="ident">f</span>,
             [<span class="ident">FormatWithSemicolon::new</span>(
-                <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(
-                    <span class="ident">modifiers</span>.<span class="ident">format</span>(),
-                    <span class="ident">async_token</span>
-                        .<span class="ident">format</span>()
-                        .<span class="ident">with_or_empty</span>(<span class="op">|</span><span class="ident">token</span>, <span class="ident">f</span><span class="op">|</span> <span class="macro">write!</span>[<span class="ident">f</span>, [<span class="ident">token</span>, <span class="ident">space</span>()]]),
-                    <span class="ident">space</span>(),
-                    <span class="ident">name</span>.<span class="ident">format</span>(),
-                    <span class="ident">question_mark_token</span>.<span class="ident">format</span>(),
-                    <span class="ident">type_parameters</span>.<span class="ident">format</span>(),
-                    <span class="ident">parameters</span>.<span class="ident">format</span>(),
-                    <span class="ident">return_type_annotation</span>.<span class="ident">format</span>(),
-                ),
-                <span class="ident">semicolon_token</span>.<span class="ident">as_ref</span>()
+                <span class="kw-2">&amp;</span><span class="ident">format_inner</span>,
+                <span class="ident">node</span>.<span class="ident">semicolon_token</span>().<span class="ident">as_ref</span>()
             )]
         )
     }

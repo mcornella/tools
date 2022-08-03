@@ -54,7 +54,7 @@ is written in the buffer.</p>
     <span class="ident">formatted</span>.<span class="ident">print</span>().<span class="ident">as_code</span>()
 );</code></pre></div>
 <h6 id="alternatives"><a href="#alternatives">Alternatives</a></h6>
-<p>Use <code>Memoized.inspect(f).will_break()</code> if you need to know if some content breaks that should
+<p>Use <code>Memoized.inspect(f)?.will_break()</code> if you need to know if some content breaks that should
 only be written later.</p>
 </div></details><details class="rustdoc-toggle" open><summary><div id="method.inspect_is_labelled" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/rome_formatter/buffer.rs.html#546-549">source</a></div><h4 class="code-header">fn <a href="#method.inspect_is_labelled" class="fnname">inspect_is_labelled</a>&lt;T:&nbsp;?<a class="trait" href="https://doc.rust-lang.org/1.62.0/core/marker/trait.Sized.html" title="trait core::marker::Sized">Sized</a> + 'static&gt;(<br>&nbsp;&nbsp;&nbsp;&nbsp;&amp;mut self<br>) -&gt; <a class="struct" href="../struct.HasLabelBuffer.html" title="struct rome_formatter::HasLabelBuffer">HasLabelBuffer</a>&lt;'_, Self::<a class="associatedtype" href="trait._.html#associatedtype.Context" title="type rome_formatter::prelude::_::Context">Context</a>&gt;</h4></div></summary><div class="docblock"><p>Wraps the current buffer in a <a href="../struct.HasLabelBuffer.html" title="HasLabelBuffer">HasLabelBuffer</a>, which tracks
 labelled elements written in the main buffer, it does so by
@@ -98,7 +98,7 @@ is written in the buffer.</p>
 
 <span class="macro">assert_eq!</span>(<span class="string">&quot;&#39;I have a label&#39; has label SomeLabelId&quot;</span>, <span class="ident">formatted</span>.<span class="ident">print</span>().<span class="ident">as_code</span>());</code></pre></div>
 <p>/// ## Alternatives</p>
-<p>Use <code>Memoized.inspect(f).will_break()</code> if you need to know if some content breaks that should
+<p>Use <code>Memoized.inspect(f)?.has_label(LabelId::of::&lt;SomeLabelId&gt;()</code> if you need to know if some content breaks that should
 only be written later.</p>
 </div></details></div><h2 id="implementors" class="small-section-header">Implementors<a href="#implementors" class="anchor"></a></h2><div class="item-list" id="implementors-list"><section id="impl-BufferExtensions" class="impl has-srclink"><span class="rightside"><a class="srclink" href="../../src/rome_formatter/buffer.rs.html#552">source</a></span><a href="#impl-BufferExtensions" class="anchor"></a><h3 class="code-header in-band">impl&lt;T&gt; <a class="trait" href="trait.BufferExtensions.html" title="trait rome_formatter::prelude::BufferExtensions">BufferExtensions</a> for T <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: <a class="trait" href="trait._.html" title="trait rome_formatter::prelude::_">Buffer</a>,&nbsp;</span></h3></section></div><script type="text/javascript" src="../../implementors/rome_formatter/buffer/trait.BufferExtensions.js" data-ignore-extern-crates="" async></script></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rome_formatter" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
 </body></html>

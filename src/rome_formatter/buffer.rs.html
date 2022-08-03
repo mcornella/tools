@@ -1154,7 +1154,7 @@ Make sure that you take and restore the snapshot in order and that this snapshot
     <span class="doccomment">///</span>
     <span class="doccomment">/// ## Alternatives</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Use `Memoized.inspect(f).will_break()` if you need to know if some content breaks that should</span>
+    <span class="doccomment">/// Use `Memoized.inspect(f)?.will_break()` if you need to know if some content breaks that should</span>
     <span class="doccomment">/// only be written later.</span>
     <span class="kw">fn</span> <span class="ident">inspect_will_break</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">WillBreakBuffer</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Context</span><span class="op">&gt;</span> {
         <span class="ident">WillBreakBuffer::new</span>(<span class="self">self</span>)
@@ -1209,7 +1209,7 @@ Make sure that you take and restore the snapshot in order and that this snapshot
     <span class="doccomment">///</span>
     <span class="doccomment">/// /// ## Alternatives</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Use `Memoized.inspect(f).will_break()` if you need to know if some content breaks that should</span>
+    <span class="doccomment">/// Use `Memoized.inspect(f)?.has_label(LabelId::of::&lt;SomeLabelId&gt;()` if you need to know if some content breaks that should</span>
     <span class="doccomment">/// only be written later.</span>
     <span class="kw">fn</span> <span class="ident">inspect_is_labelled</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">HasLabelBuffer</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Context</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">label_id</span> <span class="op">=</span> <span class="ident">LabelId::of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>();
