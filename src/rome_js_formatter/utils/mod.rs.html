@@ -502,6 +502,9 @@
 <span id="497">497</span>
 <span id="498">498</span>
 <span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">array</span>;
 <span class="kw">mod</span> <span class="ident">assignment_like</span>;
 <span class="kw">mod</span> <span class="ident">binary_like_expression</span>;
@@ -521,7 +524,10 @@
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">assignment_like</span>::{<span class="ident">should_break_after_operator</span>, <span class="ident">JsAnyAssignmentLike</span>};
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">binary_like_expression</span>::{<span class="ident">format_binary_like_expression</span>, <span class="ident">JsAnyBinaryLikeExpression</span>};
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">binary_like_expression</span>::{
+    <span class="ident">binary_argument_needs_parens</span>, <span class="ident">format_binary_like_expression</span>, <span class="ident">JsAnyBinaryLikeExpression</span>,
+    <span class="ident">JsAnyBinaryLikeLeftExpression</span>,
+};
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">format_conditional</span>::{<span class="ident">format_conditional</span>, <span class="ident">Conditional</span>};
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">member_chain::format_call_expression</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">object_like::JsObjectLike</span>;

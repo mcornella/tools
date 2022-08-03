@@ -892,6 +892,15 @@
 <span id="887">887</span>
 <span id="888">888</span>
 <span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
+<span id="897">897</span>
+<span id="898">898</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">write</span>, <span class="ident">Buffer</span>, <span class="ident">CstFormatContext</span>};
 <span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{
@@ -1044,7 +1053,7 @@
 
 <span class="doccomment">/// Small wrapper to identify the operation of an expression and deduce their precedence</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">BinaryLikeOperator</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">BinaryLikeOperator</span> {
     <span class="ident">Logical</span>(<span class="ident">JsLogicalOperator</span>),
     <span class="ident">Binary</span>(<span class="ident">JsBinaryOperator</span>),
     <span class="ident">Instanceof</span>,
@@ -1068,10 +1077,10 @@
 <span class="doccomment">/// first `foo &amp;&amp; bar` is computed and its result is then computed against `|| lorem`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// In order to make this distinction more obvious, we wrap `foo &amp;&amp; bar` in parenthesis.</span>
-<span class="kw">fn</span> <span class="ident">needs_parens</span>(
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">binary_argument_needs_parens</span>(
     <span class="ident">parent_operator</span>: <span class="ident">BinaryLikeOperator</span>,
     <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">JsAnyBinaryLikeLeftExpression</span>,
-) -&gt; <span class="ident">FormatResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">compare_to</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">node</span> {
         <span class="ident">JsAnyBinaryLikeLeftExpression::JsAnyExpression</span>(<span class="ident">expression</span>) =&gt; <span class="kw">match</span> <span class="ident">expression</span> {
             <span class="ident">JsAnyExpression::JsLogicalExpression</span>(<span class="ident">logical</span>) =&gt; {
@@ -1118,7 +1127,7 @@
     <span class="ident">sub_expression</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">JsAnyBinaryLikeLeftExpression</span>,
 ) -&gt; <span class="kw">impl</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">JsFormatContext</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
     <span class="ident">format_with</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
-        <span class="kw">if</span> <span class="ident">needs_parens</span>(<span class="ident">parent_operator</span>, <span class="ident">sub_expression</span>)<span class="question-mark">?</span> {
+        <span class="kw">if</span> <span class="ident">binary_argument_needs_parens</span>(<span class="ident">parent_operator</span>, <span class="ident">sub_expression</span>)<span class="question-mark">?</span> {
             <span class="ident">format_parenthesize</span>(
                 <span class="ident">sub_expression</span>.<span class="ident">syntax</span>().<span class="ident">first_token</span>().<span class="ident">as_ref</span>(),
                 <span class="kw-2">&amp;</span><span class="ident">sub_expression</span>,
@@ -1160,7 +1169,12 @@
 <span class="doccomment">/// the indentation, then there&#39;s no need to do a second indentation.</span>
 <span class="doccomment">/// [Prettier applies]: https://github.com/prettier/prettier/blob/b0201e01ef99db799eb3716f15b7dfedb0a2e62b/src/language-js/print/binaryish.js#L122-L125</span>
 <span class="kw">fn</span> <span class="ident">should_not_indent_if_parent_indents</span>(<span class="ident">current_node</span>: <span class="kw-2">&amp;</span><span class="ident">JsAnyBinaryLikeLeftExpression</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">let</span> <span class="ident">parent</span> <span class="op">=</span> <span class="ident">current_node</span>.<span class="ident">syntax</span>().<span class="ident">parent</span>();
+    <span class="kw">let</span> <span class="ident">parent</span> <span class="op">=</span> <span class="ident">current_node</span>
+        .<span class="ident">syntax</span>()
+        .<span class="ident">ancestors</span>()
+        .<span class="ident">skip</span>(<span class="number">1</span>)
+        .<span class="ident">find</span>(<span class="op">|</span><span class="ident">parent</span><span class="op">|</span> <span class="ident">parent</span>.<span class="ident">kind</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">JsSyntaxKind::JS_PARENTHESIZED_EXPRESSION</span>);
+
     <span class="kw">let</span> <span class="ident">parent_kind</span> <span class="op">=</span> <span class="ident">parent</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">node</span><span class="op">|</span> <span class="ident">node</span>.<span class="ident">kind</span>());
 
     <span class="kw">let</span> <span class="ident">great_parent</span> <span class="op">=</span> <span class="ident">parent</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">parent</span><span class="op">|</span> <span class="ident">parent</span>.<span class="ident">parent</span>());
@@ -1175,7 +1189,11 @@
                 .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
         }
         (
-            <span class="prelude-val">Some</span>(<span class="ident">JsSyntaxKind::JS_RETURN_STATEMENT</span> <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_ARROW_FUNCTION_EXPRESSION</span>),
+            <span class="prelude-val">Some</span>(
+                <span class="ident">JsSyntaxKind::JS_RETURN_STATEMENT</span>
+                <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_THROW_STATEMENT</span>
+                <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_ARROW_FUNCTION_EXPRESSION</span>,
+            ),
             <span class="kw">_</span>,
         ) =&gt; <span class="bool-val">true</span>,
         <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
@@ -1273,7 +1291,7 @@
         <span class="kw">let</span> <span class="ident">operator_token</span> <span class="op">=</span> <span class="ident">binary_like_expression</span>.<span class="ident">operator_token</span>()<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">operator_has_trailing_comments</span> <span class="op">=</span> <span class="ident">operator_token</span>.<span class="ident">has_trailing_comments</span>();
-        <span class="kw">let</span> <span class="ident">left_parenthesized</span> <span class="op">=</span> <span class="ident">needs_parens</span>(<span class="ident">operator</span>, <span class="kw-2">&amp;</span><span class="ident">left</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">left_parenthesized</span> <span class="op">=</span> <span class="ident">binary_argument_needs_parens</span>(<span class="ident">operator</span>, <span class="kw-2">&amp;</span><span class="ident">left</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">left_item</span> <span class="op">=</span> <span class="ident">FlattenItem::new</span>(
             <span class="ident">FlattenedBinaryExpressionPart::Group</span> {
                 <span class="ident">current</span>: <span class="ident">left</span>,
@@ -1653,7 +1671,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">operator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">BinaryLikeOperator</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">operator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">BinaryLikeOperator</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">JsAnyBinaryLikeExpression::JsLogicalExpression</span>(<span class="ident">logical</span>) =&gt; {
                 <span class="ident">logical</span>.<span class="ident">operator</span>().<span class="ident">map</span>(<span class="ident">BinaryLikeOperator::Logical</span>)
@@ -1744,7 +1762,7 @@
 }
 
 <span class="macro">declare_node_union!</span> {
-    <span class="ident">JsAnyBinaryLikeLeftExpression</span> <span class="op">=</span> <span class="ident">JsAnyExpression</span> <span class="op">|</span> <span class="ident">JsPrivateName</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">JsAnyBinaryLikeLeftExpression</span> <span class="op">=</span> <span class="ident">JsAnyExpression</span> <span class="op">|</span> <span class="ident">JsPrivateName</span>
 }
 
 <span class="kw">impl</span> <span class="ident">JsAnyBinaryLikeLeftExpression</span> {
