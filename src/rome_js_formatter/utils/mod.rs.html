@@ -484,6 +484,24 @@
 <span id="479">479</span>
 <span id="480">480</span>
 <span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">array</span>;
 <span class="kw">mod</span> <span class="ident">assignment_like</span>;
 <span class="kw">mod</span> <span class="ident">binary_like_expression</span>;
@@ -638,27 +656,45 @@
     <span class="bool-val">false</span>
 }
 
-<span class="doccomment">/// Format an element with a single line head and a body that might</span>
-<span class="doccomment">/// be either a block or a single statement.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FormatBodyStatement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="doccomment">/// Formats the body of a statement where it can either be a single statement, an empty statement,</span>
+<span class="doccomment">/// or a block statement.</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">FormatStatementBody</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">body</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">JsAnyStatement</span>,
+    <span class="ident">force_space</span>: <span class="ident">bool</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FormatBodyStatement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">statement</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">JsAnyStatement</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">body</span>: <span class="ident">statement</span> }
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FormatStatementBody</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">body</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">JsAnyStatement</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">body</span>,
+            <span class="ident">force_space</span>: <span class="bool-val">false</span>,
+        }
+    }
+
+    <span class="doccomment">/// Prevents that the consequent is formatted on its own line and indented by one level and</span>
+    <span class="doccomment">/// instead gets separated by a space.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_forced_space</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">forced</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">force_space</span> <span class="op">=</span> <span class="ident">forced</span>;
+        <span class="self">self</span>
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">JsFormatContext</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FormatBodyStatement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">JsFormatter</span>) -&gt; <span class="ident">FormatResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">body</span> {
-            <span class="ident">JsAnyStatement::JsEmptyStatement</span>(<span class="ident">body</span>) =&gt; {
-                <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">body</span>.<span class="ident">format</span>(), <span class="ident">format_inserted</span>(<span class="ident">JsSyntaxKind::SEMICOLON</span>)])
-            }
-            <span class="ident">body</span> =&gt; {
-                <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">space</span>(), <span class="ident">body</span>.<span class="ident">format</span>()])
-            }
+<span class="kw">impl</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">JsFormatContext</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FormatStatementBody</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="ident">JsFormatContext</span><span class="op">&gt;</span>) -&gt; <span class="ident">FormatResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">use</span> <span class="ident">JsAnyStatement</span>::<span class="kw-2">*</span>;
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">JsEmptyStatement</span>(<span class="ident">empty</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">body</span> {
+            <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">empty</span>.<span class="ident">format</span>()])
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">body</span>, <span class="ident">JsBlockStatement</span>(<span class="kw">_</span>)) <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">force_space</span> {
+            <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">space</span>(), <span class="self">self</span>.<span class="ident">body</span>.<span class="ident">format</span>()])
+        } <span class="kw">else</span> {
+            <span class="macro">write!</span>(
+                <span class="ident">f</span>,
+                [<span class="ident">indent</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
+                    <span class="ident">soft_line_break_or_space</span>(),
+                    <span class="self">self</span>.<span class="ident">body</span>.<span class="ident">format</span>()
+                ])]
+            )
         }
     }
 }

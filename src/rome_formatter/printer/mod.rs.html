@@ -1249,10 +1249,6 @@
 <span id="1244">1244</span>
 <span id="1245">1245</span>
 <span id="1246">1246</span>
-<span id="1247">1247</span>
-<span id="1248">1248</span>
-<span id="1249">1249</span>
-<span id="1250">1250</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">printer_options</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">printer_options</span>::<span class="kw-2">*</span>;
@@ -1578,11 +1574,7 @@
         <span class="ident">queue</span>.<span class="ident">extend</span>(
             <span class="ident">line_break</span>
                 .<span class="ident">into_iter</span>()
-                .<span class="ident">chain</span>(<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">line_suffixes</span>.<span class="ident">drain</span>(..).<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">call</span><span class="op">|</span> {
-                    <span class="comment">// Overwrite the arguments for the PrintElementCalls in the queue with the current arguments</span>
-                    <span class="ident">call</span>.<span class="ident">args</span> <span class="op">=</span> <span class="ident">args</span>;
-                    <span class="ident">call</span>
-                }))
+                .<span class="ident">chain</span>(<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">line_suffixes</span>.<span class="ident">drain</span>(..))
                 .<span class="ident">chain</span>(<span class="ident">once</span>(<span class="ident">call_self</span>)),
         );
     }
