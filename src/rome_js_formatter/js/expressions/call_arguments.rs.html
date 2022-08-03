@@ -740,6 +740,31 @@
 <span id="735">735</span>
 <span id="736">736</span>
 <span id="737">737</span>
+<span id="738">738</span>
+<span id="739">739</span>
+<span id="740">740</span>
+<span id="741">741</span>
+<span id="742">742</span>
+<span id="743">743</span>
+<span id="744">744</span>
+<span id="745">745</span>
+<span id="746">746</span>
+<span id="747">747</span>
+<span id="748">748</span>
+<span id="749">749</span>
+<span id="750">750</span>
+<span id="751">751</span>
+<span id="752">752</span>
+<span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builders</span>::{<span class="ident">format_close_delimiter</span>, <span class="ident">format_open_delimiter</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>::{<span class="ident">is_call_like_expression</span>, <span class="ident">write_arguments_multi_line</span>};
@@ -1216,8 +1241,33 @@
     <span class="ident">arguments_len</span>: <span class="ident">usize</span>,
     <span class="ident">callee</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">JsAnyExpression</span>,
 }
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_test_call_expression</span>(<span class="ident">expression</span>: <span class="kw-2">&amp;</span><span class="ident">JsCallExpression</span>) -&gt; <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">arguments</span> <span class="op">=</span> <span class="ident">expression</span>.<span class="ident">arguments</span>()<span class="question-mark">?</span>.<span class="ident">args</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">arguments_iter</span> <span class="op">=</span> <span class="ident">arguments</span>.<span class="ident">iter</span>();
+
+    <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> (
+        <span class="ident">arguments_iter</span>.<span class="ident">next</span>(),
+        <span class="ident">arguments_iter</span>.<span class="ident">next</span>(),
+        <span class="ident">arguments_iter</span>.<span class="ident">next</span>(),
+    ) {
+        (<span class="prelude-val">Some</span>(<span class="ident">first_argument</span>), <span class="prelude-val">Some</span>(<span class="ident">second_argument</span>), <span class="ident">third_argument</span>) =&gt; {
+            <span class="ident">is_framework_test_call</span>(<span class="ident">IsTestFrameworkCallPayload</span> {
+                <span class="ident">first_argument</span>: <span class="kw-2">&amp;</span><span class="ident">first_argument</span><span class="question-mark">?</span>,
+                <span class="ident">second_argument</span>: <span class="kw-2">&amp;</span><span class="ident">second_argument</span><span class="question-mark">?</span>,
+                <span class="ident">third_argument</span>: <span class="kw-2">&amp;</span><span class="ident">third_argument</span>,
+                <span class="ident">arguments_len</span>: <span class="ident">arguments</span>.<span class="ident">len</span>(),
+                <span class="ident">callee</span>: <span class="kw-2">&amp;</span><span class="ident">expression</span>.<span class="ident">callee</span>()<span class="question-mark">?</span>,
+            })<span class="question-mark">?</span>
+        }
+        (<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+    };
+
+    <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
+}
+
 <span class="doccomment">/// This is a specialised function that checks if the current [call expression]</span>
-<span class="doccomment">/// is reminds a call expression usually used by the majority of testing frameworks.</span>
+<span class="doccomment">/// resembles a call expression usually used by a testing frameworks.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// If the [call expression] matches the criteria, a different formatting is applied.</span>
 <span class="doccomment">///</span>
