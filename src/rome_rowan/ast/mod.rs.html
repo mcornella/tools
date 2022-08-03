@@ -975,6 +975,16 @@
 <span id="970">970</span>
 <span id="971">971</span>
 <span id="972">972</span>
+<span id="973">973</span>
+<span id="974">974</span>
+<span id="975">975</span>
+<span id="976">976</span>
+<span id="977">977</span>
+<span id="978">978</span>
+<span id="979">979</span>
+<span id="980">980</span>
+<span id="981">981</span>
+<span id="982">982</span>
 </pre><pre class="rust"><code><span class="doccomment">//! AST definitions for converting untyped syntax nodes into typed AST nodes.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Every field of every AST node is optional, this is to allow the parser to recover</span>
@@ -1339,6 +1349,16 @@
         <span class="ident">AstSeparatedListNodesIterator</span> {
             <span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">elements</span>(),
         }
+    }
+
+    <span class="doccomment">/// Returns the first node</span>
+    <span class="kw">fn</span> <span class="ident">first</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Node</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">next</span>()
+    }
+
+    <span class="doccomment">/// Returns the last node</span>
+    <span class="kw">fn</span> <span class="ident">last</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Node</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">next_back</span>()
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
