@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["to_camel_case","Return the camel case form of the input parameter. If it is already in camel case, nothing is done."]],"mod":[["rename",""]],"trait":[["ToCamelCase",""]]});
+initSidebarItems({"fn":[["to_camel_case","Return the camel case form of the input parameter. If it is already in camel case, nothing is done."]],"mod":[["batch",""],["rename",""]],"trait":[["ToCamelCase",""]]});

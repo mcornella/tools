@@ -194,11 +194,13 @@
 <span id="189">189</span>
 <span id="190">190</span>
 <span id="191">191</span>
+<span id="192">192</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_js_factory::make</span>;
 <span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{<span class="ident">JsAnyRoot</span>, <span class="ident">JsAnyStatement</span>, <span class="ident">JsLanguage</span>, <span class="ident">JsModuleItemList</span>, <span class="ident">JsStatementList</span>, <span class="ident">T</span>};
 <span class="kw">use</span> <span class="ident">rome_rowan</span>::{<span class="ident">AstNode</span>, <span class="ident">BatchMutation</span>};
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">batch</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rename</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">tests</span>;
