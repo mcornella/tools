@@ -402,6 +402,8 @@
 <span id="397">397</span>
 <span id="398">398</span>
 <span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Generated file, do not edit by hand, see `xtask/codegen`</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ConfigurationError</span>, <span class="ident">RomeError</span>, <span class="ident">RuleConfiguration</span>};
@@ -535,7 +537,7 @@
 }
 <span class="kw">impl</span> <span class="ident">Js</span> {
     <span class="kw">const</span> <span class="ident">GROUP_NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;js&quot;</span>;
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">GROUP_RULES</span>: [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>; <span class="number">25</span>] <span class="op">=</span> [
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">GROUP_RULES</span>: [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>; <span class="number">26</span>] <span class="op">=</span> [
         <span class="string">&quot;noArguments&quot;</span>,
         <span class="string">&quot;noAsyncPromiseExecutor&quot;</span>,
         <span class="string">&quot;noCatchAssign&quot;</span>,
@@ -545,6 +547,7 @@
         <span class="string">&quot;noDelete&quot;</span>,
         <span class="string">&quot;noDoubleEquals&quot;</span>,
         <span class="string">&quot;noEmptyPattern&quot;</span>,
+        <span class="string">&quot;noExtraBooleanCast&quot;</span>,
         <span class="string">&quot;noFunctionAssign&quot;</span>,
         <span class="string">&quot;noLabelVar&quot;</span>,
         <span class="string">&quot;noNegationElse&quot;</span>,
@@ -562,7 +565,7 @@
         <span class="string">&quot;useValidTypeof&quot;</span>,
         <span class="string">&quot;useWhile&quot;</span>,
     ];
-    <span class="kw">const</span> <span class="ident">RECOMMENDED_RULES</span>: [<span class="ident">RuleFilter</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>; <span class="number">23</span>] <span class="op">=</span> [
+    <span class="kw">const</span> <span class="ident">RECOMMENDED_RULES</span>: [<span class="ident">RuleFilter</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>; <span class="number">24</span>] <span class="op">=</span> [
         <span class="ident">RuleFilter::Rule</span>(<span class="string">&quot;js&quot;</span>, <span class="ident"><span class="self">Self</span>::GROUP_RULES</span>[<span class="number">0</span>]),
         <span class="ident">RuleFilter::Rule</span>(<span class="string">&quot;js&quot;</span>, <span class="ident"><span class="self">Self</span>::GROUP_RULES</span>[<span class="number">1</span>]),
         <span class="ident">RuleFilter::Rule</span>(<span class="string">&quot;js&quot;</span>, <span class="ident"><span class="self">Self</span>::GROUP_RULES</span>[<span class="number">2</span>]),
@@ -580,12 +583,13 @@
         <span class="ident">RuleFilter::Rule</span>(<span class="string">&quot;js&quot;</span>, <span class="ident"><span class="self">Self</span>::GROUP_RULES</span>[<span class="number">15</span>]),
         <span class="ident">RuleFilter::Rule</span>(<span class="string">&quot;js&quot;</span>, <span class="ident"><span class="self">Self</span>::GROUP_RULES</span>[<span class="number">16</span>]),
         <span class="ident">RuleFilter::Rule</span>(<span class="string">&quot;js&quot;</span>, <span class="ident"><span class="self">Self</span>::GROUP_RULES</span>[<span class="number">17</span>]),
-        <span class="ident">RuleFilter::Rule</span>(<span class="string">&quot;js&quot;</span>, <span class="ident"><span class="self">Self</span>::GROUP_RULES</span>[<span class="number">19</span>]),
+        <span class="ident">RuleFilter::Rule</span>(<span class="string">&quot;js&quot;</span>, <span class="ident"><span class="self">Self</span>::GROUP_RULES</span>[<span class="number">18</span>]),
         <span class="ident">RuleFilter::Rule</span>(<span class="string">&quot;js&quot;</span>, <span class="ident"><span class="self">Self</span>::GROUP_RULES</span>[<span class="number">20</span>]),
         <span class="ident">RuleFilter::Rule</span>(<span class="string">&quot;js&quot;</span>, <span class="ident"><span class="self">Self</span>::GROUP_RULES</span>[<span class="number">21</span>]),
         <span class="ident">RuleFilter::Rule</span>(<span class="string">&quot;js&quot;</span>, <span class="ident"><span class="self">Self</span>::GROUP_RULES</span>[<span class="number">22</span>]),
         <span class="ident">RuleFilter::Rule</span>(<span class="string">&quot;js&quot;</span>, <span class="ident"><span class="self">Self</span>::GROUP_RULES</span>[<span class="number">23</span>]),
         <span class="ident">RuleFilter::Rule</span>(<span class="string">&quot;js&quot;</span>, <span class="ident"><span class="self">Self</span>::GROUP_RULES</span>[<span class="number">24</span>]),
+        <span class="ident">RuleFilter::Rule</span>(<span class="string">&quot;js&quot;</span>, <span class="ident"><span class="self">Self</span>::GROUP_RULES</span>[<span class="number">25</span>]),
     ];
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_recommended</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> { <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">recommended</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)) }
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_enabled_rules</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">IndexSet</span><span class="op">&lt;</span><span class="ident">RuleFilter</span><span class="op">&gt;</span> {
