@@ -1941,6 +1941,94 @@
 <span id="1936">1936</span>
 <span id="1937">1937</span>
 <span id="1938">1938</span>
+<span id="1939">1939</span>
+<span id="1940">1940</span>
+<span id="1941">1941</span>
+<span id="1942">1942</span>
+<span id="1943">1943</span>
+<span id="1944">1944</span>
+<span id="1945">1945</span>
+<span id="1946">1946</span>
+<span id="1947">1947</span>
+<span id="1948">1948</span>
+<span id="1949">1949</span>
+<span id="1950">1950</span>
+<span id="1951">1951</span>
+<span id="1952">1952</span>
+<span id="1953">1953</span>
+<span id="1954">1954</span>
+<span id="1955">1955</span>
+<span id="1956">1956</span>
+<span id="1957">1957</span>
+<span id="1958">1958</span>
+<span id="1959">1959</span>
+<span id="1960">1960</span>
+<span id="1961">1961</span>
+<span id="1962">1962</span>
+<span id="1963">1963</span>
+<span id="1964">1964</span>
+<span id="1965">1965</span>
+<span id="1966">1966</span>
+<span id="1967">1967</span>
+<span id="1968">1968</span>
+<span id="1969">1969</span>
+<span id="1970">1970</span>
+<span id="1971">1971</span>
+<span id="1972">1972</span>
+<span id="1973">1973</span>
+<span id="1974">1974</span>
+<span id="1975">1975</span>
+<span id="1976">1976</span>
+<span id="1977">1977</span>
+<span id="1978">1978</span>
+<span id="1979">1979</span>
+<span id="1980">1980</span>
+<span id="1981">1981</span>
+<span id="1982">1982</span>
+<span id="1983">1983</span>
+<span id="1984">1984</span>
+<span id="1985">1985</span>
+<span id="1986">1986</span>
+<span id="1987">1987</span>
+<span id="1988">1988</span>
+<span id="1989">1989</span>
+<span id="1990">1990</span>
+<span id="1991">1991</span>
+<span id="1992">1992</span>
+<span id="1993">1993</span>
+<span id="1994">1994</span>
+<span id="1995">1995</span>
+<span id="1996">1996</span>
+<span id="1997">1997</span>
+<span id="1998">1998</span>
+<span id="1999">1999</span>
+<span id="2000">2000</span>
+<span id="2001">2001</span>
+<span id="2002">2002</span>
+<span id="2003">2003</span>
+<span id="2004">2004</span>
+<span id="2005">2005</span>
+<span id="2006">2006</span>
+<span id="2007">2007</span>
+<span id="2008">2008</span>
+<span id="2009">2009</span>
+<span id="2010">2010</span>
+<span id="2011">2011</span>
+<span id="2012">2012</span>
+<span id="2013">2013</span>
+<span id="2014">2014</span>
+<span id="2015">2015</span>
+<span id="2016">2016</span>
+<span id="2017">2017</span>
+<span id="2018">2018</span>
+<span id="2019">2019</span>
+<span id="2020">2020</span>
+<span id="2021">2021</span>
+<span id="2022">2022</span>
+<span id="2023">2023</span>
+<span id="2024">2024</span>
+<span id="2025">2025</span>
+<span id="2026">2026</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">format_element</span>, <span class="ident">write</span>, <span class="ident">Argument</span>, <span class="ident">Arguments</span>, <span class="ident">BufferSnapshot</span>, <span class="ident">FormatState</span>, <span class="ident">GroupId</span>,
@@ -1951,6 +2039,7 @@
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 <span class="kw">use</span> <span class="ident">std::cell::Cell</span>;
 <span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
+<span class="kw">use</span> <span class="ident">std::num::NonZeroU8</span>;
 <span class="kw">use</span> <span class="ident">std::ops::Deref</span>;
 
 <span class="doccomment">/// A line break that only gets printed if the enclosing `Group` doesn&#39;t fit on a single line.</span>
@@ -2604,6 +2693,93 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Indent</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Context</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Indent&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="string">&quot;{{content}}&quot;</span>).<span class="ident">finish</span>()
+    }
+}
+
+<span class="doccomment">/// Aligns its content by indenting the content by `count` spaces.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [align] is a variant of `[indent]` that indents its content by a specified number of spaces rather than</span>
+<span class="doccomment">/// using the configured indent character (tab or a specified number of spaces).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// You should use [align] when you want to indent a content by a specific number of spaces.</span>
+<span class="doccomment">/// Using [indent] is preferred in all other situations as it respects the users preferred indent character.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// use std::num::NonZeroU8;</span>
+<span class="doccomment">/// use rome_formatter::{format, format_args};</span>
+<span class="doccomment">/// use rome_formatter::prelude::*;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let block = format!(SimpleFormatContext::default(), [</span>
+<span class="doccomment">///     text(&quot;a&quot;),</span>
+<span class="doccomment">///     hard_line_break(),</span>
+<span class="doccomment">///     text(&quot;?&quot;),</span>
+<span class="doccomment">///     space(),</span>
+<span class="doccomment">///     align(2, &amp;format_args![</span>
+<span class="doccomment">///         text(&quot;function () {&quot;),</span>
+<span class="doccomment">///         hard_line_break(),</span>
+<span class="doccomment">///         text(&quot;}&quot;),</span>
+<span class="doccomment">///     ]),</span>
+<span class="doccomment">///     hard_line_break(),</span>
+<span class="doccomment">///     text(&quot;:&quot;),</span>
+<span class="doccomment">///     space(),</span>
+<span class="doccomment">///     align(2, &amp;format_args![</span>
+<span class="doccomment">///         text(&quot;function () {&quot;),</span>
+<span class="doccomment">///         block_indent(&amp;text(&quot;console.log(&#39;test&#39;);&quot;)),</span>
+<span class="doccomment">///         text(&quot;}&quot;),</span>
+<span class="doccomment">///     ]),</span>
+<span class="doccomment">///     text(&quot;;&quot;)</span>
+<span class="doccomment">/// ]).unwrap();</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// assert_eq!(</span>
+<span class="doccomment">///     &quot;a\n? function () {\n  }\n: function () {\n\t\tconsole.log(&#39;test&#39;);\n  };&quot;,</span>
+<span class="doccomment">///     block.print().as_code()</span>
+<span class="doccomment">/// );</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// You can see that the printer indents the function&#39;s `}` by two spaces as specified by the IR and not with a tab.</span>
+<span class="doccomment">/// You can further see that alignments behave the same as an `indent` if you nest `indent` inside an align.</span>
+<span class="doccomment">///</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">align</span><span class="op">&lt;</span><span class="ident">Content</span>, <span class="ident">Context</span><span class="op">&gt;</span>(<span class="ident">count</span>: <span class="ident">u8</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">Content</span>) -&gt; <span class="ident">Align</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">Content</span>: <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>,
+{
+    <span class="ident">Align</span> {
+        <span class="ident">count</span>: <span class="ident">NonZeroU8::new</span>(<span class="ident">count</span>).<span class="ident">expect</span>(<span class="string">&quot;Alignment count must be a non-zero number.&quot;</span>),
+        <span class="ident">content</span>: <span class="ident">Argument::new</span>(<span class="ident">content</span>),
+    }
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Align</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Context</span><span class="op">&gt;</span> {
+    <span class="ident">count</span>: <span class="ident">NonZeroU8</span>,
+    <span class="ident">content</span>: <span class="ident">Argument</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Context</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Align</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Context</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>) -&gt; <span class="ident">FormatResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">VecBuffer::new</span>(<span class="ident">f</span>.<span class="ident">state_mut</span>());
+
+        <span class="ident">buffer</span>.<span class="ident">write_fmt</span>(<span class="ident">Arguments::from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">content</span>))<span class="question-mark">?</span>;
+
+        <span class="kw">if</span> <span class="ident">buffer</span>.<span class="ident">is_empty</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+        }
+
+        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">buffer</span>.<span class="ident">into_vec</span>();
+        <span class="ident">f</span>.<span class="ident">write_element</span>(<span class="ident">FormatElement::Align</span>(<span class="ident">format_element::Align</span> {
+            <span class="ident">content</span>: <span class="ident">content</span>.<span class="ident">into_boxed_slice</span>(),
+            <span class="ident">count</span>: <span class="self">self</span>.<span class="ident">count</span>,
+        }))
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Align</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Context</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Align&quot;</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;count&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">count</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;content&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;{{content}}&quot;</span>)
+            .<span class="ident">finish</span>()
     }
 }
 
