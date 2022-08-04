@@ -277,6 +277,23 @@
 <span id="272">272</span>
 <span id="273">273</span>
 <span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
 </pre><pre class="rust"><code><span class="doccomment">//! TypeScript specific functions.</span>
 
 <span class="kw">mod</span> <span class="ident">statement</span>;
@@ -302,15 +319,32 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::js_parse_error::expected_identifier</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::stmt::optional_semi</span>;
 
-<span class="kw">fn</span> <span class="ident">parse_ts_identifier_binding</span>(<span class="ident">p</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Parser</span>) -&gt; <span class="ident">ParsedSyntax</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">TsIdentifierContext</span> {
+    <span class="ident">Module</span>,
+    <span class="doccomment">/// Inside of an `Interface` or `Type` declaration</span>
+    <span class="ident">Type</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">TsIdentifierContext</span> {
+    <span class="kw">fn</span> <span class="ident">is_reserved_word</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">TsIdentifierContext::Module</span> =&gt; <span class="ident">is_reserved_module_name</span>(<span class="ident">name</span>),
+            <span class="ident">TsIdentifierContext::Type</span> =&gt; <span class="ident">is_reserved_type_name</span>(<span class="ident">name</span>),
+        }
+    }
+}
+<span class="kw">fn</span> <span class="ident">parse_ts_identifier_binding</span>(
+    <span class="ident">p</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Parser</span>,
+    <span class="ident">ts_identifier_context</span>: <span class="ident">TsIdentifierContext</span>,
+) -&gt; <span class="ident">ParsedSyntax</span> {
     <span class="ident">parse_identifier</span>(<span class="ident">p</span>, <span class="ident">TS_IDENTIFIER_BINDING</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">ident</span><span class="op">|</span> {
         <span class="kw">if</span> <span class="ident">ident</span>.<span class="ident">kind</span>().<span class="ident">is_unknown</span>() {
             <span class="kw">return</span> <span class="ident">ident</span>;
         }
 
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">source</span>(<span class="ident">ident</span>.<span class="ident">range</span>(<span class="ident">p</span>));
-
-        <span class="kw">if</span> <span class="ident">is_reserved_type_name</span>(<span class="ident">name</span>) {
+        <span class="kw">let</span> <span class="ident">is_reserved_word_this_context</span> <span class="op">=</span> <span class="ident">ts_identifier_context</span>.<span class="ident">is_reserved_word</span>(<span class="ident">name</span>);
+        <span class="kw">if</span> <span class="ident">is_reserved_word_this_context</span> {
             <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">p</span>
                 .<span class="ident">err_builder</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Type alias cannot be {}&quot;</span>, <span class="ident">name</span>))
                 .<span class="ident">primary</span>(<span class="ident">ident</span>.<span class="ident">range</span>(<span class="ident">p</span>), <span class="string">&quot;&quot;</span>);
