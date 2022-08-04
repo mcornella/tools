@@ -153,33 +153,29 @@
 <span id="148">148</span>
 <span id="149">149</span>
 <span id="150">150</span>
-<span id="151">151</span>
-<span id="152">152</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-
-<span class="kw">use</span> <span class="ident">rome_console::MarkupBuf</span>;
-<span class="kw">use</span> <span class="ident">rome_diagnostics</span>::{
-    <span class="ident">file</span>::{<span class="ident">FileId</span>, <span class="ident">FileSpan</span>},
-    <span class="ident">Applicability</span>, <span class="ident">CodeSuggestion</span>, <span class="ident">Diagnostic</span>, <span class="ident">SuggestionChange</span>, <span class="ident">SuggestionStyle</span>,
-};
-<span class="kw">use</span> <span class="ident">rome_rowan</span>::{<span class="ident">BatchMutation</span>, <span class="ident">Language</span>};
-
-<span class="kw">use</span> <span class="kw">crate</span>::{
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">categories::ActionCategory</span>,
     <span class="ident">context::RuleContext</span>,
     <span class="ident">registry</span>::{<span class="ident">LanguageRoot</span>, <span class="ident">RuleLanguage</span>, <span class="ident">RuleRoot</span>},
     <span class="ident">rule::Rule</span>,
-    <span class="ident">Queryable</span>, <span class="ident">RuleGroup</span>, <span class="ident">ServiceBag</span>,
+    <span class="ident">AnalyzerDiagnostic</span>, <span class="ident">Queryable</span>, <span class="ident">RuleGroup</span>, <span class="ident">ServiceBag</span>,
 };
+<span class="kw">use</span> <span class="ident">rome_console::MarkupBuf</span>;
+<span class="kw">use</span> <span class="ident">rome_diagnostics</span>::{
+    <span class="ident">file</span>::{<span class="ident">FileId</span>, <span class="ident">FileSpan</span>},
+    <span class="ident">Applicability</span>, <span class="ident">CodeSuggestion</span>, <span class="ident">SuggestionChange</span>, <span class="ident">SuggestionStyle</span>,
+};
+<span class="kw">use</span> <span class="ident">rome_rowan</span>::{<span class="ident">BatchMutation</span>, <span class="ident">Language</span>};
+<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
 
 <span class="doccomment">/// Event raised by the analyzer when a [Rule](crate::Rule)</span>
 <span class="doccomment">/// emits a diagnostic, a code action, or both</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AnalyzerSignal</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">Language</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">diagnostic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Diagnostic</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">diagnostic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AnalyzerDiagnostic</span><span class="op">&gt;</span>;
     <span class="kw">fn</span> <span class="ident">action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AnalyzerAction</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 }
 
-<span class="doccomment">/// Simple implementation of [AnalyzerSignal] generating a diagnostic from a</span>
+<span class="doccomment">/// Simple implementation of [AnalyzerSignal] generating a [AnalyzerDiagnostic] from a</span>
 <span class="doccomment">/// provided factory function</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">DiagnosticSignal</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
     <span class="ident">factory</span>: <span class="ident">F</span>,
@@ -187,7 +183,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="ident">DiagnosticSignal</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Fn</span>() -&gt; <span class="ident">Diagnostic</span>,
+    <span class="ident">F</span>: <span class="ident">Fn</span>() -&gt; <span class="ident">AnalyzerDiagnostic</span>,
 {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">factory</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">factory</span> }
@@ -196,9 +192,9 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">Language</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">AnalyzerSignal</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DiagnosticSignal</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">Fn</span>() -&gt; <span class="ident">Diagnostic</span>,
+    <span class="ident">F</span>: <span class="ident">Fn</span>() -&gt; <span class="ident">AnalyzerDiagnostic</span>,
 {
-    <span class="kw">fn</span> <span class="ident">diagnostic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Diagnostic</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">diagnostic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AnalyzerDiagnostic</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>((<span class="self">self</span>.<span class="ident">factory</span>)())
     }
 
@@ -281,11 +277,11 @@
     <span class="ident">G</span>: <span class="ident">RuleGroup</span>,
     <span class="ident">R</span>: <span class="ident">Rule</span>,
 {
-    <span class="kw">fn</span> <span class="ident">diagnostic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Diagnostic</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">diagnostic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AnalyzerDiagnostic</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">RuleContext::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">query_result</span>, <span class="self">self</span>.<span class="ident">root</span>, <span class="self">self</span>.<span class="ident">services</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
 
         <span class="ident">R::diagnostic</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">diag</span><span class="op">|</span> {
-            <span class="ident">diag</span>.<span class="ident">into_diagnostic</span>(
+            <span class="ident">diag</span>.<span class="ident">into_analyzer_diagnostic</span>(
                 <span class="self">self</span>.<span class="ident">file_id</span>,
                 <span class="macro">format!</span>(<span class="string">&quot;{}/{}&quot;</span>, <span class="ident">G::NAME</span>, <span class="ident">R::METADATA</span>.<span class="ident">name</span>),
                 <span class="macro">format!</span>(<span class="string">&quot;https://rome.tools/docs/lint/rules/{}/&quot;</span>, <span class="ident">R::METADATA</span>.<span class="ident">name</span>),

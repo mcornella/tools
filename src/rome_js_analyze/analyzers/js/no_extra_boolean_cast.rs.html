@@ -524,7 +524,7 @@
 			<span class="ident">ExtraBooleanCastType::BooleanCall</span> =&gt; (<span class="string">&quot;Avoid redundant `Boolean` call&quot;</span>, <span class="string">&quot;It is not necessary to use `Boolean` call when a value will already be coerced to a boolean.&quot;</span>),
 		};
         <span class="prelude-val">Some</span>(
-            <span class="ident">RuleDiagnostic::warning</span>(
+            <span class="ident">RuleDiagnostic::new</span>(
                 <span class="ident">node</span>.<span class="ident">range</span>(),
                 <span class="macro">markup!</span> {
                     {<span class="ident">title</span>}

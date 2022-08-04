@@ -262,7 +262,7 @@
         <span class="kw">let</span> (<span class="ident">first_start</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">state</span>[<span class="number">0</span>];
         <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">last_end</span>) <span class="op">=</span> <span class="ident">state</span>[<span class="ident">state</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>];
 
-        <span class="prelude-val">Some</span>(<span class="ident">RuleDiagnostic::warning</span>(
+        <span class="prelude-val">Some</span>(<span class="ident">RuleDiagnostic::new</span>(
             <span class="ident">TextRange::new</span>(
                 <span class="ident">value_token_range</span>.<span class="ident">start</span>() <span class="op">+</span> <span class="ident">TextSize::from</span>(<span class="ident">first_start</span> <span class="kw">as</span> <span class="ident">u32</span>),
                 <span class="ident">value_token_range</span>.<span class="ident">start</span>() <span class="op">+</span> <span class="ident">TextSize::from</span>(<span class="ident">last_end</span> <span class="kw">as</span> <span class="ident">u32</span>),

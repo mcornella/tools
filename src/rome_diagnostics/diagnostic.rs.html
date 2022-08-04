@@ -465,6 +465,11 @@
 <span id="460">460</span>
 <span id="461">461</span>
 <span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::suggestion::SuggestionChange</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">file</span>::{<span class="ident">FileId</span>, <span class="ident">FileSpan</span>, <span class="ident">Span</span>},
@@ -513,6 +518,11 @@
     <span class="doccomment">/// Creates a new [`Diagnostic`] with the `Note` severity.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">note</span>(<span class="ident">file_id</span>: <span class="ident">FileId</span>, <span class="ident">code</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">title</span>: <span class="kw">impl</span> <span class="ident">Display</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::new_with_code</span>(<span class="ident">file_id</span>, <span class="ident">Severity::Note</span>, <span class="ident">title</span>, <span class="prelude-val">Some</span>(<span class="ident">code</span>.<span class="ident">into</span>()))
+    }
+
+    <span class="doccomment">/// Creates a new [`Diagnostic`] with the `Bug` severity.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bug</span>(<span class="ident">file_id</span>: <span class="ident">FileId</span>, <span class="ident">code</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">title</span>: <span class="kw">impl</span> <span class="ident">Display</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::new_with_code</span>(<span class="ident">file_id</span>, <span class="ident">Severity::Bug</span>, <span class="ident">title</span>, <span class="prelude-val">Some</span>(<span class="ident">code</span>.<span class="ident">into</span>()))
     }
 
     <span class="doccomment">/// Creates a new [`Diagnostic`] that will be used in a builder-like way</span>

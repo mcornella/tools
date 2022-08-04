@@ -137,7 +137,7 @@
         <span class="kw">let</span> (<span class="ident">binding_syntax_node</span>, <span class="ident">label_token</span>) <span class="op">=</span> <span class="ident">state</span>;
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">label_token</span>.<span class="ident">text_trimmed</span>();
 
-        <span class="prelude-val">Some</span>(<span class="ident">RuleDiagnostic::warning</span>(
+        <span class="prelude-val">Some</span>(<span class="ident">RuleDiagnostic::new</span>(
             <span class="ident">label_token</span>.<span class="ident">text_trimmed_range</span>(),
             <span class="macro">markup!</span> {
                 <span class="string">&quot;Do not use the &quot;</span><span class="op">&lt;</span><span class="ident">Emphasis</span><span class="op">&gt;</span>{<span class="ident">name</span>}<span class="op">&lt;</span><span class="op">/</span><span class="ident">Emphasis</span><span class="op">&gt;</span><span class="string">&quot; variable name as a label&quot;</span>

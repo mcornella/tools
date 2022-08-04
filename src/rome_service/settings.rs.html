@@ -191,8 +191,24 @@
 <span id="186">186</span>
 <span id="187">187</span>
 <span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Configuration</span>, <span class="ident">Rules</span>};
 <span class="kw">use</span> <span class="ident">indexmap::IndexSet</span>;
+<span class="kw">use</span> <span class="ident">rome_console::codespan::Severity</span>;
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">IndentStyle</span>, <span class="ident">LineWidth</span>};
 <span class="kw">use</span> <span class="ident">rome_fs::RomePath</span>;
 <span class="kw">use</span> <span class="ident">rome_js_syntax::JsLanguage</span>;
@@ -236,6 +252,20 @@
         <span class="kw">let</span> <span class="ident">globals</span> <span class="op">=</span> <span class="ident">configuration</span>.<span class="ident">javascript</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">j</span><span class="op">|</span> <span class="ident">j</span>.<span class="ident">globals</span>);
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">globals</span>) <span class="op">=</span> <span class="ident">globals</span> {
             <span class="self">self</span>.<span class="ident">languages</span>.<span class="ident">javascript</span>.<span class="ident">globals</span> <span class="op">=</span> <span class="ident">globals</span>;
+        }
+    }
+
+    <span class="doccomment">/// It retrieves the severity based on the `code` of the rule and the current configuration.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The code of the has the following pattern: `{group}/{rule_name}`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// It returns [None] if the `code` doesn&#39;t match any rule.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_severity_from_rule_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">code</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Severity</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">rules</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">linter</span>.<span class="ident">rules</span>.<span class="ident">as_ref</span>();
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rules</span>) <span class="op">=</span> <span class="ident">rules</span> {
+            <span class="ident">rules</span>.<span class="ident">get_severity_from_code</span>(<span class="ident">code</span>)
+        } <span class="kw">else</span> {
+            <span class="prelude-val">None</span>
         }
     }
 }
