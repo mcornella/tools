@@ -2024,14 +2024,12 @@
 <span id="2019">2019</span>
 <span id="2020">2020</span>
 <span id="2021">2021</span>
-<span id="2022">2022</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Expressions, these include `this`, identifiers, arrays, objects,</span>
 <span class="doccomment">//! binary expressions, unary expressions, and more.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! See the [ECMAScript spec](https://www.ecma-international.org/ecma-262/5.1/#sec-11).</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::typescript</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::util</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::event::rewrite_events</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::event::RewriteParseEvents</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::lexer</span>::{<span class="ident">LexContext</span>, <span class="ident">ReLexContext</span>};
@@ -2506,9 +2504,9 @@
         }
 
         <span class="kw">let</span> <span class="ident">new_precedence</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">OperatorPrecedence::try_from_binary_operator</span>(<span class="ident">op</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">precedence</span>) =&gt; <span class="ident">precedence</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">precedence</span>) =&gt; <span class="ident">precedence</span>,
             <span class="comment">// Not a binary operator</span>
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
         };
 
         <span class="kw">let</span> <span class="ident">stop_at_current_operator</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">new_precedence</span>.<span class="ident">is_right_to_left</span>() {

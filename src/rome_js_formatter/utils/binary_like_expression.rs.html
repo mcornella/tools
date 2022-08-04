@@ -901,17 +901,70 @@
 <span id="896">896</span>
 <span id="897">897</span>
 <span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
+<span id="904">904</span>
+<span id="905">905</span>
+<span id="906">906</span>
+<span id="907">907</span>
+<span id="908">908</span>
+<span id="909">909</span>
+<span id="910">910</span>
+<span id="911">911</span>
+<span id="912">912</span>
+<span id="913">913</span>
+<span id="914">914</span>
+<span id="915">915</span>
+<span id="916">916</span>
+<span id="917">917</span>
+<span id="918">918</span>
+<span id="919">919</span>
+<span id="920">920</span>
+<span id="921">921</span>
+<span id="922">922</span>
+<span id="923">923</span>
+<span id="924">924</span>
+<span id="925">925</span>
+<span id="926">926</span>
+<span id="927">927</span>
+<span id="928">928</span>
+<span id="929">929</span>
+<span id="930">930</span>
+<span id="931">931</span>
+<span id="932">932</span>
+<span id="933">933</span>
+<span id="934">934</span>
+<span id="935">935</span>
+<span id="936">936</span>
+<span id="937">937</span>
+<span id="938">938</span>
+<span id="939">939</span>
+<span id="940">940</span>
+<span id="941">941</span>
+<span id="942">942</span>
+<span id="943">943</span>
+<span id="944">944</span>
+<span id="945">945</span>
+<span id="946">946</span>
+<span id="947">947</span>
+<span id="948">948</span>
+<span id="949">949</span>
+<span id="950">950</span>
+<span id="951">951</span>
+<span id="952">952</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">write</span>, <span class="ident">Buffer</span>, <span class="ident">CstFormatContext</span>};
 <span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{
     <span class="ident">JsAnyExpression</span>, <span class="ident">JsAnyInProperty</span>, <span class="ident">JsBinaryExpression</span>, <span class="ident">JsBinaryOperator</span>, <span class="ident">JsInExpression</span>,
     <span class="ident">JsInstanceofExpression</span>, <span class="ident">JsLogicalExpression</span>, <span class="ident">JsLogicalOperator</span>, <span class="ident">JsPrivateName</span>, <span class="ident">JsSyntaxKind</span>,
-    <span class="ident">JsSyntaxNode</span>, <span class="ident">JsSyntaxToken</span>,
+    <span class="ident">JsSyntaxNode</span>, <span class="ident">JsSyntaxToken</span>, <span class="ident">OperatorPrecedence</span>,
 };
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::should_break_after_operator</span>;
 <span class="kw">use</span> <span class="ident">rome_rowan</span>::{<span class="ident">declare_node_union</span>, <span class="ident">AstNode</span>, <span class="ident">SyntaxResult</span>};
-<span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
 <span class="kw">use</span> <span class="ident">std::fmt::Debug</span>;
 <span class="kw">use</span> <span class="ident">std::iter::FusedIterator</span>;
 <span class="kw">use</span> <span class="ident">std::ops::Deref</span>;
@@ -1060,59 +1113,84 @@
     <span class="ident">In</span>,
 }
 
-<span class="doccomment">/// This function is in charge of formatting a node inside a binaryish expression with parenthesis or not</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// At the moment this logic is applied only to logical expressions.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A logical expressions should be decorated with parenthesis only if its previous operation has a lower</span>
-<span class="doccomment">/// precedence.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For example:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// foo &amp;&amp; bar || lorem</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The logical expression `foo &amp;&amp; bar` has higher precedence of `bar || lorem`. This means that</span>
-<span class="doccomment">/// first `foo &amp;&amp; bar` is computed and its result is then computed against `|| lorem`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In order to make this distinction more obvious, we wrap `foo &amp;&amp; bar` in parenthesis.</span>
+<span class="kw">impl</span> <span class="ident">BinaryLikeOperator</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">precedence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">OperatorPrecedence</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">BinaryLikeOperator::Logical</span>(<span class="ident">logical</span>) =&gt; <span class="ident">logical</span>.<span class="ident">precedence</span>(),
+            <span class="ident">BinaryLikeOperator::Binary</span>(<span class="ident">binary</span>) =&gt; <span class="ident">binary</span>.<span class="ident">precedence</span>(),
+            <span class="ident">BinaryLikeOperator::Instanceof</span> <span class="op">|</span> <span class="ident">BinaryLikeOperator::In</span> =&gt; {
+                <span class="ident">OperatorPrecedence::Relational</span>
+            }
+        }
+    }
+
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_logical</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">BinaryLikeOperator::Logical</span>(<span class="kw">_</span>))
+    }
+
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_remainder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="macro">matches!</span>(
+            <span class="self">self</span>,
+            <span class="ident">BinaryLikeOperator::Binary</span>(<span class="ident">JsBinaryOperator::Remainder</span>)
+        )
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">JsLogicalOperator</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BinaryLikeOperator</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">operator</span>: <span class="ident">JsLogicalOperator</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">BinaryLikeOperator::Logical</span>(<span class="ident">operator</span>)
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">JsBinaryOperator</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BinaryLikeOperator</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">binary</span>: <span class="ident">JsBinaryOperator</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">BinaryLikeOperator::Binary</span>(<span class="ident">binary</span>)
+    }
+}
+
+<span class="doccomment">/// This function returns `true` when the binary expression should be wrapped in parentheses to either</span>
+<span class="doccomment">/// * a) correctly encode precedence</span>
+<span class="doccomment">/// * b) Improve readability by adding parentheses around expressions where the precedence may not be obvious to many readers.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">binary_argument_needs_parens</span>(
     <span class="ident">parent_operator</span>: <span class="ident">BinaryLikeOperator</span>,
     <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">JsAnyBinaryLikeLeftExpression</span>,
+    <span class="ident">is_right</span>: <span class="ident">bool</span>,
 ) -&gt; <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">compare_to</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">node</span> {
-        <span class="ident">JsAnyBinaryLikeLeftExpression::JsAnyExpression</span>(<span class="ident">expression</span>) =&gt; <span class="kw">match</span> <span class="ident">expression</span> {
-            <span class="ident">JsAnyExpression::JsLogicalExpression</span>(<span class="ident">logical</span>) =&gt; {
-                <span class="prelude-val">Some</span>(<span class="ident">BinaryLikeOperator::Logical</span>(<span class="ident">logical</span>.<span class="ident">operator</span>()<span class="question-mark">?</span>))
-            }
-            <span class="ident">JsAnyExpression::JsBinaryExpression</span>(<span class="ident">binary</span>) =&gt; {
-                <span class="prelude-val">Some</span>(<span class="ident">BinaryLikeOperator::Binary</span>(<span class="ident">binary</span>.<span class="ident">operator</span>()<span class="question-mark">?</span>))
-            }
-            <span class="ident">JsAnyExpression::JsInstanceofExpression</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">BinaryLikeOperator::Instanceof</span>),
-            <span class="ident">JsAnyExpression::JsInExpression</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">BinaryLikeOperator::In</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-        },
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-    };
+    <span class="kw">let</span> <span class="ident">current_operator</span> <span class="op">=</span>
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">binary_like</span>) <span class="op">=</span> <span class="ident">JsAnyBinaryLikeExpression::cast</span>(<span class="ident">node</span>.<span class="ident">syntax</span>().<span class="ident">clone</span>()) {
+            <span class="ident">binary_like</span>.<span class="ident">operator</span>()<span class="question-mark">?</span>
+        } <span class="kw">else</span> {
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
+        };
 
-    <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">compare_to</span>) <span class="op">=</span> <span class="ident">compare_to</span> {
-        <span class="kw">match</span> (<span class="ident">parent_operator</span>, <span class="ident">compare_to</span>) {
-            (
-                <span class="ident">BinaryLikeOperator::Logical</span>(<span class="ident">previous_operation</span>),
-                <span class="ident">BinaryLikeOperator::Logical</span>(<span class="ident">compare_to</span>),
-            ) =&gt; <span class="ident">compare_to</span> <span class="op">&gt;</span> <span class="ident">previous_operation</span>,
+    <span class="comment">// For logical nodes, add parentheses if the operators aren&#39;t the same</span>
+    <span class="kw">if</span> <span class="ident">parent_operator</span>.<span class="ident">is_logical</span>() <span class="op">&amp;&amp;</span> <span class="ident">current_operator</span>.<span class="ident">is_logical</span>() {
+        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">parent_operator</span> <span class="op">!</span><span class="op">=</span> <span class="ident">current_operator</span>);
+    }
 
-            (
-                <span class="ident">BinaryLikeOperator::Binary</span>(<span class="ident">previous_operation</span>),
-                <span class="ident">BinaryLikeOperator::Binary</span>(<span class="ident">compare_to</span>),
-            ) =&gt; <span class="ident">compare_to</span>.<span class="ident">compare_precedence</span>(<span class="kw-2">&amp;</span><span class="ident">previous_operation</span>) <span class="op">==</span> <span class="ident">Ordering::Greater</span>,
-            <span class="comment">// `instanceof` operator has higher precedence than `in` operator, so we apply parenthesis here</span>
-            (<span class="ident">BinaryLikeOperator::In</span>, <span class="ident">BinaryLikeOperator::Instanceof</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="comment">// any other case where we have `instanceof` or `in` on the right, we apply parenthesis</span>
-            (<span class="kw">_</span>, <span class="ident">BinaryLikeOperator::Instanceof</span>) <span class="op">|</span> (<span class="kw">_</span>, <span class="ident">BinaryLikeOperator::In</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
-        }
+    <span class="kw">let</span> <span class="ident">current_precedence</span> <span class="op">=</span> <span class="ident">current_operator</span>.<span class="ident">precedence</span>();
+    <span class="kw">let</span> <span class="ident">parent_precedence</span> <span class="op">=</span> <span class="ident">parent_operator</span>.<span class="ident">precedence</span>();
+
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::if_same_then_else</span>, <span class="ident">clippy::needless_bool</span>)]</span>
+    <span class="comment">// If the parent has a higher precedence than parentheses are necessary to not change the semantic meaning</span>
+    <span class="comment">// when re-parsing.</span>
+    <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">parent_precedence</span> <span class="op">&gt;</span> <span class="ident">current_precedence</span> {
+        <span class="bool-val">true</span>
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">is_right</span> <span class="op">&amp;&amp;</span> <span class="ident">parent_precedence</span> <span class="op">==</span> <span class="ident">current_precedence</span> {
+        <span class="bool-val">true</span>
+    }
+    <span class="comment">// Add parentheses around bitwise and bit shift operators</span>
+    <span class="comment">// `a * 3 &gt;&gt; 5` -&gt; `(a * 3) &gt;&gt; 5`</span>
+    <span class="kw">else</span> <span class="kw">if</span> <span class="ident">parent_precedence</span>.<span class="ident">is_bitwise</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">parent_precedence</span>.<span class="ident">is_shift</span>() {
+        <span class="bool-val">true</span>
+    }
+    <span class="comment">// `a % 4 + 4` -&gt; `a % (4 + 4)`</span>
+    <span class="kw">else</span> <span class="kw">if</span> <span class="ident">parent_precedence</span> <span class="op">&lt;</span> <span class="ident">current_precedence</span> <span class="op">&amp;&amp;</span> <span class="ident">current_operator</span>.<span class="ident">is_remainder</span>() {
+        <span class="ident">parent_precedence</span>.<span class="ident">is_additive</span>()
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">parent_precedence</span> <span class="op">==</span> <span class="ident">current_precedence</span>
+        <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">should_flatten</span>(<span class="ident">parent_operator</span>, <span class="ident">current_operator</span>)
+    {
+        <span class="bool-val">true</span>
     } <span class="kw">else</span> {
         <span class="bool-val">false</span>
     };
@@ -1127,7 +1205,7 @@
     <span class="ident">sub_expression</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">JsAnyBinaryLikeLeftExpression</span>,
 ) -&gt; <span class="kw">impl</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">JsFormatContext</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
     <span class="ident">format_with</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
-        <span class="kw">if</span> <span class="ident">binary_argument_needs_parens</span>(<span class="ident">parent_operator</span>, <span class="ident">sub_expression</span>)<span class="question-mark">?</span> {
+        <span class="kw">if</span> <span class="ident">binary_argument_needs_parens</span>(<span class="ident">parent_operator</span>, <span class="ident">sub_expression</span>, <span class="bool-val">true</span>)<span class="question-mark">?</span> {
             <span class="ident">format_parenthesize</span>(
                 <span class="ident">sub_expression</span>.<span class="ident">syntax</span>().<span class="ident">first_token</span>().<span class="ident">as_ref</span>(),
                 <span class="kw-2">&amp;</span><span class="ident">sub_expression</span>,
@@ -1291,7 +1369,7 @@
         <span class="kw">let</span> <span class="ident">operator_token</span> <span class="op">=</span> <span class="ident">binary_like_expression</span>.<span class="ident">operator_token</span>()<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">operator_has_trailing_comments</span> <span class="op">=</span> <span class="ident">operator_token</span>.<span class="ident">has_trailing_comments</span>();
-        <span class="kw">let</span> <span class="ident">left_parenthesized</span> <span class="op">=</span> <span class="ident">binary_argument_needs_parens</span>(<span class="ident">operator</span>, <span class="kw-2">&amp;</span><span class="ident">left</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">left_parenthesized</span> <span class="op">=</span> <span class="ident">binary_argument_needs_parens</span>(<span class="ident">operator</span>, <span class="kw-2">&amp;</span><span class="ident">left</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">left_item</span> <span class="op">=</span> <span class="ident">FlattenItem::new</span>(
             <span class="ident">FlattenedBinaryExpressionPart::Group</span> {
                 <span class="ident">current</span>: <span class="ident">left</span>,
@@ -1643,7 +1721,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">JsAnyBinaryLikeExpression</span> {
-    <span class="kw">fn</span> <span class="ident">left</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">JsAnyBinaryLikeLeftExpression</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">left</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">JsAnyBinaryLikeLeftExpression</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">JsAnyBinaryLikeExpression::JsLogicalExpression</span>(<span class="ident">logical</span>) =&gt; <span class="ident">logical</span>
                 .<span class="ident">left</span>()
@@ -1686,7 +1764,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">right</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">JsAnyExpression</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">right</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">JsAnyExpression</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">JsAnyBinaryLikeExpression::JsLogicalExpression</span>(<span class="ident">logical</span>) =&gt; <span class="ident">logical</span>.<span class="ident">right</span>(),
             <span class="ident">JsAnyBinaryLikeExpression::JsBinaryExpression</span>(<span class="ident">binary</span>) =&gt; <span class="ident">binary</span>.<span class="ident">right</span>(),
@@ -1731,33 +1809,63 @@
             <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }
-    <span class="doccomment">/// Determines if a binary like expression should be flattened or not. As a rule of thumb, an expression</span>
-    <span class="doccomment">/// can be flattened if it is of the same kind as the left-hand side sub-expression and uses the same operator.</span>
+    <span class="doccomment">/// Determines if the left expression can be flattened together with this expression.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns `false` if the left hand side isn&#39;t a binary like expression and otherwise.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Delegates to [should_flatten] for all other expressions.</span>
     <span class="kw">fn</span> <span class="ident">can_flatten</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">JsAnyBinaryLikeExpression::JsLogicalExpression</span>(<span class="ident">logical</span>) =&gt; <span class="kw">match</span> <span class="ident">logical</span>.<span class="ident">left</span>()<span class="question-mark">?</span> {
-                <span class="ident">JsAnyExpression::JsLogicalExpression</span>(<span class="ident">left</span>) =&gt; {
-                    <span class="ident">left</span>.<span class="ident">operator</span>()<span class="question-mark">?</span> <span class="op">==</span> <span class="ident">logical</span>.<span class="ident">operator</span>()<span class="question-mark">?</span>
-                }
-                <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
-            },
-            <span class="ident">JsAnyBinaryLikeExpression::JsBinaryExpression</span>(<span class="ident">binary</span>) =&gt; <span class="kw">match</span> <span class="ident">binary</span>.<span class="ident">left</span>()<span class="question-mark">?</span> {
-                <span class="ident">JsAnyExpression::JsBinaryExpression</span>(<span class="ident">left</span>) =&gt; {
-                    <span class="ident">left</span>.<span class="ident">operator</span>()<span class="question-mark">?</span> <span class="op">==</span> <span class="ident">binary</span>.<span class="ident">operator</span>()<span class="question-mark">?</span>
-                }
-                <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
-            },
-            <span class="ident">JsAnyBinaryLikeExpression::JsInstanceofExpression</span>(<span class="ident">instance_of</span>) =&gt; {
-                <span class="macro">matches!</span>(
-                    <span class="ident">instance_of</span>.<span class="ident">left</span>()<span class="question-mark">?</span>,
-                    <span class="ident">JsAnyExpression::JsInstanceofExpression</span>(<span class="kw">_</span>)
-                )
-            }
-            <span class="ident">JsAnyBinaryLikeExpression::JsInExpression</span>(<span class="ident">in_expression</span>) =&gt; <span class="macro">matches!</span>(
-                <span class="ident">in_expression</span>.<span class="ident">property</span>()<span class="question-mark">?</span>,
-                <span class="ident">JsAnyInProperty::JsAnyExpression</span>(<span class="ident">JsAnyExpression::JsInExpression</span>(<span class="kw">_</span>))
-            ),
-        })
+        <span class="kw">let</span> <span class="ident">left</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">left</span>()<span class="question-mark">?</span>;
+
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">left</span>) <span class="op">=</span> <span class="ident">JsAnyBinaryLikeExpression::cast</span>(<span class="ident">left</span>.<span class="ident">into_syntax</span>()) {
+            <span class="ident">should_flatten</span>(<span class="self">self</span>.<span class="ident">operator</span>()<span class="question-mark">?</span>, <span class="ident">left</span>.<span class="ident">operator</span>()<span class="question-mark">?</span>)
+        } <span class="kw">else</span> {
+            <span class="bool-val">false</span>
+        };
+
+        <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
+    }
+}
+
+<span class="doccomment">/// Returns `true` if a binary expression nested into another binary expression should be flattened together.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This is generally the case if both operator have the same precedence. See the inline comments for the exceptions</span>
+<span class="doccomment">/// to that rule.</span>
+<span class="kw">fn</span> <span class="ident">should_flatten</span>(<span class="ident">parent_operator</span>: <span class="ident">BinaryLikeOperator</span>, <span class="ident">child_operator</span>: <span class="ident">BinaryLikeOperator</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">let</span> <span class="ident">parent_precedence</span> <span class="op">=</span> <span class="ident">parent_operator</span>.<span class="ident">precedence</span>();
+    <span class="kw">let</span> <span class="ident">child_precedence</span> <span class="op">=</span> <span class="ident">child_operator</span>.<span class="ident">precedence</span>();
+
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::if_same_then_else</span>, <span class="ident">clippy::needless_bool</span>)]</span>
+    <span class="kw">if</span> <span class="ident">parent_precedence</span> <span class="op">!</span><span class="op">=</span> <span class="ident">child_precedence</span> {
+        <span class="bool-val">false</span>
+    }
+    <span class="comment">// `**` is right associative.</span>
+    <span class="kw">else</span> <span class="kw">if</span> <span class="ident">parent_precedence</span>.<span class="ident">is_exponential</span>() {
+        <span class="bool-val">false</span>
+    }
+    <span class="comment">// avoid `a == b == c` -&gt; `(a == b) == c`</span>
+    <span class="kw">else</span> <span class="kw">if</span> <span class="ident">parent_precedence</span>.<span class="ident">is_equality</span>() <span class="op">&amp;&amp;</span> <span class="ident">child_precedence</span>.<span class="ident">is_equality</span>() {
+        <span class="bool-val">false</span>
+    }
+    <span class="comment">// `a % b * c` -&gt; `(a % b) * c`</span>
+    <span class="comment">// `a * b % c` -&gt; `(a * b) % c`</span>
+    <span class="kw">else</span> <span class="kw">if</span> (<span class="ident">child_operator</span>.<span class="ident">is_remainder</span>() <span class="op">&amp;&amp;</span> <span class="ident">parent_precedence</span>.<span class="ident">is_multiplicative</span>())
+        <span class="op">|</span><span class="op">|</span> (<span class="ident">parent_operator</span>.<span class="ident">is_remainder</span>() <span class="op">&amp;&amp;</span> <span class="ident">child_precedence</span>.<span class="ident">is_multiplicative</span>())
+    {
+        <span class="bool-val">false</span>
+    }
+    <span class="comment">// `a * b / c` -&gt; `(a * b) / c`</span>
+    <span class="kw">else</span> <span class="kw">if</span> <span class="ident">child_operator</span> <span class="op">!</span><span class="op">=</span> <span class="ident">parent_operator</span>
+        <span class="op">&amp;&amp;</span> <span class="ident">child_precedence</span>.<span class="ident">is_multiplicative</span>()
+        <span class="op">&amp;&amp;</span> <span class="ident">parent_precedence</span>.<span class="ident">is_multiplicative</span>()
+    {
+        <span class="bool-val">false</span>
+    }
+    <span class="comment">// `a &gt;&gt; b &gt;&gt; c` -&gt; `(a &gt;&gt; b) &gt;&gt; c`</span>
+    <span class="kw">else</span> <span class="kw">if</span> <span class="ident">parent_precedence</span>.<span class="ident">is_shift</span>() <span class="op">&amp;&amp;</span> <span class="ident">child_precedence</span>.<span class="ident">is_shift</span>() {
+        <span class="bool-val">false</span>
+    } <span class="kw">else</span> {
+        <span class="bool-val">true</span>
     }
 }
 
