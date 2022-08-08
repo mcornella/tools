@@ -80,7 +80,6 @@
 <span id="75">75</span>
 <span id="76">76</span>
 <span id="77">77</span>
-<span id="78">78</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">IndentStyle</span>, <span class="ident">LineWidth</span>};
 
 <span class="doccomment">/// Options that affect how the [crate::Printer] prints the format tokens</span>
@@ -95,12 +94,8 @@
     <span class="doccomment">/// The type of line ending to apply to the printed input</span>
     <span class="kw">pub</span> <span class="ident">line_ending</span>: <span class="ident">LineEnding</span>,
 
-    <span class="doccomment">/// The never ending question whatever to use spaces or tabs, and if spaces, how many spaces</span>
-    <span class="doccomment">/// to indent code.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * Tab: Value is &#39;\t&#39;</span>
-    <span class="doccomment">/// * Spaces: String containing the number of spaces per indention level, e.g. &quot;  &quot; for using two spaces</span>
-    <span class="kw">pub</span> <span class="ident">indent_string</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Whether the printer should use tabs or spaces to indent code and if spaces, by how many.</span>
+    <span class="kw">pub</span> <span class="ident">indent_style</span>: <span class="ident">IndentStyle</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">PrinterOptions</span> {
@@ -110,18 +105,21 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_indent</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">style</span>: <span class="ident">IndentStyle</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">style</span> {
-            <span class="ident">IndentStyle::Tab</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">indent_string</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="string">&quot;\t&quot;</span>);
-                <span class="self">self</span>.<span class="ident">tab_width</span> <span class="op">=</span> <span class="number">2</span>;
-            }
-            <span class="ident">IndentStyle::Space</span>(<span class="ident">quantity</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">indent_string</span> <span class="op">=</span> <span class="string">&quot; &quot;</span>.<span class="ident">repeat</span>(<span class="ident">quantity</span> <span class="kw">as</span> <span class="ident">usize</span>);
-                <span class="self">self</span>.<span class="ident">tab_width</span> <span class="op">=</span> <span class="ident">quantity</span>;
-            }
-        }
+        <span class="self">self</span>.<span class="ident">indent_style</span> <span class="op">=</span> <span class="ident">style</span>;
 
         <span class="self">self</span>
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">indent_style</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">IndentStyle</span> {
+        <span class="self">self</span>.<span class="ident">indent_style</span>
+    }
+
+    <span class="doccomment">/// Width of an indent in characters.</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">indent_width</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">indent_style</span> {
+            <span class="ident">IndentStyle::Tab</span> =&gt; <span class="self">self</span>.<span class="ident">tab_width</span>,
+            <span class="ident">IndentStyle::Space</span>(<span class="ident">count</span>) =&gt; <span class="ident">count</span>,
+        }
     }
 }
 
@@ -154,7 +152,7 @@
         <span class="ident">PrinterOptions</span> {
             <span class="ident">tab_width</span>: <span class="number">2</span>,
             <span class="ident">print_width</span>: <span class="ident">LineWidth::default</span>(),
-            <span class="ident">indent_string</span>: <span class="ident">String::from</span>(<span class="string">&quot;\t&quot;</span>),
+            <span class="ident">indent_style</span>: <span class="ident">Default::default</span>(),
             <span class="ident">line_ending</span>: <span class="ident">LineEnding::LineFeed</span>,
         }
     }

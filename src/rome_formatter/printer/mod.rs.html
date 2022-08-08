@@ -1402,6 +1402,34 @@
 <span id="1397">1397</span>
 <span id="1398">1398</span>
 <span id="1399">1399</span>
+<span id="1400">1400</span>
+<span id="1401">1401</span>
+<span id="1402">1402</span>
+<span id="1403">1403</span>
+<span id="1404">1404</span>
+<span id="1405">1405</span>
+<span id="1406">1406</span>
+<span id="1407">1407</span>
+<span id="1408">1408</span>
+<span id="1409">1409</span>
+<span id="1410">1410</span>
+<span id="1411">1411</span>
+<span id="1412">1412</span>
+<span id="1413">1413</span>
+<span id="1414">1414</span>
+<span id="1415">1415</span>
+<span id="1416">1416</span>
+<span id="1417">1417</span>
+<span id="1418">1418</span>
+<span id="1419">1419</span>
+<span id="1420">1420</span>
+<span id="1421">1421</span>
+<span id="1422">1422</span>
+<span id="1423">1423</span>
+<span id="1424">1424</span>
+<span id="1425">1425</span>
+<span id="1426">1426</span>
+<span id="1427">1427</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">printer_options</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">printer_options</span>::<span class="kw-2">*</span>;
@@ -1411,7 +1439,7 @@
     <span class="ident">Align</span>, <span class="ident">ConditionalGroupContent</span>, <span class="ident">Group</span>, <span class="ident">LineMode</span>, <span class="ident">PrintMode</span>, <span class="ident">VerbatimKind</span>,
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::intersperse::Intersperse</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">FormatElement</span>, <span class="ident">GroupId</span>, <span class="ident">Printed</span>, <span class="ident">SourceMarker</span>, <span class="ident">TextRange</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">FormatElement</span>, <span class="ident">GroupId</span>, <span class="ident">IndentStyle</span>, <span class="ident">Printed</span>, <span class="ident">SourceMarker</span>, <span class="ident">TextRange</span>};
 
 <span class="kw">use</span> <span class="ident">rome_rowan::TextSize</span>;
 <span class="kw">use</span> <span class="ident">std::iter</span>::{<span class="ident">once</span>, <span class="ident">Rev</span>};
@@ -1484,15 +1512,25 @@
             }
             <span class="ident">FormatElement::Text</span>(<span class="ident">token</span>) =&gt; {
                 <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">pending_indent</span>.<span class="ident">is_empty</span>() {
-                    <span class="self">self</span>.<span class="ident">print_str</span>(
-                        <span class="self">self</span>.<span class="ident">options</span>
-                            .<span class="ident">indent_string</span>
-                            .<span class="ident">repeat</span>(<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">pending_indent</span>.<span class="ident">level</span>() <span class="kw">as</span> <span class="ident">usize</span>)
-                            .<span class="ident">as_str</span>(),
-                    );
+                    <span class="kw">let</span> (<span class="ident">indent_char</span>, <span class="ident">repeat_count</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">indent_style</span>() {
+                        <span class="ident">IndentStyle::Tab</span> =&gt; (<span class="string">&#39;\t&#39;</span>, <span class="number">1</span>),
+                        <span class="ident">IndentStyle::Space</span>(<span class="ident">count</span>) =&gt; (<span class="string">&#39; &#39;</span>, <span class="ident">count</span>),
+                    };
 
-                    <span class="self">self</span>.<span class="ident">print_str</span>(<span class="kw-2">&amp;</span><span class="string">&quot; &quot;</span>.<span class="ident">repeat</span>(<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">pending_indent</span>.<span class="ident">align</span>() <span class="kw">as</span> <span class="ident">usize</span>));
-                    <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">pending_indent</span> <span class="op">=</span> <span class="ident">Indention::default</span>();
+                    <span class="kw">let</span> <span class="ident">indent</span> <span class="op">=</span> <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">pending_indent</span>);
+                    <span class="kw">let</span> <span class="ident">total_indent_char_count</span> <span class="op">=</span> <span class="ident">indent</span>.<span class="ident">level</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="ident">repeat_count</span> <span class="kw">as</span> <span class="ident">usize</span>;
+
+                    <span class="self">self</span>.<span class="ident">state</span>
+                        .<span class="ident">buffer</span>
+                        .<span class="ident">reserve</span>(<span class="ident">total_indent_char_count</span> <span class="op">+</span> <span class="ident">indent</span>.<span class="ident">align</span>() <span class="kw">as</span> <span class="ident">usize</span>);
+
+                    <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">total_indent_char_count</span> {
+                        <span class="self">self</span>.<span class="ident">print_char</span>(<span class="ident">indent_char</span>);
+                    }
+
+                    <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">indent</span>.<span class="ident">align</span>() {
+                        <span class="self">self</span>.<span class="ident">print_char</span>(<span class="string">&#39; &#39;</span>);
+                    }
                 }
 
                 <span class="comment">// Print pending spaces</span>
@@ -1574,7 +1612,10 @@
             }
 
             <span class="ident">FormatElement::Indent</span>(<span class="ident">content</span>) =&gt; {
-                <span class="ident">queue</span>.<span class="ident">extend_with_args</span>(<span class="ident">content</span>.<span class="ident">iter</span>(), <span class="ident">args</span>.<span class="ident">increment_indent_level</span>());
+                <span class="ident">queue</span>.<span class="ident">extend_with_args</span>(
+                    <span class="ident">content</span>.<span class="ident">iter</span>(),
+                    <span class="ident">args</span>.<span class="ident">increment_indent_level</span>(<span class="self">self</span>.<span class="ident">options</span>.<span class="ident">indent_style</span>()),
+                );
             }
 
             <span class="ident">FormatElement::Dedent</span>(<span class="ident">content</span>) =&gt; {
@@ -1864,27 +1905,31 @@
 
     <span class="kw">fn</span> <span class="ident">print_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
         <span class="kw">for</span> <span class="ident">char</span> <span class="kw">in</span> <span class="ident">content</span>.<span class="ident">chars</span>() {
-            <span class="kw">if</span> <span class="ident">char</span> <span class="op">==</span> <span class="string">&#39;\n&#39;</span> {
-                <span class="self">self</span>.<span class="ident">state</span>
-                    .<span class="ident">buffer</span>
-                    .<span class="ident">push_str</span>(<span class="self">self</span>.<span class="ident">options</span>.<span class="ident">line_ending</span>.<span class="ident">as_str</span>());
-                <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">generated_line</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">generated_column</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">line_width</span> <span class="op">=</span> <span class="number">0</span>;
-            } <span class="kw">else</span> {
-                <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">char</span>);
-                <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">generated_column</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-
-                <span class="kw">let</span> <span class="ident">char_width</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">char</span> <span class="op">==</span> <span class="string">&#39;\t&#39;</span> {
-                    <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">tab_width</span> <span class="kw">as</span> <span class="ident">usize</span>
-                } <span class="kw">else</span> {
-                    <span class="number">1</span>
-                };
-
-                <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">line_width</span> <span class="op">+</span><span class="op">=</span> <span class="ident">char_width</span>;
-            }
+            <span class="self">self</span>.<span class="ident">print_char</span>(<span class="ident">char</span>);
 
             <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">has_empty_line</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">print_char</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">char</span>: <span class="ident">char</span>) {
+        <span class="kw">if</span> <span class="ident">char</span> <span class="op">==</span> <span class="string">&#39;\n&#39;</span> {
+            <span class="self">self</span>.<span class="ident">state</span>
+                .<span class="ident">buffer</span>
+                .<span class="ident">push_str</span>(<span class="self">self</span>.<span class="ident">options</span>.<span class="ident">line_ending</span>.<span class="ident">as_str</span>());
+            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">generated_line</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">generated_column</span> <span class="op">=</span> <span class="number">0</span>;
+            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">line_width</span> <span class="op">=</span> <span class="number">0</span>;
+        } <span class="kw">else</span> {
+            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">char</span>);
+            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">generated_column</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+
+            <span class="kw">let</span> <span class="ident">char_width</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">char</span> <span class="op">==</span> <span class="string">&#39;\t&#39;</span> {
+                <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">tab_width</span> <span class="kw">as</span> <span class="ident">usize</span>
+            } <span class="kw">else</span> {
+                <span class="number">1</span>
+            };
+
+            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">line_width</span> <span class="op">+</span><span class="op">=</span> <span class="ident">char_width</span>;
         }
     }
 }
@@ -1959,8 +2004,8 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increment_indent_level</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">indent</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">indent</span>.<span class="ident">increment_level</span>();
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increment_indent_level</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">indent_style</span>: <span class="ident">IndentStyle</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">indent</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">indent</span>.<span class="ident">increment_level</span>(<span class="ident">indent_style</span>);
         <span class="self">self</span>
     }
 
@@ -2026,12 +2071,22 @@
 
     <span class="doccomment">/// Increments the level by one.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// It sets `align` to 0 if the current value is [Indent::Align] and increments the level by one.</span>
-    <span class="kw">fn</span> <span class="ident">increment_level</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
+    <span class="doccomment">/// The behaviour depends on the [`indent_style`][IndentStyle] if this is an [Indent::Align]:</span>
+    <span class="doccomment">/// * **Tabs**: `align` is converted into an indent. This results in `level` increasing by two: once for the align, once for the level increment</span>
+    <span class="doccomment">/// * **Spaces**: Increments the `level` by one and keeps the `align` unchanged.</span>
+    <span class="doccomment">/// Keeps any  the current value is [Indent::Align] and increments the level by one.</span>
+    <span class="kw">fn</span> <span class="ident">increment_level</span>(<span class="self">self</span>, <span class="ident">indent_style</span>: <span class="ident">IndentStyle</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Indention::Level</span>(<span class="ident">count</span>) =&gt; <span class="ident">Indention::Level</span>(<span class="ident">count</span> <span class="op">+</span> <span class="number">1</span>),
             <span class="comment">// Increase the indent AND convert the align to an indent</span>
-            <span class="ident">Indention::Align</span> { <span class="ident">level</span>: <span class="ident">indent</span>, .. } =&gt; <span class="ident">Indention::Level</span>(<span class="ident">indent</span> <span class="op">+</span> <span class="number">2</span>),
+            <span class="ident">Indention::Align</span> { <span class="ident">level</span>, .. } <span class="kw">if</span> <span class="ident">indent_style</span>.<span class="ident">is_tab</span>() =&gt; <span class="ident">Indention::Level</span>(<span class="ident">level</span> <span class="op">+</span> <span class="number">2</span>),
+            <span class="ident">Indention::Align</span> {
+                <span class="ident">level</span>: <span class="ident">indent</span>,
+                <span class="ident">align</span>,
+            } =&gt; <span class="ident">Indention::Align</span> {
+                <span class="ident">level</span>: <span class="ident">indent</span> <span class="op">+</span> <span class="number">1</span>,
+                <span class="ident">align</span>,
+            },
         }
     }
 
@@ -2282,9 +2337,10 @@
             }
         }
 
-        <span class="ident">FormatElement::Indent</span>(<span class="ident">content</span>) =&gt; {
-            <span class="ident">queue</span>.<span class="ident">extend</span>(<span class="ident">content</span>.<span class="ident">iter</span>(), <span class="ident">args</span>.<span class="ident">increment_indent_level</span>())
-        }
+        <span class="ident">FormatElement::Indent</span>(<span class="ident">content</span>) =&gt; <span class="ident">queue</span>.<span class="ident">extend</span>(
+            <span class="ident">content</span>.<span class="ident">iter</span>(),
+            <span class="ident">args</span>.<span class="ident">increment_indent_level</span>(<span class="ident">options</span>.<span class="ident">indent_style</span>()),
+        ),
 
         <span class="ident">FormatElement::Dedent</span>(<span class="ident">content</span>) =&gt; <span class="ident">queue</span>.<span class="ident">extend</span>(<span class="ident">content</span>.<span class="ident">iter</span>(), <span class="ident">args</span>.<span class="ident">decrement_indent</span>()),
 
@@ -2322,9 +2378,9 @@
         ),
 
         <span class="ident">FormatElement::Text</span>(<span class="ident">token</span>) =&gt; {
-            <span class="ident">state</span>.<span class="ident">line_width</span> <span class="op">+</span><span class="op">=</span> <span class="ident">state</span>.<span class="ident">pending_indent</span>.<span class="ident">level</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="ident">options</span>.<span class="ident">indent_string</span>.<span class="ident">len</span>()
-                <span class="op">+</span> <span class="ident">state</span>.<span class="ident">pending_indent</span>.<span class="ident">align</span>() <span class="kw">as</span> <span class="ident">usize</span>;
-            <span class="ident">state</span>.<span class="ident">pending_indent</span> <span class="op">=</span> <span class="ident">Indention::default</span>();
+            <span class="kw">let</span> <span class="ident">indent</span> <span class="op">=</span> <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="ident">state</span>.<span class="ident">pending_indent</span>);
+            <span class="ident">state</span>.<span class="ident">line_width</span> <span class="op">+</span><span class="op">=</span>
+                <span class="ident">indent</span>.<span class="ident">level</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="ident">options</span>.<span class="ident">indent_width</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="ident">indent</span>.<span class="ident">align</span>() <span class="kw">as</span> <span class="ident">usize</span>;
 
             <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">pending_space</span> {
                 <span class="ident">state</span>.<span class="ident">line_width</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
@@ -2483,13 +2539,13 @@
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::printer</span>::{<span class="ident">LineEnding</span>, <span class="ident">Printer</span>, <span class="ident">PrinterOptions</span>};
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">format_args</span>, <span class="ident">write</span>, <span class="ident">FormatState</span>, <span class="ident">LineWidth</span>, <span class="ident">Printed</span>, <span class="ident">VecBuffer</span>};
+    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">format_args</span>, <span class="ident">write</span>, <span class="ident">FormatState</span>, <span class="ident">IndentStyle</span>, <span class="ident">LineWidth</span>, <span class="ident">Printed</span>, <span class="ident">VecBuffer</span>};
 
     <span class="kw">fn</span> <span class="ident">format</span>(<span class="ident">root</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Format</span><span class="op">&lt;</span>()<span class="op">&gt;</span>) -&gt; <span class="ident">Printed</span> {
         <span class="ident">format_with_options</span>(
             <span class="ident">root</span>,
             <span class="ident">PrinterOptions</span> {
-                <span class="ident">indent_string</span>: <span class="ident">String::from</span>(<span class="string">&quot;  &quot;</span>),
+                <span class="ident">indent_style</span>: <span class="ident">IndentStyle::Space</span>(<span class="number">2</span>),
                 ..<span class="ident">PrinterOptions::default</span>()
             },
         )
@@ -2630,7 +2686,7 @@ two lines`,
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">it_use_the_indent_character_specified_in_the_options</span>() {
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">PrinterOptions</span> {
-            <span class="ident">indent_string</span>: <span class="ident">String::from</span>(<span class="string">&quot;\t&quot;</span>),
+            <span class="ident">indent_style</span>: <span class="ident">IndentStyle::Tab</span>,
             <span class="ident">tab_width</span>: <span class="number">4</span>,
             <span class="ident">print_width</span>: <span class="ident">LineWidth::try_from</span>(<span class="number">19</span>).<span class="ident">unwrap</span>(),
             ..<span class="ident">PrinterOptions::default</span>()
