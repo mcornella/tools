@@ -452,14 +452,10 @@
 <span id="447">447</span>
 <span id="448">448</span>
 <span id="449">449</span>
-<span id="450">450</span>
-<span id="451">451</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::categories</span>::{<span class="ident">ActionCategory</span>, <span class="ident">RuleCategory</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::context::RuleContext</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::registry</span>::{<span class="ident">RuleLanguage</span>, <span class="ident">RuleSuppressions</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">AnalysisFilter</span>, <span class="ident">AnalyzerDiagnostic</span>, <span class="ident">LanguageRoot</span>, <span class="ident">Phase</span>, <span class="ident">Phases</span>, <span class="ident">Queryable</span>, <span class="ident">RuleRegistry</span>,
-};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">AnalysisFilter</span>, <span class="ident">AnalyzerDiagnostic</span>, <span class="ident">Phase</span>, <span class="ident">Phases</span>, <span class="ident">Queryable</span>, <span class="ident">RuleRegistry</span>};
 <span class="kw">use</span> <span class="ident">rome_console::fmt::Display</span>;
 <span class="kw">use</span> <span class="ident">rome_console</span>::{<span class="ident">markup</span>, <span class="ident">MarkupBuf</span>};
 <span class="kw">use</span> <span class="ident">rome_diagnostics</span>::{<span class="ident">file::FileId</span>, <span class="ident">Applicability</span>, <span class="ident">Severity</span>};
@@ -903,7 +899,7 @@
     <span class="kw">pub</span> <span class="ident">category</span>: <span class="ident">ActionCategory</span>,
     <span class="kw">pub</span> <span class="ident">applicability</span>: <span class="ident">Applicability</span>,
     <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">MarkupBuf</span>,
-    <span class="kw">pub</span> <span class="ident">mutation</span>: <span class="ident">BatchMutation</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">LanguageRoot</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">mutation</span>: <span class="ident">BatchMutation</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>,
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rome_analyze" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>

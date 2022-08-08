@@ -196,11 +196,11 @@
 <span id="191">191</span>
 <span id="192">192</span>
 <span id="193">193</span>
-<span id="194">194</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_console</span>::{<span class="ident">Console</span>, <span class="ident">EnvConsole</span>};
 <span class="kw">use</span> <span class="ident">rome_formatter::FormatError</span>;
 <span class="kw">use</span> <span class="ident">rome_fs</span>::{<span class="ident">FileSystem</span>, <span class="ident">OsFileSystem</span>, <span class="ident">RomePath</span>};
 <span class="kw">use</span> <span class="ident">rome_js_analyze::utils::rename::RenameError</span>;
+<span class="kw">use</span> <span class="ident">rome_js_analyze::RuleError</span>;
 <span class="kw">use</span> <span class="ident">std::error::Error</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Display</span>, <span class="ident">Formatter</span>};
 <span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>};
@@ -241,6 +241,8 @@
     <span class="ident">FormatError</span>(<span class="ident">FormatError</span>),
     <span class="doccomment">/// The file could not be formatted since it has syntax errors and `format_with_errors` is disabled</span>
     <span class="ident">FormatWithErrorsDisabled</span>,
+    <span class="doccomment">/// The file could not be analyzed because a rule caused an error.</span>
+    <span class="ident">RuleError</span>(<span class="ident">RuleError</span>),
     <span class="doccomment">/// Thrown when Rome can&#39;t read a generic directory</span>
     <span class="ident">CantReadDirectory</span>(<span class="ident">PathBuf</span>),
     <span class="doccomment">/// Thrown when Rome can&#39;t read a generic file</span>
@@ -253,17 +255,7 @@
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">RomeError</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RomeError::NotFound</span> =&gt; <span class="ident">std::fmt::Display::fmt</span>(<span class="self">self</span>, <span class="ident">f</span>),
-            <span class="ident">RomeError::SourceFileNotSupported</span>(<span class="kw">_</span>) =&gt; <span class="ident">std::fmt::Display::fmt</span>(<span class="self">self</span>, <span class="ident">f</span>),
-            <span class="ident">RomeError::FormatError</span>(<span class="kw">_</span>) =&gt; <span class="ident">std::fmt::Display::fmt</span>(<span class="self">self</span>, <span class="ident">f</span>),
-            <span class="ident">RomeError::FormatWithErrorsDisabled</span> =&gt; <span class="ident">std::fmt::Display::fmt</span>(<span class="self">self</span>, <span class="ident">f</span>),
-            <span class="ident">RomeError::CantReadDirectory</span>(<span class="kw">_</span>) =&gt; <span class="ident">std::fmt::Display::fmt</span>(<span class="self">self</span>, <span class="ident">f</span>),
-            <span class="ident">RomeError::CantReadFile</span>(<span class="kw">_</span>) =&gt; <span class="ident">std::fmt::Display::fmt</span>(<span class="self">self</span>, <span class="ident">f</span>),
-            <span class="ident">RomeError::Configuration</span>(<span class="kw">_</span>) =&gt; <span class="ident">std::fmt::Display::fmt</span>(<span class="self">self</span>, <span class="ident">f</span>),
-            <span class="ident">RomeError::DirtyWorkspace</span> =&gt; <span class="ident">std::fmt::Display::fmt</span>(<span class="self">self</span>, <span class="ident">f</span>),
-            <span class="ident">RomeError::RenameError</span>(<span class="kw">_</span>) =&gt; <span class="ident">std::fmt::Display::fmt</span>(<span class="self">self</span>, <span class="ident">f</span>),
-        }
+        <span class="ident">std::fmt::Display::fmt</span>(<span class="self">self</span>, <span class="ident">f</span>)
     }
 }
 
@@ -328,6 +320,12 @@
                     )
                 }
             },
+            <span class="ident">RomeError::RuleError</span>(<span class="ident">cause</span>) =&gt; {
+                <span class="macro">write!</span>(
+                    <span class="ident">f</span>,
+                    <span class="string">&quot;the linter encountered an error while analyzing the file: {cause}&quot;</span>,
+                )
+            }
         }
     }
 }

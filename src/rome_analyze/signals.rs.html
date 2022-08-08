@@ -156,7 +156,7 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">categories::ActionCategory</span>,
     <span class="ident">context::RuleContext</span>,
-    <span class="ident">registry</span>::{<span class="ident">LanguageRoot</span>, <span class="ident">RuleLanguage</span>, <span class="ident">RuleRoot</span>},
+    <span class="ident">registry</span>::{<span class="ident">RuleLanguage</span>, <span class="ident">RuleRoot</span>},
     <span class="ident">rule::Rule</span>,
     <span class="ident">AnalyzerDiagnostic</span>, <span class="ident">Queryable</span>, <span class="ident">RuleGroup</span>, <span class="ident">ServiceBag</span>,
 };
@@ -216,7 +216,7 @@
     <span class="kw">pub</span> <span class="ident">category</span>: <span class="ident">ActionCategory</span>,
     <span class="kw">pub</span> <span class="ident">applicability</span>: <span class="ident">Applicability</span>,
     <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">MarkupBuf</span>,
-    <span class="kw">pub</span> <span class="ident">mutation</span>: <span class="ident">BatchMutation</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">LanguageRoot</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">mutation</span>: <span class="ident">BatchMutation</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">AnalyzerAction</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CodeSuggestion</span>

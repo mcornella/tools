@@ -441,7 +441,7 @@
     <span class="ident">JsSyntaxToken::new_detached</span>(<span class="ident">JsSyntaxKind::IDENT</span>, <span class="ident">new_text</span>.<span class="ident">as_str</span>(), <span class="ident">leading</span>, <span class="ident">trailing</span>)
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">AstNode</span><span class="op">&lt;</span><span class="ident">Language</span> <span class="op">=</span> <span class="ident">JsLanguage</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">RenameSymbolExtensions</span> <span class="kw">for</span> <span class="ident">BatchMutation</span><span class="op">&lt;</span><span class="ident">JsLanguage</span>, <span class="ident">N</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">RenameSymbolExtensions</span> <span class="kw">for</span> <span class="ident">BatchMutation</span><span class="op">&lt;</span><span class="ident">JsLanguage</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Rename the binding and all its references to &quot;new_name&quot;.</span>
     <span class="doccomment">/// If we can´t rename the binding, the [BatchMutation] is never changes and it is left</span>
     <span class="doccomment">/// intact.</span>
