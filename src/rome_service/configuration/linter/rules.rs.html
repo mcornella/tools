@@ -566,6 +566,10 @@
 <span id="561">561</span>
 <span id="562">562</span>
 <span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Generated file, do not edit by hand, see `xtask/codegen`</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ConfigurationError</span>, <span class="ident">RomeError</span>, <span class="ident">RuleConfiguration</span>};
@@ -769,7 +773,7 @@
     }
 }
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>, <span class="ident">default</span>, <span class="ident">deny_unknown_fields</span>)]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>, <span class="ident">default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Js</span> {
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">r&quot; It enables the recommended rules for this group&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
@@ -777,7 +781,8 @@
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">r&quot; List of rules for the current group&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">serde</span>(
         <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;IndexMap::is_empty&quot;</span>,
-        <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_js_rules&quot;</span>
+        <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_js_rules&quot;</span>,
+        <span class="ident">flatten</span>
     )]</span>
     <span class="kw">pub</span> <span class="ident">rules</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">RuleConfiguration</span><span class="op">&gt;</span>,
 }
@@ -920,7 +925,7 @@
     <span class="prelude-val">Ok</span>(<span class="ident">value</span>)
 }
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>, <span class="ident">default</span>, <span class="ident">deny_unknown_fields</span>)]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>, <span class="ident">default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Jsx</span> {
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">r&quot; It enables the recommended rules for this group&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
@@ -928,7 +933,8 @@
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">r&quot; List of rules for the current group&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">serde</span>(
         <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;IndexMap::is_empty&quot;</span>,
-        <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_jsx_rules&quot;</span>
+        <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_jsx_rules&quot;</span>,
+        <span class="ident">flatten</span>
     )]</span>
     <span class="kw">pub</span> <span class="ident">rules</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">RuleConfiguration</span><span class="op">&gt;</span>,
 }
@@ -997,7 +1003,7 @@
     <span class="prelude-val">Ok</span>(<span class="ident">value</span>)
 }
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>, <span class="ident">default</span>, <span class="ident">deny_unknown_fields</span>)]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>, <span class="ident">default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Regex</span> {
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">r&quot; It enables the recommended rules for this group&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
@@ -1005,7 +1011,8 @@
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">r&quot; List of rules for the current group&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">serde</span>(
         <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;IndexMap::is_empty&quot;</span>,
-        <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_regex_rules&quot;</span>
+        <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_regex_rules&quot;</span>,
+        <span class="ident">flatten</span>
     )]</span>
     <span class="kw">pub</span> <span class="ident">rules</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">RuleConfiguration</span><span class="op">&gt;</span>,
 }
@@ -1064,7 +1071,7 @@
     <span class="prelude-val">Ok</span>(<span class="ident">value</span>)
 }
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>, <span class="ident">default</span>, <span class="ident">deny_unknown_fields</span>)]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>, <span class="ident">default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ts</span> {
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">r&quot; It enables the recommended rules for this group&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
@@ -1072,7 +1079,8 @@
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">r&quot; List of rules for the current group&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">serde</span>(
         <span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;IndexMap::is_empty&quot;</span>,
-        <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_ts_rules&quot;</span>
+        <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_ts_rules&quot;</span>,
+        <span class="ident">flatten</span>
     )]</span>
     <span class="kw">pub</span> <span class="ident">rules</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">RuleConfiguration</span><span class="op">&gt;</span>,
 }
