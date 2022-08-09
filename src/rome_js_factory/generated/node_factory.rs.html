@@ -6812,6 +6812,93 @@
 <span id="6807">6807</span>
 <span id="6808">6808</span>
 <span id="6809">6809</span>
+<span id="6810">6810</span>
+<span id="6811">6811</span>
+<span id="6812">6812</span>
+<span id="6813">6813</span>
+<span id="6814">6814</span>
+<span id="6815">6815</span>
+<span id="6816">6816</span>
+<span id="6817">6817</span>
+<span id="6818">6818</span>
+<span id="6819">6819</span>
+<span id="6820">6820</span>
+<span id="6821">6821</span>
+<span id="6822">6822</span>
+<span id="6823">6823</span>
+<span id="6824">6824</span>
+<span id="6825">6825</span>
+<span id="6826">6826</span>
+<span id="6827">6827</span>
+<span id="6828">6828</span>
+<span id="6829">6829</span>
+<span id="6830">6830</span>
+<span id="6831">6831</span>
+<span id="6832">6832</span>
+<span id="6833">6833</span>
+<span id="6834">6834</span>
+<span id="6835">6835</span>
+<span id="6836">6836</span>
+<span id="6837">6837</span>
+<span id="6838">6838</span>
+<span id="6839">6839</span>
+<span id="6840">6840</span>
+<span id="6841">6841</span>
+<span id="6842">6842</span>
+<span id="6843">6843</span>
+<span id="6844">6844</span>
+<span id="6845">6845</span>
+<span id="6846">6846</span>
+<span id="6847">6847</span>
+<span id="6848">6848</span>
+<span id="6849">6849</span>
+<span id="6850">6850</span>
+<span id="6851">6851</span>
+<span id="6852">6852</span>
+<span id="6853">6853</span>
+<span id="6854">6854</span>
+<span id="6855">6855</span>
+<span id="6856">6856</span>
+<span id="6857">6857</span>
+<span id="6858">6858</span>
+<span id="6859">6859</span>
+<span id="6860">6860</span>
+<span id="6861">6861</span>
+<span id="6862">6862</span>
+<span id="6863">6863</span>
+<span id="6864">6864</span>
+<span id="6865">6865</span>
+<span id="6866">6866</span>
+<span id="6867">6867</span>
+<span id="6868">6868</span>
+<span id="6869">6869</span>
+<span id="6870">6870</span>
+<span id="6871">6871</span>
+<span id="6872">6872</span>
+<span id="6873">6873</span>
+<span id="6874">6874</span>
+<span id="6875">6875</span>
+<span id="6876">6876</span>
+<span id="6877">6877</span>
+<span id="6878">6878</span>
+<span id="6879">6879</span>
+<span id="6880">6880</span>
+<span id="6881">6881</span>
+<span id="6882">6882</span>
+<span id="6883">6883</span>
+<span id="6884">6884</span>
+<span id="6885">6885</span>
+<span id="6886">6886</span>
+<span id="6887">6887</span>
+<span id="6888">6888</span>
+<span id="6889">6889</span>
+<span id="6890">6890</span>
+<span id="6891">6891</span>
+<span id="6892">6892</span>
+<span id="6893">6893</span>
+<span id="6894">6894</span>
+<span id="6895">6895</span>
+<span id="6896">6896</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Generated file, do not edit by hand, see `xtask/codegen`</span>
 
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::redundant_closure</span>)]</span>
@@ -13619,6 +13706,93 @@
                 <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
             }
         }),
+    ))
+}
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_unknown</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">slots</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsUnknown</span>
+<span class="kw">where</span>
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SyntaxElement</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+{
+    <span class="ident">JsUnknown::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(<span class="ident">JsSyntaxKind::JS_UNKNOWN</span>, <span class="ident">slots</span>))
+}
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_unknown_assignment</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">slots</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsUnknownAssignment</span>
+<span class="kw">where</span>
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SyntaxElement</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+{
+    <span class="ident">JsUnknownAssignment::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
+        <span class="ident">JsSyntaxKind::JS_UNKNOWN_ASSIGNMENT</span>,
+        <span class="ident">slots</span>,
+    ))
+}
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_unknown_binding</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">slots</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsUnknownBinding</span>
+<span class="kw">where</span>
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SyntaxElement</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+{
+    <span class="ident">JsUnknownBinding::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
+        <span class="ident">JsSyntaxKind::JS_UNKNOWN_BINDING</span>,
+        <span class="ident">slots</span>,
+    ))
+}
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_unknown_expression</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">slots</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsUnknownExpression</span>
+<span class="kw">where</span>
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SyntaxElement</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+{
+    <span class="ident">JsUnknownExpression::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
+        <span class="ident">JsSyntaxKind::JS_UNKNOWN_EXPRESSION</span>,
+        <span class="ident">slots</span>,
+    ))
+}
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_unknown_import_assertion_entry</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">slots</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsUnknownImportAssertionEntry</span>
+<span class="kw">where</span>
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SyntaxElement</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+{
+    <span class="ident">JsUnknownImportAssertionEntry::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
+        <span class="ident">JsSyntaxKind::JS_UNKNOWN_IMPORT_ASSERTION_ENTRY</span>,
+        <span class="ident">slots</span>,
+    ))
+}
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_unknown_member</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">slots</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsUnknownMember</span>
+<span class="kw">where</span>
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SyntaxElement</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+{
+    <span class="ident">JsUnknownMember::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
+        <span class="ident">JsSyntaxKind::JS_UNKNOWN_MEMBER</span>,
+        <span class="ident">slots</span>,
+    ))
+}
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_unknown_named_import_specifier</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">slots</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsUnknownNamedImportSpecifier</span>
+<span class="kw">where</span>
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SyntaxElement</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+{
+    <span class="ident">JsUnknownNamedImportSpecifier::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
+        <span class="ident">JsSyntaxKind::JS_UNKNOWN_NAMED_IMPORT_SPECIFIER</span>,
+        <span class="ident">slots</span>,
+    ))
+}
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_unknown_parameter</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">slots</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsUnknownParameter</span>
+<span class="kw">where</span>
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SyntaxElement</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+{
+    <span class="ident">JsUnknownParameter::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
+        <span class="ident">JsSyntaxKind::JS_UNKNOWN_PARAMETER</span>,
+        <span class="ident">slots</span>,
+    ))
+}
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">js_unknown_statement</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">slots</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsUnknownStatement</span>
+<span class="kw">where</span>
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SyntaxElement</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+{
+    <span class="ident">JsUnknownStatement::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
+        <span class="ident">JsSyntaxKind::JS_UNKNOWN_STATEMENT</span>,
+        <span class="ident">slots</span>,
     ))
 }
 </code></pre></div>

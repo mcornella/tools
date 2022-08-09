@@ -155,6 +155,16 @@
 <span id="150">150</span>
 <span id="151">151</span>
 <span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Generated file, do not edit by hand, see `xtask/codegen`</span>
 
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::redundant_closure</span>)]</span>
@@ -305,6 +315,16 @@
                 <span class="prelude-val">Some</span>(<span class="ident">separators</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
             }
         }),
+    ))
+}
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">json_unknown</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">slots</span>: <span class="ident">I</span>) -&gt; <span class="ident">JsonUnknown</span>
+<span class="kw">where</span>
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SyntaxElement</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+{
+    <span class="ident">JsonUnknown::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(
+        <span class="ident">JsonSyntaxKind::JSON_UNKNOWN</span>,
+        <span class="ident">slots</span>,
     ))
 }
 </code></pre></div>

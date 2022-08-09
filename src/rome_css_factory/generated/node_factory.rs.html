@@ -817,6 +817,13 @@
 <span id="812">812</span>
 <span id="813">813</span>
 <span id="814">814</span>
+<span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Generated file, do not edit by hand, see `xtask/codegen`</span>
 
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::redundant_closure</span>)]</span>
@@ -1630,6 +1637,13 @@
             }
         }),
     ))
+}
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">css_unknown</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">slots</span>: <span class="ident">I</span>) -&gt; <span class="ident">CssUnknown</span>
+<span class="kw">where</span>
+    <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SyntaxElement</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">I::IntoIter</span>: <span class="ident">ExactSizeIterator</span>,
+{
+    <span class="ident">CssUnknown::unwrap_cast</span>(<span class="ident">SyntaxNode::new_detached</span>(<span class="ident">CssSyntaxKind::CSS_UNKNOWN</span>, <span class="ident">slots</span>))
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rome_css_factory" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
