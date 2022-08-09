@@ -985,6 +985,76 @@
 <span id="980">980</span>
 <span id="981">981</span>
 <span id="982">982</span>
+<span id="983">983</span>
+<span id="984">984</span>
+<span id="985">985</span>
+<span id="986">986</span>
+<span id="987">987</span>
+<span id="988">988</span>
+<span id="989">989</span>
+<span id="990">990</span>
+<span id="991">991</span>
+<span id="992">992</span>
+<span id="993">993</span>
+<span id="994">994</span>
+<span id="995">995</span>
+<span id="996">996</span>
+<span id="997">997</span>
+<span id="998">998</span>
+<span id="999">999</span>
+<span id="1000">1000</span>
+<span id="1001">1001</span>
+<span id="1002">1002</span>
+<span id="1003">1003</span>
+<span id="1004">1004</span>
+<span id="1005">1005</span>
+<span id="1006">1006</span>
+<span id="1007">1007</span>
+<span id="1008">1008</span>
+<span id="1009">1009</span>
+<span id="1010">1010</span>
+<span id="1011">1011</span>
+<span id="1012">1012</span>
+<span id="1013">1013</span>
+<span id="1014">1014</span>
+<span id="1015">1015</span>
+<span id="1016">1016</span>
+<span id="1017">1017</span>
+<span id="1018">1018</span>
+<span id="1019">1019</span>
+<span id="1020">1020</span>
+<span id="1021">1021</span>
+<span id="1022">1022</span>
+<span id="1023">1023</span>
+<span id="1024">1024</span>
+<span id="1025">1025</span>
+<span id="1026">1026</span>
+<span id="1027">1027</span>
+<span id="1028">1028</span>
+<span id="1029">1029</span>
+<span id="1030">1030</span>
+<span id="1031">1031</span>
+<span id="1032">1032</span>
+<span id="1033">1033</span>
+<span id="1034">1034</span>
+<span id="1035">1035</span>
+<span id="1036">1036</span>
+<span id="1037">1037</span>
+<span id="1038">1038</span>
+<span id="1039">1039</span>
+<span id="1040">1040</span>
+<span id="1041">1041</span>
+<span id="1042">1042</span>
+<span id="1043">1043</span>
+<span id="1044">1044</span>
+<span id="1045">1045</span>
+<span id="1046">1046</span>
+<span id="1047">1047</span>
+<span id="1048">1048</span>
+<span id="1049">1049</span>
+<span id="1050">1050</span>
+<span id="1051">1051</span>
+<span id="1052">1052</span>
 </pre><pre class="rust"><code><span class="doccomment">//! AST definitions for converting untyped syntax nodes into typed AST nodes.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Every field of every AST node is optional, this is to allow the parser to recover</span>
@@ -1031,7 +1101,7 @@
     <span class="doccomment">/// and will result in a compile-time error if the value overflows:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```compile_fail</span>
-    <span class="doccomment">/// # use rome_rowan::{SyntaxKindSet, RawLanguage, RawSyntaxKind};</span>
+    <span class="doccomment">/// # use rome_rowan::{SyntaxKindSet, RawSyntaxKind, raw_language::RawLanguage};</span>
     <span class="doccomment">/// const EXAMPLE: SyntaxKindSet&lt;RawLanguage&gt; =</span>
     <span class="doccomment">///     SyntaxKindSet::&lt;RawLanguage&gt;::from_raw(RawSyntaxKind(512));</span>
     <span class="doccomment">/// # println!(&quot;{EXAMPLE:?}&quot;); // The constant must be used to be evaluated</span>
@@ -1110,6 +1180,76 @@
     <span class="kw">fn</span> <span class="ident">cast</span>(<span class="ident">syntax</span>: <span class="ident">SyntaxNode</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Language</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>;
+
+    <span class="doccomment">/// Tries to cast the passed syntax node to this AST node.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Returns</span>
+    <span class="doccomment">/// * [Ok] if the passed node can be cast into this [AstNode]</span>
+    <span class="doccomment">/// * [Err(syntax)](Err) If the node is of another kind.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Examples</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use rome_rowan::AstNode;</span>
+    <span class="doccomment">/// # use rome_rowan::raw_language::{LiteralExpression, RawLanguageKind, RawLanguageRoot, RawSyntaxTreeBuilder};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut builder = RawSyntaxTreeBuilder::new();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// builder.start_node(RawLanguageKind::ROOT);</span>
+    <span class="doccomment">/// builder.start_node(RawLanguageKind::LITERAL_EXPRESSION);</span>
+    <span class="doccomment">/// builder.token(RawLanguageKind::STRING_TOKEN, &quot;&#39;abcd&#39;&quot;);</span>
+    <span class="doccomment">/// builder.finish_node();</span>
+    <span class="doccomment">/// builder.finish_node();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let root_syntax = builder.finish();</span>
+    <span class="doccomment">/// let root = RawLanguageRoot::cast(root_syntax.clone()).expect(&quot;Root to be a raw language root&quot;);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // Returns `OK` because syntax is a `RawLanguageRoot`</span>
+    <span class="doccomment">/// assert_eq!(RawLanguageRoot::try_cast(root.syntax().clone()), Ok(root.clone()));</span>
+    <span class="doccomment">/// // Returns `Err` with the syntax node passed to `try_cast` because `root` isn&#39;t a `LiteralExpression`</span>
+    <span class="doccomment">/// assert_eq!(LiteralExpression::try_cast(root.syntax().clone()), Err(root_syntax));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">fn</span> <span class="ident">try_cast</span>(<span class="ident">syntax</span>: <span class="ident">SyntaxNode</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Language</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">SyntaxNode</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Language</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident"><span class="self">Self</span>::can_cast</span>(<span class="ident">syntax</span>.<span class="ident">kind</span>()) {
+            <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::unwrap_cast</span>(<span class="ident">syntax</span>))
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">syntax</span>)
+        }
+    }
+
+    <span class="doccomment">/// Tries to cast the AST `node` into this node.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Returns</span>
+    <span class="doccomment">/// * [Ok] if the passed node can be cast into this [AstNode]</span>
+    <span class="doccomment">/// * [Err] if the node is of another kind</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use rome_rowan::AstNode;</span>
+    <span class="doccomment">/// # use rome_rowan::raw_language::{LiteralExpression, RawLanguageKind, RawLanguageRoot, RawSyntaxTreeBuilder};</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let mut builder = RawSyntaxTreeBuilder::new();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// builder.start_node(RawLanguageKind::ROOT);</span>
+    <span class="doccomment">/// builder.start_node(RawLanguageKind::LITERAL_EXPRESSION);</span>
+    <span class="doccomment">/// builder.token(RawLanguageKind::STRING_TOKEN, &quot;&#39;abcd&#39;&quot;);</span>
+    <span class="doccomment">/// builder.finish_node();</span>
+    <span class="doccomment">/// builder.finish_node();</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// let root_syntax = builder.finish();</span>
+    <span class="doccomment">/// let root = RawLanguageRoot::cast(root_syntax.clone()).expect(&quot;Root to be a raw language root&quot;);</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // Returns `OK` because syntax is a `RawLanguageRoot`</span>
+    <span class="doccomment">/// assert_eq!(RawLanguageRoot::try_cast_node(root.clone()), Ok(root.clone()));</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // Returns `Err` with the node passed to `try_cast_node` because `root` isn&#39;t a `LiteralExpression`</span>
+    <span class="doccomment">/// assert_eq!(LiteralExpression::try_cast_node(root.clone()), Err(root.clone()));</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">fn</span> <span class="ident">try_cast_node</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AstNode</span><span class="op">&lt;</span><span class="ident">Language</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Language</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">node</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident"><span class="self">Self</span>::can_cast</span>(<span class="ident">node</span>.<span class="ident">syntax</span>().<span class="ident">kind</span>()) {
+            <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::unwrap_cast</span>(<span class="ident">node</span>.<span class="ident">into_syntax</span>()))
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">node</span>)
+        }
+    }
 
     <span class="doccomment">/// Returns the underlying syntax node.</span>
     <span class="kw">fn</span> <span class="ident">syntax</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">SyntaxNode</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Language</span><span class="op">&gt;</span>;

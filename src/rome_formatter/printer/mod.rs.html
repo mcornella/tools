@@ -1389,51 +1389,9 @@
 <span id="1384">1384</span>
 <span id="1385">1385</span>
 <span id="1386">1386</span>
-<span id="1387">1387</span>
-<span id="1388">1388</span>
-<span id="1389">1389</span>
-<span id="1390">1390</span>
-<span id="1391">1391</span>
-<span id="1392">1392</span>
-<span id="1393">1393</span>
-<span id="1394">1394</span>
-<span id="1395">1395</span>
-<span id="1396">1396</span>
-<span id="1397">1397</span>
-<span id="1398">1398</span>
-<span id="1399">1399</span>
-<span id="1400">1400</span>
-<span id="1401">1401</span>
-<span id="1402">1402</span>
-<span id="1403">1403</span>
-<span id="1404">1404</span>
-<span id="1405">1405</span>
-<span id="1406">1406</span>
-<span id="1407">1407</span>
-<span id="1408">1408</span>
-<span id="1409">1409</span>
-<span id="1410">1410</span>
-<span id="1411">1411</span>
-<span id="1412">1412</span>
-<span id="1413">1413</span>
-<span id="1414">1414</span>
-<span id="1415">1415</span>
-<span id="1416">1416</span>
-<span id="1417">1417</span>
-<span id="1418">1418</span>
-<span id="1419">1419</span>
-<span id="1420">1420</span>
-<span id="1421">1421</span>
-<span id="1422">1422</span>
-<span id="1423">1423</span>
-<span id="1424">1424</span>
-<span id="1425">1425</span>
-<span id="1426">1426</span>
-<span id="1427">1427</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">printer_options</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">printer_options</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::format_element</span>::{
     <span class="ident">Align</span>, <span class="ident">ConditionalGroupContent</span>, <span class="ident">Group</span>, <span class="ident">LineMode</span>, <span class="ident">PrintMode</span>, <span class="ident">VerbatimKind</span>,
@@ -1765,7 +1723,7 @@
         <span class="comment">// If the indentation level has changed since these line suffixes were queued,</span>
         <span class="comment">// insert a line break before to push the comments into the new indent block</span>
         <span class="comment">// SAFETY: Indexing into line_suffixes is guarded by the above call to is_empty</span>
-        <span class="kw">let</span> <span class="ident">has_line_break</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">line_suffixes</span>[<span class="number">0</span>].<span class="ident">args</span>.<span class="ident">indent</span> <span class="op">&lt;</span> <span class="ident">args</span>.<span class="ident">indent</span>;
+        <span class="kw">let</span> <span class="ident">has_line_break</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">line_suffixes</span>[<span class="number">0</span>].<span class="ident">args</span>.<span class="ident">indent</span>.<span class="ident">level</span>() <span class="op">&lt;</span> <span class="ident">args</span>.<span class="ident">indent</span>.<span class="ident">level</span>();
 
         <span class="comment">// Print this line break element again once all the line suffixes have been flushed</span>
         <span class="kw">let</span> <span class="ident">call_self</span> <span class="op">=</span> <span class="ident">PrintElementCall::new</span>(<span class="ident">line_break</span>, <span class="ident">args</span>);
@@ -2118,46 +2076,6 @@
                 <span class="ident">align</span>: <span class="ident">count</span>,
             },
         }
-    }
-}
-
-<span class="doccomment">/// Compares two [Indent]s by first comparing the indent level and, if equal, comparing the `align`.</span>
-<span class="doccomment">/// This implementation assumes that `width(align) &lt; width(1-level)`.</span>
-<span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">Indention</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="kw">match</span> (<span class="self">self</span>, <span class="ident">other</span>) {
-            (<span class="ident">Indention::Level</span>(<span class="ident">this_indent</span>), <span class="ident">Indention::Level</span>(<span class="ident">other_indent</span>)) =&gt; {
-                <span class="ident">this_indent</span>.<span class="ident">cmp</span>(<span class="ident">other_indent</span>)
-            }
-            (
-                <span class="ident">Indention::Align</span> {
-                    <span class="ident">level</span>: <span class="ident">this_indent</span>,
-                    <span class="ident">align</span>: <span class="ident">this_align</span>,
-                },
-                <span class="ident">Indention::Align</span> {
-                    <span class="ident">level</span>: <span class="ident">other_indent</span>,
-                    <span class="ident">align</span>: <span class="ident">other_align</span>,
-                },
-            ) =&gt; {
-                <span class="kw">let</span> <span class="ident">indent_ordering</span> <span class="op">=</span> <span class="ident">this_indent</span>.<span class="ident">cmp</span>(<span class="ident">other_indent</span>);
-
-                <span class="kw">if</span> <span class="ident">indent_ordering</span> <span class="op">==</span> <span class="ident">Ordering::Equal</span> {
-                    <span class="ident">this_align</span>.<span class="ident">cmp</span>(<span class="ident">other_align</span>)
-                } <span class="kw">else</span> {
-                    <span class="ident">indent_ordering</span>
-                }
-            }
-            (<span class="ident">Indention::Level</span>(<span class="ident">this_indent</span>), <span class="ident">Indention::Align</span> { <span class="ident">level</span>: <span class="ident">indent</span>, .. }) =&gt; {
-                <span class="kw">let</span> <span class="ident">indent_ordering</span> <span class="op">=</span> <span class="ident">this_indent</span>.<span class="ident">cmp</span>(<span class="ident">indent</span>);
-
-                <span class="kw">if</span> <span class="ident">indent_ordering</span> <span class="op">==</span> <span class="ident">Ordering::Equal</span> {
-                    <span class="ident">Ordering::Greater</span>
-                } <span class="kw">else</span> {
-                    <span class="ident">indent_ordering</span>
-                }
-            }
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="ident">other</span>.<span class="ident">partial_cmp</span>(<span class="self">self</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">ordering</span><span class="op">|</span> <span class="ident">ordering</span>.<span class="ident">reverse</span>()),
-        })
     }
 }
 

@@ -21,7 +21,7 @@
 <span id="16">16</span>
 <span id="17">17</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>::{<span class="ident">format_conditional</span>, <span class="ident">Conditional</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::JsAnyConditional</span>;
 
 <span class="kw">use</span> <span class="ident">rome_js_syntax::JsConditionalExpression</span>;
 
@@ -34,7 +34,7 @@
         <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">JsConditionalExpression</span>,
         <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">JsFormatter</span>,
     ) -&gt; <span class="ident">FormatResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">format_conditional</span>(<span class="kw-2">&amp;</span><span class="ident">Conditional::Expression</span>(<span class="ident">node</span>.<span class="ident">clone</span>()), <span class="ident">formatter</span>, <span class="bool-val">false</span>)
+        <span class="ident">JsAnyConditional::from</span>(<span class="ident">node</span>.<span class="ident">clone</span>()).<span class="ident">fmt</span>(<span class="ident">formatter</span>)
     }
 }
 </code></pre></div>

@@ -955,6 +955,15 @@
 <span id="950">950</span>
 <span id="951">951</span>
 <span id="952">952</span>
+<span id="953">953</span>
+<span id="954">954</span>
+<span id="955">955</span>
+<span id="956">956</span>
+<span id="957">957</span>
+<span id="958">958</span>
+<span id="959">959</span>
+<span id="960">960</span>
+<span id="961">961</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">write</span>, <span class="ident">Buffer</span>, <span class="ident">CstFormatContext</span>};
 <span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{
@@ -1789,9 +1798,7 @@
             }
         }
     }
-}
 
-<span class="kw">impl</span> <span class="ident">JsAnyBinaryLikeExpression</span> {
     <span class="doccomment">/// Determines if a binary like expression should be inline or not.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">should_inline</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span> {
@@ -1824,6 +1831,17 @@
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">JsAnyBinaryLikeExpression</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">JsAnyExpression</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">binary_like</span>: <span class="ident">JsAnyBinaryLikeExpression</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">match</span> <span class="ident">binary_like</span> {
+            <span class="ident">JsAnyBinaryLikeExpression::JsLogicalExpression</span>(<span class="ident">logical</span>) =&gt; <span class="ident">logical</span>.<span class="ident">into</span>(),
+            <span class="ident">JsAnyBinaryLikeExpression::JsBinaryExpression</span>(<span class="ident">binary</span>) =&gt; <span class="ident">binary</span>.<span class="ident">into</span>(),
+            <span class="ident">JsAnyBinaryLikeExpression::JsInstanceofExpression</span>(<span class="ident">instanceof</span>) =&gt; <span class="ident">instanceof</span>.<span class="ident">into</span>(),
+            <span class="ident">JsAnyBinaryLikeExpression::JsInExpression</span>(<span class="ident">in_expression</span>) =&gt; <span class="ident">in_expression</span>.<span class="ident">into</span>(),
+        }
     }
 }
 
