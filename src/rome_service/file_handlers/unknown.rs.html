@@ -21,40 +21,12 @@
 <span id="16">16</span>
 <span id="17">17</span>
 <span id="18">18</span>
-<span id="19">19</span>
-<span id="20">20</span>
-<span id="21">21</span>
-<span id="22">22</span>
-<span id="23">23</span>
-<span id="24">24</span>
-<span id="25">25</span>
-<span id="26">26</span>
-<span id="27">27</span>
-<span id="28">28</span>
-<span id="29">29</span>
-<span id="30">30</span>
-<span id="31">31</span>
-<span id="32">32</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ExtensionHandler</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">UnknownFileHandler</span> {}
 
 <span class="kw">impl</span> <span class="ident">ExtensionHandler</span> <span class="kw">for</span> <span class="ident">UnknownFileHandler</span> {
-    <span class="kw">fn</span> <span class="ident">capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">super</span>::Capabilities</span> {
-        <span class="ident"><span class="kw">super</span>::Capabilities</span> {
-            <span class="ident">parse</span>: <span class="prelude-val">None</span>,
-            <span class="ident">debug_print</span>: <span class="prelude-val">None</span>,
-            <span class="ident">format</span>: <span class="prelude-val">None</span>,
-            <span class="ident">lint</span>: <span class="prelude-val">None</span>,
-            <span class="ident">code_actions</span>: <span class="prelude-val">None</span>,
-            <span class="ident">fix_all</span>: <span class="prelude-val">None</span>,
-            <span class="ident">format_range</span>: <span class="prelude-val">None</span>,
-            <span class="ident">format_on_type</span>: <span class="prelude-val">None</span>,
-            <span class="ident">rename</span>: <span class="prelude-val">None</span>,
-        }
-    }
-
     <span class="kw">fn</span> <span class="ident">language</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">super</span>::Language</span> {
         <span class="ident"><span class="kw">super</span>::Language::Unknown</span>
     }
