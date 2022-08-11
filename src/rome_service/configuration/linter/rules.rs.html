@@ -570,14 +570,24 @@
 <span id="565">565</span>
 <span id="566">566</span>
 <span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Generated file, do not edit by hand, see `xtask/codegen`</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ConfigurationError</span>, <span class="ident">RomeError</span>, <span class="ident">RuleConfiguration</span>};
 <span class="kw">use</span> <span class="ident">indexmap</span>::{<span class="ident">IndexMap</span>, <span class="ident">IndexSet</span>};
 <span class="kw">use</span> <span class="ident">rome_analyze::RuleFilter</span>;
 <span class="kw">use</span> <span class="ident">rome_console::codespan::Severity</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;schemars&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">schemars::JsonSchema</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;schemars&quot;</span>, <span class="ident">derive</span>(<span class="ident">JsonSchema</span>))]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>, <span class="ident">deny_unknown_fields</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Rules</span> {
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">r&quot; It enables the lint rules recommended by Rome. `true` by default.&quot;</span>]</span>
@@ -773,6 +783,7 @@
     }
 }
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;schemars&quot;</span>, <span class="ident">derive</span>(<span class="ident">JsonSchema</span>))]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>, <span class="ident">default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Js</span> {
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">r&quot; It enables the recommended rules for this group&quot;</span>]</span>
@@ -925,6 +936,7 @@
     <span class="prelude-val">Ok</span>(<span class="ident">value</span>)
 }
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;schemars&quot;</span>, <span class="ident">derive</span>(<span class="ident">JsonSchema</span>))]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>, <span class="ident">default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Jsx</span> {
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">r&quot; It enables the recommended rules for this group&quot;</span>]</span>
@@ -1003,6 +1015,7 @@
     <span class="prelude-val">Ok</span>(<span class="ident">value</span>)
 }
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;schemars&quot;</span>, <span class="ident">derive</span>(<span class="ident">JsonSchema</span>))]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>, <span class="ident">default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Regex</span> {
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">r&quot; It enables the recommended rules for this group&quot;</span>]</span>
@@ -1071,6 +1084,7 @@
     <span class="prelude-val">Ok</span>(<span class="ident">value</span>)
 }
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;schemars&quot;</span>, <span class="ident">derive</span>(<span class="ident">JsonSchema</span>))]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>, <span class="ident">default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ts</span> {
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">r&quot; It enables the recommended rules for this group&quot;</span>]</span>

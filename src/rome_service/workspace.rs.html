@@ -449,6 +449,15 @@
 <span id="444">444</span>
 <span id="445">445</span>
 <span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The [Workspace] is the main entry point for high-level clients (the Rome</span>
 <span class="doccomment">//! CLI and Language Server) into the various language-specific services of the</span>
 <span class="doccomment">//! Rome toolchain (parser, formatter, analyzer ...)</span>
@@ -510,6 +519,8 @@
 <span class="kw">use</span> <span class="ident">rome_formatter::Printed</span>;
 <span class="kw">use</span> <span class="ident">rome_fs::RomePath</span>;
 <span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{<span class="ident">TextRange</span>, <span class="ident">TextSize</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">rome_rowan::TextRangeSchema</span>;
 <span class="kw">use</span> <span class="ident">rome_text_edit::Indel</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">panic::RefUnwindSafe</span>};
 
@@ -517,7 +528,7 @@
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SupportsFeatureParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
@@ -526,7 +537,7 @@
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FeatureName</span> {
     <span class="ident">Format</span>,
@@ -535,7 +546,7 @@
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UpdateSettingsParams</span> {
     <span class="kw">pub</span> <span class="ident">settings</span>: <span class="ident">WorkspaceSettings</span>,
@@ -543,7 +554,7 @@
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OpenFileParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
@@ -553,7 +564,7 @@
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetSyntaxTreeParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
@@ -561,7 +572,7 @@
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetSyntaxTreeResult</span> {
     <span class="kw">pub</span> <span class="ident">cst</span>: <span class="ident">String</span>,
@@ -570,16 +581,17 @@
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetControlFlowGraphParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>, <span class="ident">schemars</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;u32&quot;</span>))]</span>
     <span class="kw">pub</span> <span class="ident">cursor</span>: <span class="ident">TextSize</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetFormatterIRParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
@@ -587,7 +599,7 @@
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ChangeFileParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
@@ -597,7 +609,7 @@
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CloseFileParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
@@ -605,7 +617,7 @@
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PullDiagnosticsParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
@@ -614,7 +626,7 @@
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PullDiagnosticsResult</span> {
     <span class="kw">pub</span> <span class="ident">diagnostics</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Diagnostic</span><span class="op">&gt;</span>,
@@ -622,16 +634,17 @@
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PullActionsParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>, <span class="ident">schemars</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;TextRangeSchema&quot;</span>))]</span>
     <span class="kw">pub</span> <span class="ident">range</span>: <span class="ident">TextRange</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PullActionsResult</span> {
     <span class="kw">pub</span> <span class="ident">actions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CodeAction</span><span class="op">&gt;</span>,
@@ -639,7 +652,7 @@
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CodeAction</span> {
     <span class="kw">pub</span> <span class="ident">category</span>: <span class="ident">ActionCategory</span>,
@@ -649,7 +662,7 @@
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FormatFileParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
@@ -657,26 +670,28 @@
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FormatRangeParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>, <span class="ident">schemars</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;TextRangeSchema&quot;</span>))]</span>
     <span class="kw">pub</span> <span class="ident">range</span>: <span class="ident">TextRange</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FormatOnTypeParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>, <span class="ident">schemars</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;u32&quot;</span>))]</span>
     <span class="kw">pub</span> <span class="ident">offset</span>: <span class="ident">TextSize</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="doccomment">/// Which fixes should be applied during the analyzing phase</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FixFileMode</span> {
@@ -688,7 +703,7 @@
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FixFileParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
@@ -698,7 +713,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FixFileResult</span> {
     <span class="doccomment">/// New source code for the file with all fixes applied</span>
@@ -712,32 +727,35 @@
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FixAction</span> {
     <span class="doccomment">/// Name of the rule that emitted this code action</span>
     <span class="kw">pub</span> <span class="ident">rule_name</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Source range at which this action was applied</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>, <span class="ident">schemars</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;TextRangeSchema&quot;</span>))]</span>
     <span class="kw">pub</span> <span class="ident">range</span>: <span class="ident">TextRange</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RenameParams</span> {
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>, <span class="ident">schemars</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;u32&quot;</span>))]</span>
     <span class="kw">pub</span> <span class="ident">symbol_at</span>: <span class="ident">TextSize</span>,
     <span class="kw">pub</span> <span class="ident">new_name</span>: <span class="ident">String</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RenameResult</span> {
     <span class="doccomment">/// Range of source code modified by this rename operation</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>, <span class="ident">schemars</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;TextRangeSchema&quot;</span>))]</span>
     <span class="kw">pub</span> <span class="ident">range</span>: <span class="ident">TextRange</span>,
     <span class="doccomment">/// List of text edit operations to apply on the source code</span>
     <span class="kw">pub</span> <span class="ident">indels</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Indel</span><span class="op">&gt;</span>,

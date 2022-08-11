@@ -112,10 +112,30 @@
 <span id="107">107</span>
 <span id="108">108</span>
 <span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">bitflags::bitflags</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RuleCategory</span> {
     <span class="doccomment">/// This rule checks the syntax according to the language specification</span>
     <span class="doccomment">/// and emits error diagnostics accordingly</span>
@@ -130,7 +150,10 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ActionCategory</span> {
     <span class="doccomment">/// This action provides a fix to the diagnostic emitted by the same signal</span>
     <span class="ident">QuickFix</span>,
@@ -219,6 +242,17 @@
         }
 
         <span class="ident">deserializer</span>.<span class="ident">deserialize_seq</span>(<span class="ident">Visitor</span>)
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
+<span class="kw">impl</span> <span class="ident">schemars::JsonSchema</span> <span class="kw">for</span> <span class="ident">RuleCategories</span> {
+    <span class="kw">fn</span> <span class="ident">schema_name</span>() -&gt; <span class="ident">String</span> {
+        <span class="ident">String::from</span>(<span class="string">&quot;RuleCategories&quot;</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">json_schema</span>(<span class="ident">gen</span>: <span class="kw-2">&amp;mut</span> <span class="ident">schemars::gen::SchemaGenerator</span>) -&gt; <span class="ident">schemars::schema::Schema</span> {
+        <span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RuleCategory</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::json_schema</span>(<span class="ident">gen</span>)
     }
 }
 </code></pre></div>

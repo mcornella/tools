@@ -470,6 +470,15 @@
 <span id="465">465</span>
 <span id="466">466</span>
 <span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::suggestion::SuggestionChange</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">file</span>::{<span class="ident">FileId</span>, <span class="ident">FileSpan</span>, <span class="ident">Span</span>},
@@ -482,7 +491,10 @@
 <span class="doccomment">/// A diagnostic message that can give information</span>
 <span class="doccomment">/// like errors or warnings.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Diagnostic</span> {
     <span class="kw">pub</span> <span class="ident">file_id</span>: <span class="ident">FileId</span>,
 
@@ -923,7 +935,10 @@
 <span class="doccomment">/// Everything that can be added to a diagnostic, like</span>
 <span class="doccomment">/// a suggestion that will be displayed under the actual error.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SubDiagnostic</span> {
     <span class="kw">pub</span> <span class="ident">severity</span>: <span class="ident">Severity</span>,
     <span class="kw">pub</span> <span class="ident">msg</span>: <span class="ident">MarkupBuf</span>,
@@ -932,7 +947,10 @@
 
 <span class="doccomment">/// A note or help that is displayed under the diagnostic.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Footer</span> {
     <span class="kw">pub</span> <span class="ident">msg</span>: <span class="ident">MarkupBuf</span>,
     <span class="kw">pub</span> <span class="ident">severity</span>: <span class="ident">Severity</span>,

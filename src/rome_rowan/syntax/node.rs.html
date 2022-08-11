@@ -941,8 +941,8 @@
     <span class="doccomment">///     );</span>
     <span class="doccomment">/// });</span>
     <span class="doccomment">/// let range = node.text_range();</span>
-    <span class="doccomment">/// assert_eq!(0u32, range.start().into());</span>
-    <span class="doccomment">/// assert_eq!(14u32, range.end().into());</span>
+    <span class="doccomment">/// assert_eq!(0u32, u32::from(range.start()));</span>
+    <span class="doccomment">/// assert_eq!(14u32, u32::from(range.end()));</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">text_range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TextRange</span> {
         <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">text_range</span>()
@@ -971,8 +971,8 @@
     <span class="doccomment">///     );</span>
     <span class="doccomment">/// });</span>
     <span class="doccomment">/// let range = node.text_trimmed_range();</span>
-    <span class="doccomment">/// assert_eq!(3u32, range.start().into());</span>
-    <span class="doccomment">/// assert_eq!(11u32, range.end().into());</span>
+    <span class="doccomment">/// assert_eq!(3u32, u32::from(range.start()));</span>
+    <span class="doccomment">/// assert_eq!(11u32, u32::from(range.end()));</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">text_trimmed_range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TextRange</span> {
         <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">text_trimmed_range</span>()

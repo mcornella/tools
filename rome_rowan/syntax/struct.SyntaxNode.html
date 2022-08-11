@@ -73,8 +73,8 @@ All other trivia is included.</p>
     );
 });
 <span class="kw">let</span> <span class="ident">range</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">text_range</span>();
-<span class="macro">assert_eq!</span>(<span class="number">0u32</span>, <span class="ident">range</span>.<span class="ident">start</span>().<span class="ident">into</span>());
-<span class="macro">assert_eq!</span>(<span class="number">14u32</span>, <span class="ident">range</span>.<span class="ident">end</span>().<span class="ident">into</span>());</code></pre></div>
+<span class="macro">assert_eq!</span>(<span class="number">0u32</span>, <span class="ident">u32::from</span>(<span class="ident">range</span>.<span class="ident">start</span>()));
+<span class="macro">assert_eq!</span>(<span class="number">14u32</span>, <span class="ident">u32::from</span>(<span class="ident">range</span>.<span class="ident">end</span>()));</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.text_trimmed_range" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../src/rome_rowan/syntax/node.rs.html#179-181">source</a></span><a href="#method.text_trimmed_range" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.text_trimmed_range" class="fnname">text_trimmed_range</a>(&amp;self) -&gt; <a class="struct" href="../struct.TextRange.html" title="struct rome_rowan::TextRange">TextRange</a></h4></section></summary><div class="docblock"><p>Returns the range corresponding for the text of all descendants tokens combined,
 excluding the first token leading  trivia, and the last token trailing trivia.
 All other trivia is included.</p>
@@ -97,8 +97,8 @@ All other trivia is included.</p>
     );
 });
 <span class="kw">let</span> <span class="ident">range</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">text_trimmed_range</span>();
-<span class="macro">assert_eq!</span>(<span class="number">3u32</span>, <span class="ident">range</span>.<span class="ident">start</span>().<span class="ident">into</span>());
-<span class="macro">assert_eq!</span>(<span class="number">11u32</span>, <span class="ident">range</span>.<span class="ident">end</span>().<span class="ident">into</span>());</code></pre></div>
+<span class="macro">assert_eq!</span>(<span class="number">3u32</span>, <span class="ident">u32::from</span>(<span class="ident">range</span>.<span class="ident">start</span>()));
+<span class="macro">assert_eq!</span>(<span class="number">11u32</span>, <span class="ident">u32::from</span>(<span class="ident">range</span>.<span class="ident">end</span>()));</code></pre></div>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><section id="method.first_leading_trivia" class="method has-srclink"><span class="rightside"><a class="srclink" href="../../src/rome_rowan/syntax/node.rs.html#211-213">source</a></span><a href="#method.first_leading_trivia" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.first_leading_trivia" class="fnname">first_leading_trivia</a>(&amp;self) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.62.0/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="struct.SyntaxTrivia.html" title="struct rome_rowan::syntax::SyntaxTrivia">SyntaxTrivia</a>&lt;L&gt;&gt;</h4></section></summary><div class="docblock"><p>Returns the leading trivia of the <a href="struct.SyntaxNode.html#method.first_token">first_token</a>, or <a href="https://doc.rust-lang.org/1.62.0/core/option/enum.Option.html#variant.None" title="None">None</a> if the node does not have any descendant tokens.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">rome_rowan::raw_language</span>::{<span class="ident">RawLanguage</span>, <span class="ident">RawLanguageKind</span>, <span class="ident">RawSyntaxTreeBuilder</span>};

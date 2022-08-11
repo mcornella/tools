@@ -502,7 +502,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JsFormatSettings</span> {
     <span class="kw">pub</span> <span class="ident">quote_style</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QuoteStyle</span><span class="op">&gt;</span>,
@@ -511,7 +511,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>,
-    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JsLinterSettings</span> {
     <span class="kw">pub</span> <span class="ident">globals</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,

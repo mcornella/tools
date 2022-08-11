@@ -1412,6 +1412,25 @@
 <span id="1407">1407</span>
 <span id="1408">1408</span>
 <span id="1409">1409</span>
+<span id="1410">1410</span>
+<span id="1411">1411</span>
+<span id="1412">1412</span>
+<span id="1413">1413</span>
+<span id="1414">1414</span>
+<span id="1415">1415</span>
+<span id="1416">1416</span>
+<span id="1417">1417</span>
+<span id="1418">1418</span>
+<span id="1419">1419</span>
+<span id="1420">1420</span>
+<span id="1421">1421</span>
+<span id="1422">1422</span>
+<span id="1423">1423</span>
+<span id="1424">1424</span>
+<span id="1425">1425</span>
+<span id="1426">1426</span>
+<span id="1427">1427</span>
+<span id="1428">1428</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Infrastructure for code formatting</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This module defines [FormatElement], an IR to format code documents and provides a mean to print</span>
@@ -1483,7 +1502,10 @@
 <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IndentStyle</span> {
     <span class="doccomment">/// Tab</span>
     <span class="ident">Tab</span>,
@@ -1537,7 +1559,10 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The allowed range of values is 1..=320</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LineWidth</span>(<span class="ident">u16</span>);
 
 <span class="kw">impl</span> <span class="ident">LineWidth</span> {
@@ -1684,11 +1709,16 @@
 
 <span class="doccomment">/// Lightweight sourcemap marker between source and output tokens</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SourceMarker</span> {
     <span class="doccomment">/// Position of the marker in the original source</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">schemars</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;u32&quot;</span>))]</span>
     <span class="kw">pub</span> <span class="ident">source</span>: <span class="ident">TextSize</span>,
     <span class="doccomment">/// Position of the marker in the output code</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">schemars</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;u32&quot;</span>))]</span>
     <span class="kw">pub</span> <span class="ident">dest</span>: <span class="ident">TextSize</span>,
 }
 
@@ -1726,11 +1756,19 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>))]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
+)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Printed</span> {
     <span class="ident">code</span>: <span class="ident">String</span>,
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(
+        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>,
+        <span class="ident">schemars</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;Option&lt;rome_rowan::TextRangeSchema&gt;&quot;</span>)
+    )]</span>
     <span class="ident">range</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TextRange</span><span class="op">&gt;</span>,
     <span class="ident">sourcemap</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SourceMarker</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">schemars</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;Vec&lt;rome_rowan::TextRangeSchema&gt;&quot;</span>))]</span>
     <span class="ident">verbatim_ranges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TextRange</span><span class="op">&gt;</span>,
 }
 
