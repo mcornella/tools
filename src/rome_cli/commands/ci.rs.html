@@ -30,13 +30,7 @@
 <span id="25">25</span>
 <span id="26">26</span>
 <span id="27">27</span>
-<span id="28">28</span>
-<span id="29">29</span>
-<span id="30">30</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">traversal</span>::{<span class="ident">traverse</span>, <span class="ident">TraversalMode</span>},
-    <span class="ident">CliSession</span>, <span class="ident">Termination</span>,
-};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">execute_mode</span>, <span class="ident">CliSession</span>, <span class="ident">ExecutionMode</span>, <span class="ident">Termination</span>};
 <span class="kw">use</span> <span class="ident">rome_service::load_config</span>;
 <span class="kw">use</span> <span class="ident">rome_service::settings::WorkspaceSettings</span>;
 <span class="kw">use</span> <span class="ident">rome_service::workspace::UpdateSettingsParams</span>;
@@ -61,7 +55,7 @@
             <span class="ident">settings</span>: <span class="ident">workspace_settings</span>,
         })<span class="question-mark">?</span>;
 
-    <span class="ident">traverse</span>(<span class="ident">TraversalMode::CI</span>, <span class="ident">session</span>)
+    <span class="ident">execute_mode</span>(<span class="ident">ExecutionMode::CI</span>, <span class="ident">session</span>)
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rome_cli" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>

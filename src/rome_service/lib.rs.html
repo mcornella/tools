@@ -196,6 +196,10 @@
 <span id="191">191</span>
 <span id="192">192</span>
 <span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_console</span>::{<span class="ident">Console</span>, <span class="ident">EnvConsole</span>};
 <span class="kw">use</span> <span class="ident">rome_formatter::FormatError</span>;
 <span class="kw">use</span> <span class="ident">rome_fs</span>::{<span class="ident">FileSystem</span>, <span class="ident">OsFileSystem</span>, <span class="ident">RomePath</span>};
@@ -263,12 +267,16 @@
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">RomeError::SourceFileNotSupported</span>(<span class="ident">path</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">ext</span> <span class="op">=</span> <span class="ident">path</span>
-                    .<span class="ident">extension</span>()
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">ext</span><span class="op">|</span> <span class="ident">ext</span>.<span class="ident">to_str</span>())
-                    .<span class="ident">unwrap_or</span>(<span class="string">&quot;&lt;unknown&gt;&quot;</span>);
+                <span class="kw">let</span> <span class="ident">ext</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">extension</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">ext</span><span class="op">|</span> <span class="ident">ext</span>.<span class="ident">to_str</span>());
 
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Rome doesn&#39;t support the file extension {ext:?} yet&quot;</span>)
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ext</span>) <span class="op">=</span> <span class="ident">ext</span> {
+                    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Rome doesn&#39;t support the file extension {ext:?} yet&quot;</span>)
+                } <span class="kw">else</span> {
+                    <span class="macro">write!</span>(
+                        <span class="ident">f</span>,
+                        <span class="string">&quot;Rome can&#39;t process the file because it doesn&#39;t have a clear extension&quot;</span>
+                    )
+                }
             }
             <span class="ident">RomeError::NotFound</span> =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;the file does not exist in the workspace&quot;</span>)

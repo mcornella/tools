@@ -73,14 +73,8 @@
 <span id="68">68</span>
 <span id="69">69</span>
 <span id="70">70</span>
-<span id="71">71</span>
-<span id="72">72</span>
-<span id="73">73</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::commands::format::apply_format_settings_from_cli</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">traversal</span>::{<span class="ident">traverse</span>, <span class="ident">TraversalMode</span>},
-    <span class="ident">CliSession</span>, <span class="ident">Termination</span>,
-};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">execute_mode</span>, <span class="ident">CliSession</span>, <span class="ident">ExecutionMode</span>, <span class="ident">Termination</span>};
 <span class="kw">use</span> <span class="ident">rome_diagnostics::MAXIMUM_DISPLAYABLE_DIAGNOSTICS</span>;
 <span class="kw">use</span> <span class="ident">rome_service::load_config</span>;
 <span class="kw">use</span> <span class="ident">rome_service::settings::WorkspaceSettings</span>;
@@ -141,8 +135,8 @@
         <span class="prelude-val">Some</span>(<span class="ident">FixFileMode::SafeAndSuggestedFixes</span>)
     };
 
-    <span class="ident">traverse</span>(
-        <span class="ident">TraversalMode::Check</span> {
+    <span class="ident">execute_mode</span>(
+        <span class="ident">ExecutionMode::Check</span> {
             <span class="ident">max_diagnostics</span>,
             <span class="ident">fix_file_mode</span>,
         },

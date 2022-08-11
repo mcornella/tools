@@ -93,6 +93,8 @@
 <span id="88">88</span>
 <span id="89">89</span>
 <span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This is where the main CLI session starts. The module is responsible</span>
 <span class="doccomment">//! to parse commands and arguments, redirect the execution of the commands and</span>
 <span class="doccomment">//! execute the traversal of directory and files, based on the command that were passed.</span>
@@ -102,11 +104,13 @@
 <span class="kw">use</span> <span class="ident">rome_service::App</span>;
 
 <span class="kw">mod</span> <span class="ident">commands</span>;
+<span class="kw">mod</span> <span class="ident">execute</span>;
 <span class="kw">mod</span> <span class="ident">metrics</span>;
 <span class="kw">mod</span> <span class="ident">panic</span>;
 <span class="kw">mod</span> <span class="ident">termination</span>;
 <span class="kw">mod</span> <span class="ident">traversal</span>;
 
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">execute</span>::{<span class="ident">execute_mode</span>, <span class="ident">ExecutionMode</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">panic::setup_panic_handler</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">termination::Termination</span>;
 

@@ -117,9 +117,48 @@
 <span id="112">112</span>
 <span id="113">113</span>
 <span id="114">114</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::io::Write</span>;
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">atty::Stream</span>;
+<span class="kw">use</span> <span class="ident">std::io</span>;
+<span class="kw">use</span> <span class="ident">std::io</span>::{<span class="ident">Read</span>, <span class="ident">Stdin</span>, <span class="ident">Write</span>};
 <span class="kw">use</span> <span class="ident">std::panic::RefUnwindSafe</span>;
-
 <span class="kw">use</span> <span class="ident">termcolor</span>::{<span class="ident">ColorChoice</span>, <span class="ident">StandardStream</span>};
 <span class="kw">use</span> <span class="ident">write::Termcolor</span>;
 
@@ -148,6 +187,9 @@
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Console</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">RefUnwindSafe</span> {
     <span class="doccomment">/// Prints a message (formatted using [markup!]) to the console</span>
     <span class="kw">fn</span> <span class="ident">print</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">level</span>: <span class="ident">LogLevel</span>, <span class="ident">args</span>: <span class="ident">Markup</span>);
+
+    <span class="doccomment">/// It reads from a source, and if this source contains something, it&#39;s converted into a [String]</span>
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>;
 }
 
 <span class="doccomment">/// Extension trait for [Console] providing convenience printing methods</span>
@@ -171,8 +213,12 @@
 
 <span class="doccomment">/// Implementation of [Console] printing messages to the standard output and standard error</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EnvConsole</span> {
+    <span class="doccomment">/// Channel to print messages</span>
     <span class="ident">out</span>: <span class="ident">StandardStream</span>,
+    <span class="doccomment">/// Channel to print errors</span>
     <span class="ident">err</span>: <span class="ident">StandardStream</span>,
+    <span class="doccomment">/// Channel to read arbitrary input</span>
+    <span class="ident">r#in</span>: <span class="ident">Stdin</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">EnvConsole</span> {
@@ -191,6 +237,7 @@
         <span class="self">Self</span> {
             <span class="ident">out</span>: <span class="ident">StandardStream::stdout</span>(<span class="ident">out_mode</span>),
             <span class="ident">err</span>: <span class="ident">StandardStream::stderr</span>(<span class="ident">err_mode</span>),
+            <span class="ident">r#in</span>: <span class="ident">io::stdin</span>(),
         }
     }
 }
@@ -208,12 +255,32 @@
 
         <span class="macro">writeln!</span>(<span class="ident">out</span>).<span class="ident">unwrap</span>();
     }
+
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="comment">// Here we check if stdin is redirected. If not, we bail.</span>
+        <span class="comment">//</span>
+        <span class="comment">// Doing this check allows us to pipe stdin to rome, without expecting</span>
+        <span class="comment">// user content when we call `read_to_string`</span>
+        <span class="kw">if</span> <span class="ident">atty::is</span>(<span class="ident">Stream::Stdin</span>) {
+            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        }
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">handle</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">r#in</span>.<span class="ident">lock</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">String::new</span>();
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">read_to_string</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buffer</span>);
+        <span class="comment">// Skipping the error for now</span>
+        <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">is_ok</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">buffer</span>)
+        } <span class="kw">else</span> {
+            <span class="prelude-val">None</span>
+        }
+    }
 }
 
 <span class="doccomment">/// Implementation of [Console] storing all printed messages to a memory buffer</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BufferConsole</span> {
-    <span class="kw">pub</span> <span class="ident">buffer</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">out_buffer</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">in_buffer</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// Individual message entry printed to a [BufferConsole]</span>
@@ -225,10 +292,19 @@
 
 <span class="kw">impl</span> <span class="ident">Console</span> <span class="kw">for</span> <span class="ident">BufferConsole</span> {
     <span class="kw">fn</span> <span class="ident">print</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">level</span>: <span class="ident">LogLevel</span>, <span class="ident">args</span>: <span class="ident">Markup</span>) {
-        <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">push</span>(<span class="ident">Message</span> {
+        <span class="self">self</span>.<span class="ident">out_buffer</span>.<span class="ident">push</span>(<span class="ident">Message</span> {
             <span class="ident">level</span>,
             <span class="ident">content</span>: <span class="ident">args</span>.<span class="ident">to_owned</span>(),
         });
+    }
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">in_buffer</span>.<span class="ident">is_empty</span>() {
+            <span class="prelude-val">None</span>
+        } <span class="kw">else</span> {
+            <span class="comment">// for the time being we simple return the first message, as we don&#39;t</span>
+            <span class="comment">// particular use case for multiple prompts</span>
+            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">in_buffer</span>[<span class="number">0</span>].<span class="ident">clone</span>())
+        }
     }
 }
 </code></pre></div>
