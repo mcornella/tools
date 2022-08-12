@@ -95,13 +95,19 @@
 <span id="90">90</span>
 <span id="91">91</span>
 <span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This is where the main CLI session starts. The module is responsible</span>
 <span class="doccomment">//! to parse commands and arguments, redirect the execution of the commands and</span>
 <span class="doccomment">//! execute the traversal of directory and files, based on the command that were passed.</span>
 
-<span class="kw">use</span> <span class="ident">pico_args::Arguments</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pico_args::Arguments</span>;
+<span class="kw">use</span> <span class="ident">rome_console::EnvConsole</span>;
 <span class="kw">use</span> <span class="ident">rome_flags::FeatureFlags</span>;
-<span class="kw">use</span> <span class="ident">rome_service::App</span>;
+<span class="kw">use</span> <span class="ident">rome_fs::OsFileSystem</span>;
+<span class="kw">use</span> <span class="ident">rome_service</span>::{<span class="ident">App</span>, <span class="ident">DynRef</span>, <span class="ident">Workspace</span>, <span class="ident">WorkspaceRef</span>};
 
 <span class="kw">mod</span> <span class="ident">commands</span>;
 <span class="kw">mod</span> <span class="ident">execute</span>;
@@ -122,70 +128,72 @@
     <span class="kw">pub</span> <span class="ident">args</span>: <span class="ident">Arguments</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">CliSession</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_env</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">Arguments::from_env</span>();
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;app</span><span class="op">&gt;</span> <span class="ident">CliSession</span><span class="op">&lt;</span><span class="lifetime">&#39;app</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">workspace</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;app</span> <span class="kw">dyn</span> <span class="ident">Workspace</span>, <span class="kw-2">mut</span> <span class="ident">args</span>: <span class="ident">Arguments</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">no_colors</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">contains</span>(<span class="string">&quot;--no-colors&quot;</span>);
-
         <span class="self">Self</span> {
-            <span class="ident">app</span>: <span class="ident">App::from_env</span>(<span class="ident">no_colors</span>),
+            <span class="ident">app</span>: <span class="ident">App::new</span>(
+                <span class="ident">DynRef::Owned</span>(<span class="ident">Box::new</span>(<span class="ident">OsFileSystem</span>)),
+                <span class="ident">DynRef::Owned</span>(<span class="ident">Box::new</span>(<span class="ident">EnvConsole::new</span>(<span class="ident">no_colors</span>))),
+                <span class="ident">WorkspaceRef::Borrowed</span>(<span class="ident">workspace</span>),
+            ),
             <span class="ident">args</span>,
         }
     }
-}
 
-<span class="doccomment">/// Main function to run Rome CLI</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_cli</span>(<span class="kw-2">mut</span> <span class="ident">session</span>: <span class="ident">CliSession</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Termination</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">has_metrics</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">args</span>.<span class="ident">contains</span>(<span class="string">&quot;--show-metrics&quot;</span>);
-    <span class="kw">if</span> <span class="ident">has_metrics</span> {
-        <span class="ident"><span class="kw">crate</span>::metrics::init_metrics</span>();
-    }
-
-    <span class="kw">if</span> <span class="ident">session</span>.<span class="ident">args</span>.<span class="ident">contains</span>(<span class="string">&quot;--unstable&quot;</span>) {
-        <span class="ident">rome_flags::set_unstable_flags</span>(<span class="ident">FeatureFlags::ALL</span>);
-    }
-
-    <span class="kw">let</span> <span class="ident">has_help</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">args</span>.<span class="ident">contains</span>(<span class="string">&quot;--help&quot;</span>);
-    <span class="kw">let</span> <span class="ident">subcommand</span> <span class="op">=</span> <span class="ident">session</span>
-        .<span class="ident">args</span>
-        .<span class="ident">subcommand</span>()
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">source</span><span class="op">|</span> <span class="ident">Termination::ParseError</span> {
-            <span class="ident">argument</span>: <span class="string">&quot;&lt;command&gt;&quot;</span>,
-            <span class="ident">source</span>,
-        })<span class="question-mark">?</span>;
-
-    <span class="comment">// True if the command line did not contain any arguments beside the subcommand</span>
-    <span class="kw">let</span> <span class="ident">is_empty</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">args</span>.<span class="ident">clone</span>().<span class="ident">finish</span>().<span class="ident">is_empty</span>();
-
-    <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">subcommand</span>.<span class="ident">as_deref</span>() {
-        <span class="comment">// Print the help for the subcommand if it was called with `--help`</span>
-        <span class="prelude-val">Some</span>(<span class="ident">cmd</span>) <span class="kw">if</span> <span class="ident">has_help</span> =&gt; <span class="ident"><span class="kw">crate</span>::commands::help::help</span>(<span class="ident">session</span>, <span class="prelude-val">Some</span>(<span class="ident">cmd</span>)),
-
-        <span class="prelude-val">Some</span>(<span class="string">&quot;check&quot;</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">is_empty</span> =&gt; <span class="ident"><span class="kw">crate</span>::commands::check::check</span>(<span class="ident">session</span>),
-        <span class="prelude-val">Some</span>(<span class="string">&quot;ci&quot;</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">is_empty</span> =&gt; <span class="ident"><span class="kw">crate</span>::commands::ci::ci</span>(<span class="ident">session</span>),
-        <span class="prelude-val">Some</span>(<span class="string">&quot;format&quot;</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">is_empty</span> =&gt; <span class="ident"><span class="kw">crate</span>::commands::format::format</span>(<span class="ident">session</span>),
-
-        <span class="comment">// Print the help for known commands called without any arguments, and exit with an error</span>
-        <span class="prelude-val">Some</span>(<span class="ident">cmd</span> @ (<span class="string">&quot;check&quot;</span> <span class="op">|</span> <span class="string">&quot;ci&quot;</span> <span class="op">|</span> <span class="string">&quot;format&quot;</span>)) =&gt; {
-            <span class="ident"><span class="kw">crate</span>::commands::help::help</span>(<span class="ident">session</span>, <span class="prelude-val">Some</span>(<span class="ident">cmd</span>))<span class="question-mark">?</span>;
-            <span class="prelude-val">Err</span>(<span class="ident">Termination::EmptyArguments</span>)
+    <span class="doccomment">/// Main function to run Rome CLI</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Termination</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">has_metrics</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">contains</span>(<span class="string">&quot;--show-metrics&quot;</span>);
+        <span class="kw">if</span> <span class="ident">has_metrics</span> {
+            <span class="ident"><span class="kw">crate</span>::metrics::init_metrics</span>();
         }
 
-        <span class="prelude-val">Some</span>(<span class="string">&quot;init&quot;</span>) =&gt; <span class="ident"><span class="kw">crate</span>::commands::init::init</span>(<span class="ident">session</span>),
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">contains</span>(<span class="string">&quot;--unstable&quot;</span>) {
+            <span class="ident">rome_flags::set_unstable_flags</span>(<span class="ident">FeatureFlags::ALL</span>);
+        }
 
-        <span class="comment">// Print the general help if no subcommand was specified / the subcommand is `help`</span>
-        <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;help&quot;</span>) =&gt; <span class="ident"><span class="kw">crate</span>::commands::help::help</span>(<span class="ident">session</span>, <span class="prelude-val">None</span>),
+        <span class="kw">let</span> <span class="ident">has_help</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">contains</span>(<span class="string">&quot;--help&quot;</span>);
+        <span class="kw">let</span> <span class="ident">subcommand</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">args</span>
+            .<span class="ident">subcommand</span>()
+            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">source</span><span class="op">|</span> <span class="ident">Termination::ParseError</span> {
+                <span class="ident">argument</span>: <span class="string">&quot;&lt;command&gt;&quot;</span>,
+                <span class="ident">source</span>,
+            })<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Some</span>(<span class="ident">cmd</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Termination::UnknownCommand</span> {
-            <span class="ident">command</span>: <span class="ident">cmd</span>.<span class="ident">into</span>(),
-        }),
-    };
+        <span class="comment">// True if the command line did not contain any arguments beside the subcommand</span>
+        <span class="kw">let</span> <span class="ident">is_empty</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">clone</span>().<span class="ident">finish</span>().<span class="ident">is_empty</span>();
 
-    <span class="kw">if</span> <span class="ident">has_metrics</span> {
-        <span class="ident"><span class="kw">crate</span>::metrics::print_metrics</span>();
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">subcommand</span>.<span class="ident">as_deref</span>() {
+            <span class="comment">// Print the help for the subcommand if it was called with `--help`</span>
+            <span class="prelude-val">Some</span>(<span class="ident">cmd</span>) <span class="kw">if</span> <span class="ident">has_help</span> =&gt; <span class="ident"><span class="kw">crate</span>::commands::help::help</span>(<span class="self">self</span>, <span class="prelude-val">Some</span>(<span class="ident">cmd</span>)),
+
+            <span class="prelude-val">Some</span>(<span class="string">&quot;check&quot;</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">is_empty</span> =&gt; <span class="ident"><span class="kw">crate</span>::commands::check::check</span>(<span class="self">self</span>),
+            <span class="prelude-val">Some</span>(<span class="string">&quot;ci&quot;</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">is_empty</span> =&gt; <span class="ident"><span class="kw">crate</span>::commands::ci::ci</span>(<span class="self">self</span>),
+            <span class="prelude-val">Some</span>(<span class="string">&quot;format&quot;</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">is_empty</span> =&gt; <span class="ident"><span class="kw">crate</span>::commands::format::format</span>(<span class="self">self</span>),
+
+            <span class="comment">// Print the help for known commands called without any arguments, and exit with an error</span>
+            <span class="prelude-val">Some</span>(<span class="ident">cmd</span> @ (<span class="string">&quot;check&quot;</span> <span class="op">|</span> <span class="string">&quot;ci&quot;</span> <span class="op">|</span> <span class="string">&quot;format&quot;</span>)) =&gt; {
+                <span class="ident"><span class="kw">crate</span>::commands::help::help</span>(<span class="self">self</span>, <span class="prelude-val">Some</span>(<span class="ident">cmd</span>))<span class="question-mark">?</span>;
+                <span class="prelude-val">Err</span>(<span class="ident">Termination::EmptyArguments</span>)
+            }
+
+            <span class="prelude-val">Some</span>(<span class="string">&quot;init&quot;</span>) =&gt; <span class="ident"><span class="kw">crate</span>::commands::init::init</span>(<span class="self">self</span>),
+
+            <span class="comment">// Print the general help if no subcommand was specified / the subcommand is `help`</span>
+            <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;help&quot;</span>) =&gt; <span class="ident"><span class="kw">crate</span>::commands::help::help</span>(<span class="self">self</span>, <span class="prelude-val">None</span>),
+
+            <span class="prelude-val">Some</span>(<span class="ident">cmd</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Termination::UnknownCommand</span> {
+                <span class="ident">command</span>: <span class="ident">cmd</span>.<span class="ident">into</span>(),
+            }),
+        };
+
+        <span class="kw">if</span> <span class="ident">has_metrics</span> {
+            <span class="ident"><span class="kw">crate</span>::metrics::print_metrics</span>();
+        }
+
+        <span class="ident">result</span>
     }
-
-    <span class="ident">result</span>
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rome_cli" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>

@@ -155,6 +155,12 @@
 <span id="150">150</span>
 <span id="151">151</span>
 <span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">atty::Stream</span>;
 <span class="kw">use</span> <span class="ident">std::io</span>;
 <span class="kw">use</span> <span class="ident">std::io</span>::{<span class="ident">Read</span>, <span class="ident">Stdin</span>, <span class="ident">Write</span>};
@@ -239,6 +245,12 @@
             <span class="ident">err</span>: <span class="ident">StandardStream::stderr</span>(<span class="ident">err_mode</span>),
             <span class="ident">r#in</span>: <span class="ident">io::stdin</span>(),
         }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">EnvConsole</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::new</span>(<span class="bool-val">false</span>)
     }
 }
 

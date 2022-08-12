@@ -201,7 +201,6 @@
 <span class="kw">mod</span> <span class="ident">javascript</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">linter</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_workspace&quot;</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">javascript</span>::{<span class="ident">deserialize_globals</span>, <span class="ident">serialize_globals</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">linter</span>::{<span class="ident">RuleConfiguration</span>, <span class="ident">Rules</span>};
 
@@ -247,6 +246,7 @@
 }
 
 <span class="doccomment">/// Series of errors that can be thrown while computing the configuration</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ConfigurationError</span> {
     <span class="doccomment">/// Thrown when the program can&#39;t serialize the configuration, while saving it</span>
     <span class="ident">SerializationError</span>,

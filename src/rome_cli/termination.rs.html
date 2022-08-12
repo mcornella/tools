@@ -80,6 +80,10 @@
 <span id="75">75</span>
 <span id="76">76</span>
 <span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_service::RomeError</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">env::current_exe</span>,
@@ -139,6 +143,10 @@
     <span class="doccomment">/// Wrapper for an underlying `rome_service` error</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
     <span class="ident">WorkspaceError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">RomeError</span>),
+
+    <span class="doccomment">/// Wrapper for an underlying `std::io` error</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
+    <span class="ident">IoError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">std::io::Error</span>),
 }
 
 <span class="kw">fn</span> <span class="ident">command_name</span>() -&gt; <span class="ident">String</span> {

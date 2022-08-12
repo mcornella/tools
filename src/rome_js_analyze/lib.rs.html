@@ -183,6 +183,7 @@
 <span id="178">178</span>
 <span id="179">179</span>
 <span id="180">180</span>
+<span id="181">181</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">control_flow::make_visitor</span>;
 <span class="kw">use</span> <span class="ident">rome_analyze</span>::{
     <span class="ident">AnalysisFilter</span>, <span class="ident">Analyzer</span>, <span class="ident">AnalyzerContext</span>, <span class="ident">AnalyzerSignal</span>, <span class="ident">ControlFlow</span>, <span class="ident">InspectMatcher</span>,
@@ -194,7 +195,7 @@
     <span class="ident">suppression</span>::{<span class="ident">parse_suppression_comment</span>, <span class="ident">SuppressionCategory</span>},
     <span class="ident">JsLanguage</span>,
 };
-<span class="kw">use</span> <span class="ident">std::error::Error</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">error::Error</span>};
 
 <span class="kw">mod</span> <span class="ident">analyzers</span>;
 <span class="kw">mod</span> <span class="ident">assists</span>;
@@ -343,10 +344,11 @@
 }
 
 <span class="doccomment">/// Series of errors encountered when running rules on a file</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>))]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RuleError</span> {
     <span class="doccomment">/// The rule with the specified name replaced the root of the file with a node that is not a valid root for that language.</span>
-    <span class="ident">ReplacedRootWithNonRootError</span> { <span class="ident">rule_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> },
+    <span class="ident">ReplacedRootWithNonRootError</span> { <span class="ident">rule_name</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> },
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">RuleError</span> {
