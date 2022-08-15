@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["EXPR_RECOVERY_SET",""]]});
+window.SIDEBAR_ITEMS = {"constant":[["EXPR_RECOVERY_SET",""]]};

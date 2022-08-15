@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["CleanedStringLiteralText",""]],"trait":[["ToAsciiLowercaseCow",""]]});
+window.SIDEBAR_ITEMS = {"struct":[["CleanedStringLiteralText",""]],"trait":[["ToAsciiLowercaseCow",""]]};

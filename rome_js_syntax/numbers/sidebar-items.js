@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["parse_js_number","Parse a js number as a string into a number."]]});
+window.SIDEBAR_ITEMS = {"fn":[["parse_js_number","Parse a js number as a string into a number."]]};

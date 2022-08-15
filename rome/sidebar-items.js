@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["main","To run this example, run:"]]});

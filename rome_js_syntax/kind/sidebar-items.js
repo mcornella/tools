@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["JsSyntaxKind","The kind of syntax node, e.g. `IDENT`, `FUNCTION_KW`, or `FOR_STMT`."]],"macro":[["T","Utility macro for creating a SyntaxKind through simple macro syntax"]]});
+window.SIDEBAR_ITEMS = {"enum":[["JsSyntaxKind","The kind of syntax node, e.g. `IDENT`, `FUNCTION_KW`, or `FOR_STMT`."]],"macro":[["T","Utility macro for creating a SyntaxKind through simple macro syntax"]]};

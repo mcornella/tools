@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["JsAnyRenamableDeclaration",""],["RenameError",""]],"trait":[["RenamableNode",""],["RenameSymbolExtensions",""]]});
+window.SIDEBAR_ITEMS = {"enum":[["JsAnyRenamableDeclaration",""],["RenameError",""]],"trait":[["RenamableNode",""],["RenameSymbolExtensions",""]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"trait":[["JsBatchMutation",""]]});
+window.SIDEBAR_ITEMS = {"trait":[["JsBatchMutation",""]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["make",""]],"type":[["JsSyntaxTreeBuilder",""]]});
+window.SIDEBAR_ITEMS = {"mod":[["make",""]],"type":[["JsSyntaxTreeBuilder",""]]};

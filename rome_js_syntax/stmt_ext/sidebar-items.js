@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["JsVariableKind",""]]});
+window.SIDEBAR_ITEMS = {"enum":[["JsVariableKind",""]]};

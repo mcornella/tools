@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["RuleContext",""]]});
+window.SIDEBAR_ITEMS = {"struct":[["RuleContext",""]]};

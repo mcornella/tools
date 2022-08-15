@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["DebugGroupId",""],["ReleaseGroupId","Unique identification for a group."]],"type":[["GroupId",""]]});
+window.SIDEBAR_ITEMS = {"struct":[["DebugGroupId",""],["ReleaseGroupId","Unique identification for a group."]],"type":[["GroupId",""]]};
