@@ -2207,9 +2207,6 @@
 <span id="2201">2201</span>
 <span id="2202">2202</span>
 <span id="2203">2203</span>
-<span id="2204">2204</span>
-<span id="2205">2205</span>
-<span id="2206">2206</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">format_element</span>, <span class="ident">write</span>, <span class="ident">Argument</span>, <span class="ident">Arguments</span>, <span class="ident">BufferSnapshot</span>, <span class="ident">FormatState</span>, <span class="ident">GroupId</span>,
@@ -3716,6 +3713,7 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use rome_formatter::{format_args, format, LineWidth};</span>
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
+<span class="doccomment">/// use rome_formatter::printer::PrintWidth;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let context = SimpleFormatContext {</span>
 <span class="doccomment">///     line_width: LineWidth::try_from(20).unwrap(),</span>
@@ -3737,10 +3735,6 @@
 <span class="doccomment">///     ])</span>
 <span class="doccomment">/// ]).unwrap();</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let options = PrinterOptions {</span>
-<span class="doccomment">///     print_width: LineWidth::try_from(20).unwrap(),</span>
-<span class="doccomment">///     ..PrinterOptions::default()</span>
-<span class="doccomment">/// };</span>
 <span class="doccomment">/// assert_eq!(</span>
 <span class="doccomment">///     &quot;[\n\t&#39;A somewhat longer string to force a line break&#39;,\n\t2,\n\t3,\n]&quot;,</span>
 <span class="doccomment">///     elements.print().as_code()</span>

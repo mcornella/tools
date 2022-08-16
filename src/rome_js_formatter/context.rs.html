@@ -265,6 +265,9 @@
 <span id="259">259</span>
 <span id="260">260</span>
 <span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_formatter::printer::PrinterOptions</span>;
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{
     <span class="ident">CommentKind</span>, <span class="ident">CommentStyle</span>, <span class="ident">Comments</span>, <span class="ident">CstFormatContext</span>, <span class="ident">FormatContext</span>, <span class="ident">IndentStyle</span>, <span class="ident">LineWidth</span>,
@@ -372,7 +375,7 @@
     <span class="kw">fn</span> <span class="ident">as_print_options</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PrinterOptions</span> {
         <span class="ident">PrinterOptions::default</span>()
             .<span class="ident">with_indent</span>(<span class="self">self</span>.<span class="ident">indent_style</span>)
-            .<span class="ident">with_print_width</span>(<span class="self">self</span>.<span class="ident">line_width</span>)
+            .<span class="ident">with_print_width</span>(<span class="self">self</span>.<span class="ident">line_width</span>.<span class="ident">into</span>())
     }
 }
 
@@ -427,7 +430,10 @@
     <span class="kw">fn</span> <span class="ident">is_group_start_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">JsSyntaxKind</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(
             <span class="ident">kind</span>,
-            <span class="ident">JsSyntaxKind::L_PAREN</span> <span class="op">|</span> <span class="ident">JsSyntaxKind::L_BRACK</span> <span class="op">|</span> <span class="ident">JsSyntaxKind::L_CURLY</span>
+            <span class="ident">JsSyntaxKind::L_PAREN</span>
+                <span class="op">|</span> <span class="ident">JsSyntaxKind::L_BRACK</span>
+                <span class="op">|</span> <span class="ident">JsSyntaxKind::L_CURLY</span>
+                <span class="op">|</span> <span class="ident">JsSyntaxKind::DOLLAR_CURLY</span>
         )
     }
 
