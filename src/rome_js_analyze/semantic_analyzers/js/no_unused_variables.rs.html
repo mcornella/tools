@@ -243,6 +243,7 @@
 <span id="237">237</span>
 <span id="238">238</span>
 <span id="239">239</span>
+<span id="240">240</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">semantic_services::Semantic</span>, <span class="ident">utils::batch::JsBatchMutation</span>, <span class="ident">JsRuleAction</span>};
 <span class="kw">use</span> <span class="ident">rome_analyze</span>::{
     <span class="ident">context::RuleContext</span>, <span class="ident">declare_rule</span>, <span class="ident">ActionCategory</span>, <span class="ident">Rule</span>, <span class="ident">RuleCategory</span>, <span class="ident">RuleDiagnostic</span>,
@@ -330,7 +331,8 @@
                     <span class="kw">match</span> <span class="ident">parameters</span>.<span class="ident">syntax</span>().<span class="ident">parent</span>()<span class="question-mark">?</span>.<span class="ident">kind</span>() {
                         <span class="ident">JsSyntaxKind::TS_METHOD_SIGNATURE_CLASS_MEMBER</span>
                         <span class="op">|</span> <span class="ident">JsSyntaxKind::TS_CALL_SIGNATURE_TYPE_MEMBER</span>
-                        <span class="op">|</span> <span class="ident">JsSyntaxKind::TS_METHOD_SIGNATURE_TYPE_MEMBER</span> =&gt; <span class="prelude-val">Some</span>(()),
+                        <span class="op">|</span> <span class="ident">JsSyntaxKind::TS_METHOD_SIGNATURE_TYPE_MEMBER</span>
+                        <span class="op">|</span> <span class="ident">JsSyntaxKind::TS_FUNCTION_TYPE</span> =&gt; <span class="prelude-val">Some</span>(()),
                         <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                     }
                 }
