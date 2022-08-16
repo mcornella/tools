@@ -1042,6 +1042,24 @@
 <span id="1036">1036</span>
 <span id="1037">1037</span>
 <span id="1038">1038</span>
+<span id="1039">1039</span>
+<span id="1040">1040</span>
+<span id="1041">1041</span>
+<span id="1042">1042</span>
+<span id="1043">1043</span>
+<span id="1044">1044</span>
+<span id="1045">1045</span>
+<span id="1046">1046</span>
+<span id="1047">1047</span>
+<span id="1048">1048</span>
+<span id="1049">1049</span>
+<span id="1050">1050</span>
+<span id="1051">1051</span>
+<span id="1052">1052</span>
+<span id="1053">1053</span>
+<span id="1054">1054</span>
+<span id="1055">1055</span>
+<span id="1056">1056</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">dynamic_text</span>, <span class="ident">format_with</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::printer::LineEnding</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -1084,9 +1102,9 @@
     <span class="doccomment">/// Nesting (Aligns)[FormatElement::Align] has the effect that all except the most inner align are handled as (Indent)[FormatElement::Indent].</span>
     <span class="ident">Align</span>(<span class="ident">Align</span>),
 
-    <span class="doccomment">/// Reduces the indention of the specified content by one. Reverse operation of `Indent` and can be used to</span>
-    <span class="doccomment">/// *undo` an `Align` for nested content.</span>
-    <span class="ident">Dedent</span>(<span class="ident">Content</span>),
+    <span class="doccomment">/// Reduces the indention of the specified content either by one level or to the root, depending on the mode.</span>
+    <span class="doccomment">/// Reverse operation of `Indent` and can be used to *undo* an `Align` for nested content.</span>
+    <span class="ident">Dedent</span> { <span class="ident">content</span>: <span class="ident">Content</span>, <span class="ident">mode</span>: <span class="ident">DedentMode</span> },
 
     <span class="doccomment">/// Creates a logical group where its content is either consistently printed:</span>
     <span class="doccomment">/// * on a single line: Omitting `LineMode::Soft` line breaks and printing spaces for `LineMode::SoftOrSpace`</span>
@@ -1205,7 +1223,11 @@
             <span class="ident">FormatElement::Space</span> =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;Space&quot;</span>),
             <span class="ident">FormatElement::Line</span>(<span class="ident">content</span>) =&gt; <span class="ident">fmt</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Line&quot;</span>).<span class="ident">field</span>(<span class="ident">content</span>).<span class="ident">finish</span>(),
             <span class="ident">FormatElement::Indent</span>(<span class="ident">content</span>) =&gt; <span class="ident">fmt</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Indent&quot;</span>).<span class="ident">field</span>(<span class="ident">content</span>).<span class="ident">finish</span>(),
-            <span class="ident">FormatElement::Dedent</span>(<span class="ident">content</span>) =&gt; <span class="ident">fmt</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Dedent&quot;</span>).<span class="ident">field</span>(<span class="ident">content</span>).<span class="ident">finish</span>(),
+            <span class="ident">FormatElement::Dedent</span> { <span class="ident">content</span>, <span class="ident">mode</span> } =&gt; <span class="ident">fmt</span>
+                .<span class="ident">debug_struct</span>(<span class="string">&quot;Dedent&quot;</span>)
+                .<span class="ident">field</span>(<span class="string">&quot;content&quot;</span>, <span class="ident">content</span>)
+                .<span class="ident">field</span>(<span class="string">&quot;mode&quot;</span>, <span class="ident">mode</span>)
+                .<span class="ident">finish</span>(),
             <span class="ident">FormatElement::Align</span>(<span class="ident">Align</span> { <span class="ident">count</span>, <span class="ident">content</span> }) =&gt; <span class="ident">fmt</span>
                 .<span class="ident">debug_struct</span>(<span class="string">&quot;Align&quot;</span>)
                 .<span class="ident">field</span>(<span class="string">&quot;count&quot;</span>, <span class="ident">count</span>)
@@ -1376,6 +1398,15 @@
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">is_expanded</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">PrintMode::Expanded</span>)
     }
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DedentMode</span> {
+    <span class="doccomment">/// Reduces the indent by a level (if the current indent is &gt; 0)</span>
+    <span class="ident">Level</span>,
+
+    <span class="doccomment">/// Reduces the indent to the root</span>
+    <span class="ident">Root</span>,
 }
 
 <span class="doccomment">/// Provides the printer with different representations for the same element so that the printer</span>
@@ -1704,7 +1735,7 @@
             <span class="op">|</span> <span class="ident">FormatElement::Verbatim</span>(<span class="ident">Verbatim</span> { <span class="ident">content</span>, .. })
             <span class="op">|</span> <span class="ident">FormatElement::Label</span>(<span class="ident">Label</span> { <span class="ident">content</span>, .. })
             <span class="op">|</span> <span class="ident">FormatElement::Indent</span>(<span class="ident">content</span>)
-            <span class="op">|</span> <span class="ident">FormatElement::Dedent</span>(<span class="ident">content</span>)
+            <span class="op">|</span> <span class="ident">FormatElement::Dedent</span> { <span class="ident">content</span>, .. }
             <span class="op">|</span> <span class="ident">FormatElement::Align</span>(<span class="ident">Align</span> { <span class="ident">content</span>, .. }) =&gt; {
                 <span class="ident">content</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="ident">FormatElement::will_break</span>)
             }
@@ -1845,8 +1876,13 @@
             <span class="ident">FormatElement::Indent</span>(<span class="ident">content</span>) =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">text</span>(<span class="string">&quot;indent(&quot;</span>), <span class="ident">content</span>.<span class="ident">as_ref</span>(), <span class="ident">text</span>(<span class="string">&quot;)&quot;</span>)])
             }
-            <span class="ident">FormatElement::Dedent</span>(<span class="ident">content</span>) =&gt; {
-                <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">text</span>(<span class="string">&quot;dedent(&quot;</span>), <span class="ident">content</span>.<span class="ident">as_ref</span>(), <span class="ident">text</span>(<span class="string">&quot;)&quot;</span>)])
+            <span class="ident">FormatElement::Dedent</span> { <span class="ident">content</span>, <span class="ident">mode</span> } =&gt; {
+                <span class="kw">let</span> <span class="ident">label</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">mode</span> {
+                    <span class="ident">DedentMode::Level</span> =&gt; <span class="string">&quot;dedent&quot;</span>,
+                    <span class="ident">DedentMode::Root</span> =&gt; <span class="string">&quot;dedentRoot&quot;</span>,
+                };
+
+                <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">text</span>(<span class="ident">label</span>), <span class="ident">text</span>(<span class="string">&quot;(&quot;</span>), <span class="ident">content</span>.<span class="ident">as_ref</span>(), <span class="ident">text</span>(<span class="string">&quot;)&quot;</span>)])
             }
             <span class="ident">FormatElement::Align</span>(<span class="ident">Align</span> { <span class="ident">content</span>, <span class="ident">count</span> }) =&gt; {
                 <span class="macro">write!</span>(

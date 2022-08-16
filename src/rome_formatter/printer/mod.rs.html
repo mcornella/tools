@@ -1390,12 +1390,27 @@
 <span id="1384">1384</span>
 <span id="1385">1385</span>
 <span id="1386">1386</span>
+<span id="1387">1387</span>
+<span id="1388">1388</span>
+<span id="1389">1389</span>
+<span id="1390">1390</span>
+<span id="1391">1391</span>
+<span id="1392">1392</span>
+<span id="1393">1393</span>
+<span id="1394">1394</span>
+<span id="1395">1395</span>
+<span id="1396">1396</span>
+<span id="1397">1397</span>
+<span id="1398">1398</span>
+<span id="1399">1399</span>
+<span id="1400">1400</span>
+<span id="1401">1401</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">printer_options</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">printer_options</span>::<span class="kw-2">*</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::format_element</span>::{
-    <span class="ident">Align</span>, <span class="ident">ConditionalGroupContent</span>, <span class="ident">Group</span>, <span class="ident">LineMode</span>, <span class="ident">PrintMode</span>, <span class="ident">VerbatimKind</span>,
+    <span class="ident">Align</span>, <span class="ident">ConditionalGroupContent</span>, <span class="ident">DedentMode</span>, <span class="ident">Group</span>, <span class="ident">LineMode</span>, <span class="ident">PrintMode</span>, <span class="ident">VerbatimKind</span>,
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::intersperse::Intersperse</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">FormatElement</span>, <span class="ident">GroupId</span>, <span class="ident">IndentStyle</span>, <span class="ident">Printed</span>, <span class="ident">SourceMarker</span>, <span class="ident">TextRange</span>};
@@ -1577,8 +1592,12 @@
                 );
             }
 
-            <span class="ident">FormatElement::Dedent</span>(<span class="ident">content</span>) =&gt; {
-                <span class="ident">queue</span>.<span class="ident">extend_with_args</span>(<span class="ident">content</span>.<span class="ident">iter</span>(), <span class="ident">args</span>.<span class="ident">decrement_indent</span>());
+            <span class="ident">FormatElement::Dedent</span> { <span class="ident">content</span>, <span class="ident">mode</span> } =&gt; {
+                <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">mode</span> {
+                    <span class="ident">DedentMode::Level</span> =&gt; <span class="ident">args</span>.<span class="ident">decrement_indent</span>(),
+                    <span class="ident">DedentMode::Root</span> =&gt; <span class="ident">args</span>.<span class="ident">reset_indent</span>(),
+                };
+                <span class="ident">queue</span>.<span class="ident">extend_with_args</span>(<span class="ident">content</span>.<span class="ident">iter</span>(), <span class="ident">args</span>);
             }
 
             <span class="ident">FormatElement::Align</span>(<span class="ident">Align</span> { <span class="ident">content</span>, <span class="ident">count</span> }) =&gt; {
@@ -1973,6 +1992,11 @@
         <span class="self">self</span>
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset_indent</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">indent</span> <span class="op">=</span> <span class="ident">Indention::default</span>();
+        <span class="self">self</span>
+    }
+
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_indent_align</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">count</span>: <span class="ident">NonZeroU8</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">indent</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">indent</span>.<span class="ident">set_align</span>(<span class="ident">count</span>);
         <span class="self">self</span>
@@ -2261,7 +2285,13 @@
             <span class="ident">args</span>.<span class="ident">increment_indent_level</span>(<span class="ident">options</span>.<span class="ident">indent_style</span>()),
         ),
 
-        <span class="ident">FormatElement::Dedent</span>(<span class="ident">content</span>) =&gt; <span class="ident">queue</span>.<span class="ident">extend</span>(<span class="ident">content</span>.<span class="ident">iter</span>(), <span class="ident">args</span>.<span class="ident">decrement_indent</span>()),
+        <span class="ident">FormatElement::Dedent</span> { <span class="ident">content</span>, <span class="ident">mode</span> } =&gt; {
+            <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">mode</span> {
+                <span class="ident">DedentMode::Level</span> =&gt; <span class="ident">args</span>.<span class="ident">decrement_indent</span>(),
+                <span class="ident">DedentMode::Root</span> =&gt; <span class="ident">args</span>.<span class="ident">reset_indent</span>(),
+            };
+            <span class="ident">queue</span>.<span class="ident">extend</span>(<span class="ident">content</span>.<span class="ident">iter</span>(), <span class="ident">args</span>)
+        }
 
         <span class="ident">FormatElement::Align</span>(<span class="ident">Align</span> { <span class="ident">content</span>, <span class="ident">count</span> }) =&gt; {
             <span class="ident">queue</span>.<span class="ident">extend</span>(<span class="ident">content</span>.<span class="ident">iter</span>(), <span class="ident">args</span>.<span class="ident">set_indent_align</span>(<span class="kw-2">*</span><span class="ident">count</span>))
