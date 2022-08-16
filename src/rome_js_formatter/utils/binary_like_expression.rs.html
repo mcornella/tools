@@ -964,7 +964,6 @@
 <span id="958">958</span>
 <span id="959">959</span>
 <span id="960">960</span>
-<span id="961">961</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">write</span>, <span class="ident">Buffer</span>, <span class="ident">CstFormatContext</span>};
 <span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{
@@ -1493,8 +1492,7 @@
             <span class="ident">FlattenedBinaryExpressionPart::Right</span> { <span class="ident">parent</span> } =&gt; {
                 <span class="kw">let</span> <span class="ident">right</span> <span class="op">=</span> <span class="ident">JsAnyBinaryLikeLeftExpression::JsAnyExpression</span>(<span class="ident">parent</span>.<span class="ident">right</span>()<span class="question-mark">?</span>);
 
-                <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">format_sub_expression</span>(<span class="ident">parent</span>.<span class="ident">operator</span>()<span class="question-mark">?</span>, <span class="kw-2">&amp;</span><span class="ident">right</span>)])<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(())
+                <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">format_sub_expression</span>(<span class="ident">parent</span>.<span class="ident">operator</span>()<span class="question-mark">?</span>, <span class="kw-2">&amp;</span><span class="ident">right</span>)])
             }
             <span class="ident">FlattenedBinaryExpressionPart::Left</span> { <span class="ident">expression</span> } =&gt; {
                 <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">expression</span>])

@@ -426,6 +426,8 @@
 <span id="420">420</span>
 <span id="421">421</span>
 <span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
 </pre><pre class="rust"><code><span class="doccomment">/// Constructs the parameters for other formatting macros.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This macro functions by taking a list of objects implementing [crate::Format]. It canonicalize the</span>
@@ -495,7 +497,8 @@
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">write</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dst</span>:<span class="ident">expr</span>, [$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">expr</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>]) =&gt; {{
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dst</span>.<span class="ident">write_fmt</span>(<span class="macro-nonterminal">$</span><span class="macro">crate::format_args!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>),<span class="op">+</span>))
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dst</span>.<span class="ident">write_fmt</span>(<span class="macro-nonterminal">$</span><span class="macro">crate::format_args!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>),<span class="op">+</span>));
+        <span class="ident">result</span>
     }}
 }
 
@@ -531,7 +534,8 @@
             );
             <span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         });
-        <span class="ident">inspect</span>.<span class="ident">write_fmt</span>(<span class="macro-nonterminal">$</span><span class="macro">crate::format_args!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>),<span class="op">+</span>))
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">inspect</span>.<span class="ident">write_fmt</span>(<span class="macro-nonterminal">$</span><span class="macro">crate::format_args!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>),<span class="op">+</span>));
+        <span class="ident">result</span>
     }}
 }
 
