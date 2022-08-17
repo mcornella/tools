@@ -264,10 +264,6 @@
 <span id="258">258</span>
 <span id="259">259</span>
 <span id="260">260</span>
-<span id="261">261</span>
-<span id="262">262</span>
-<span id="263">263</span>
-<span id="264">264</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_formatter::printer::PrinterOptions</span>;
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{
     <span class="ident">CommentKind</span>, <span class="ident">CommentStyle</span>, <span class="ident">Comments</span>, <span class="ident">CstFormatContext</span>, <span class="ident">FormatContext</span>, <span class="ident">IndentStyle</span>, <span class="ident">LineWidth</span>,
@@ -456,15 +452,11 @@
     <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>,
     <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
 )]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">QuoteStyle</span> {
+    <span class="attribute">#[<span class="ident">default</span>]</span>
     <span class="ident">Double</span>,
     <span class="ident">Single</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">QuoteStyle</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Double</span>
-    }
 }
 
 <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">QuoteStyle</span> {

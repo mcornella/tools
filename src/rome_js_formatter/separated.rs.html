@@ -207,11 +207,6 @@
 <span id="201">201</span>
 <span id="202">202</span>
 <span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::AsFormat</span>;
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">write</span>, <span class="ident">GroupId</span>};
@@ -392,9 +387,10 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">FormatAstSeparatedListExtension</span> <span class="kw">for</span> <span class="ident">T</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">AstSeparatedList</span><span class="op">&lt;</span><span class="ident">Language</span> <span class="op">=</span> <span class="ident">JsLanguage</span><span class="op">&gt;</span> {}
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TrailingSeparator</span> {
     <span class="doccomment">/// A trailing separator is allowed and preferred</span>
+    <span class="attribute">#[<span class="ident">default</span>]</span>
     <span class="ident">Allowed</span>,
 
     <span class="doccomment">/// A trailing separator is not allowed</span>
@@ -406,12 +402,6 @@
     <span class="doccomment">/// A trailing separator might be present, but the consumer</span>
     <span class="doccomment">/// decides to remove it</span>
     <span class="ident">Omit</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">TrailingSeparator</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">TrailingSeparator::Allowed</span>
-    }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>

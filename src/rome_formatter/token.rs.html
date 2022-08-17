@@ -833,11 +833,6 @@
 <span id="827">827</span>
 <span id="828">828</span>
 <span id="829">829</span>
-<span id="830">830</span>
-<span id="831">831</span>
-<span id="832">832</span>
-<span id="833">833</span>
-<span id="834">834</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::comments::CommentStyle</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -1307,16 +1302,11 @@
 
 <span class="doccomment">/// Determines if the whitespace separating comment trivia</span>
 <span class="doccomment">/// from their associated tokens should be printed or trimmed</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TriviaPrintMode</span> {
+    <span class="attribute">#[<span class="ident">default</span>]</span>
     <span class="ident">Full</span>,
     <span class="ident">Trim</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">TriviaPrintMode</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Full</span>
-    }
 }
 
 <span class="doccomment">/// Formats the leading trivia (comments, skipped token trivia) of a token</span>
