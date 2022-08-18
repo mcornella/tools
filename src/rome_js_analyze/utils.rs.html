@@ -193,9 +193,62 @@
 <span id="187">187</span>
 <span id="188">188</span>
 <span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_js_factory::make</span>;
-<span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{<span class="ident">JsAnyStatement</span>, <span class="ident">JsLanguage</span>, <span class="ident">JsModuleItemList</span>, <span class="ident">JsStatementList</span>, <span class="ident">T</span>};
-<span class="kw">use</span> <span class="ident">rome_rowan</span>::{<span class="ident">AstNode</span>, <span class="ident">BatchMutation</span>};
+<span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{
+    <span class="ident">JsAnyStatement</span>, <span class="ident">JsLanguage</span>, <span class="ident">JsModuleItemList</span>, <span class="ident">JsStatementList</span>, <span class="ident">JsVariableDeclaration</span>,
+    <span class="ident">JsVariableDeclarator</span>, <span class="ident">JsVariableDeclaratorList</span>, <span class="ident">JsVariableStatement</span>, <span class="ident">T</span>,
+};
+<span class="kw">use</span> <span class="ident">rome_rowan</span>::{<span class="ident">AstNode</span>, <span class="ident">AstSeparatedList</span>, <span class="ident">BatchMutation</span>};
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">batch</span>;
@@ -331,6 +384,53 @@
             <span class="ident">node</span>.<span class="ident">clone</span>().<span class="ident">into</span>(),
             <span class="ident">JsAnyStatement::JsEmptyStatement</span>(<span class="ident">make::js_empty_statement</span>(<span class="ident">make::token</span>(<span class="macro">T!</span>[;]))),
         );
+    }
+
+    <span class="prelude-val">Some</span>(())
+}
+
+<span class="doccomment">/// Removes the declarator, and:</span>
+<span class="doccomment">/// 1 - removes the statement if the declaration only has one declarator;</span>
+<span class="doccomment">/// 2 - removes commas around the declarator to keep the declaration list valid.</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">remove_declarator</span>(
+    <span class="ident">batch</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BatchMutation</span><span class="op">&lt;</span><span class="ident">JsLanguage</span><span class="op">&gt;</span>,
+    <span class="ident">declarator</span>: <span class="kw-2">&amp;</span><span class="ident">JsVariableDeclarator</span>,
+) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">list</span> <span class="op">=</span> <span class="ident">declarator</span>.<span class="ident">parent</span>::<span class="op">&lt;</span><span class="ident">JsVariableDeclaratorList</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">declaration</span> <span class="op">=</span> <span class="ident">list</span>.<span class="ident">parent</span>::<span class="op">&lt;</span><span class="ident">JsVariableDeclaration</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+
+    <span class="kw">if</span> <span class="ident">list</span>.<span class="ident">syntax_list</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
+        <span class="kw">let</span> <span class="ident">statement</span> <span class="op">=</span> <span class="ident">declaration</span>.<span class="ident">parent</span>::<span class="op">&lt;</span><span class="ident">JsVariableStatement</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+        <span class="ident">batch</span>.<span class="ident">remove_node</span>(<span class="ident">statement</span>);
+    } <span class="kw">else</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">elements</span> <span class="op">=</span> <span class="ident">list</span>.<span class="ident">elements</span>();
+
+        <span class="comment">// Find the declarator we want to remove</span>
+        <span class="comment">// remove its trailing comma, if there is one</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">previous_element</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        <span class="kw">for</span> <span class="ident">element</span> <span class="kw">in</span> <span class="ident">elements</span>.<span class="ident">by_ref</span>() {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">node</span>) <span class="op">=</span> <span class="ident">element</span>.<span class="ident">node</span>() {
+                <span class="kw">if</span> <span class="ident">node</span> <span class="op">==</span> <span class="ident">declarator</span> {
+                    <span class="ident">batch</span>.<span class="ident">remove_node</span>(<span class="ident">node</span>.<span class="ident">clone</span>());
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">comma</span>) <span class="op">=</span> <span class="ident">element</span>.<span class="ident">trailing_separator</span>().<span class="ident">ok</span>().<span class="ident">flatten</span>() {
+                        <span class="ident">batch</span>.<span class="ident">remove_token</span>(<span class="ident">comma</span>.<span class="ident">clone</span>());
+                    }
+                    <span class="kw">break</span>;
+                }
+            }
+            <span class="ident">previous_element</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">element</span>);
+        }
+
+        <span class="comment">// if it is the last declarator of the list</span>
+        <span class="comment">// removes the comma before this element</span>
+        <span class="kw">let</span> <span class="ident">is_last</span> <span class="op">=</span> <span class="ident">elements</span>.<span class="ident">next</span>().<span class="ident">is_none</span>();
+        <span class="kw">if</span> <span class="ident">is_last</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">element</span>) <span class="op">=</span> <span class="ident">previous_element</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">comma</span>) <span class="op">=</span> <span class="ident">element</span>.<span class="ident">trailing_separator</span>().<span class="ident">ok</span>().<span class="ident">flatten</span>() {
+                    <span class="ident">batch</span>.<span class="ident">remove_token</span>(<span class="ident">comma</span>.<span class="ident">clone</span>());
+                }
+            }
+        }
     }
 
     <span class="prelude-val">Some</span>(())
