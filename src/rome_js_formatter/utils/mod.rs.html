@@ -357,8 +357,6 @@
 <span id="351">351</span>
 <span id="352">352</span>
 <span id="353">353</span>
-<span id="354">354</span>
-<span id="355">355</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">array</span>;
 <span class="kw">mod</span> <span class="ident">assignment_like</span>;
 <span class="kw">mod</span> <span class="ident">binary_like_expression</span>;
@@ -372,28 +370,26 @@
 <span class="kw">mod</span> <span class="ident">object</span>;
 <span class="kw">mod</span> <span class="ident">object_like</span>;
 <span class="kw">mod</span> <span class="ident">object_pattern_like</span>;
-<span class="kw">mod</span> <span class="ident">parens</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">quickcheck_utils</span>;
 <span class="kw">mod</span> <span class="ident">typescript</span>;
 
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parentheses::resolve_left_most_expression</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">assignment_like</span>::{<span class="ident">should_break_after_operator</span>, <span class="ident">JsAnyAssignmentLike</span>};
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">binary_like_expression</span>::{
-    <span class="ident">binary_argument_needs_parens</span>, <span class="ident">format_binary_like_expression</span>, <span class="ident">JsAnyBinaryLikeExpression</span>,
-    <span class="ident">JsAnyBinaryLikeLeftExpression</span>,
+    <span class="ident">binary_argument_needs_parens</span>, <span class="ident">format_binary_like_expression</span>, <span class="ident">needs_binary_like_parentheses</span>,
+    <span class="ident">JsAnyBinaryLikeExpression</span>, <span class="ident">JsAnyBinaryLikeLeftExpression</span>,
 };
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">conditional</span>::{<span class="ident">resolve_expression</span>, <span class="ident">JsAnyConditional</span>};
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">member_chain::format_call_expression</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">conditional::JsAnyConditional</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">member_chain::get_member_chain</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">object_like::JsObjectLike</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">object_pattern_like::JsObjectPatternLike</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">parens::starts_with_no_lookahead_token</span>;
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">format_args</span>, <span class="ident">write</span>, <span class="ident">Buffer</span>, <span class="ident">VecBuffer</span>};
 <span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{<span class="ident">JsAnyExpression</span>, <span class="ident">JsAnyStatement</span>, <span class="ident">JsInitializerClause</span>, <span class="ident">JsLanguage</span>, <span class="ident">Modifiers</span>};
 <span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{<span class="ident">JsSyntaxKind</span>, <span class="ident">JsSyntaxNode</span>, <span class="ident">JsSyntaxToken</span>};
 <span class="kw">use</span> <span class="ident">rome_rowan</span>::{<span class="ident">AstNode</span>, <span class="ident">AstNodeList</span>, <span class="ident">Direction</span>};
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">simple</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std::fmt::Debug</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">string_utils</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">typescript::should_hug_type</span>;
 

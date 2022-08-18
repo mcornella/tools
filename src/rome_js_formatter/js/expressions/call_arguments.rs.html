@@ -766,7 +766,33 @@
 <span id="760">760</span>
 <span id="761">761</span>
 <span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builders</span>::{<span class="ident">format_close_delimiter</span>, <span class="ident">format_open_delimiter</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parentheses::ExpressionNode</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>::{<span class="ident">is_call_like_expression</span>, <span class="ident">write_arguments_multi_line</span>};
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">format_args</span>, <span class="ident">write</span>};
@@ -811,21 +837,20 @@
             <span class="kw">let</span> <span class="ident">first_argument</span> <span class="op">=</span> <span class="ident">first_argument</span><span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">second_argument</span> <span class="op">=</span> <span class="ident">second_argument</span><span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">is_framework_test_call</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">call_expression</span>) <span class="op">=</span>
-                <span class="ident">node</span>.<span class="ident">syntax</span>().<span class="ident">parent</span>().<span class="ident">and_then</span>(<span class="ident">JsCallExpression::cast</span>)
-            {
-                <span class="kw">let</span> <span class="ident">callee</span> <span class="op">=</span> <span class="ident">call_expression</span>.<span class="ident">callee</span>()<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">is_framework_test_call</span> <span class="op">=</span>
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">call_expression</span>) <span class="op">=</span> <span class="ident">node</span>.<span class="ident">parent</span>::<span class="op">&lt;</span><span class="ident">JsCallExpression</span><span class="op">&gt;</span>() {
+                    <span class="kw">let</span> <span class="ident">callee</span> <span class="op">=</span> <span class="ident">call_expression</span>.<span class="ident">callee</span>()<span class="question-mark">?</span>;
 
-                <span class="ident">is_framework_test_call</span>(<span class="ident">IsTestFrameworkCallPayload</span> {
-                    <span class="ident">first_argument</span>: <span class="kw-2">&amp;</span><span class="ident">first_argument</span>,
-                    <span class="ident">second_argument</span>: <span class="kw-2">&amp;</span><span class="ident">second_argument</span>,
-                    <span class="ident">third_argument</span>: <span class="kw-2">&amp;</span><span class="ident">third_argument</span>,
-                    <span class="ident">arguments_len</span>,
-                    <span class="ident">callee</span>: <span class="kw-2">&amp;</span><span class="ident">callee</span>,
-                })<span class="question-mark">?</span>
-            } <span class="kw">else</span> {
-                <span class="bool-val">false</span>
-            };
+                    <span class="ident">is_framework_test_call</span>(<span class="ident">IsTestFrameworkCallPayload</span> {
+                        <span class="ident">first_argument</span>: <span class="kw-2">&amp;</span><span class="ident">first_argument</span>,
+                        <span class="ident">second_argument</span>: <span class="kw-2">&amp;</span><span class="ident">second_argument</span>,
+                        <span class="ident">third_argument</span>: <span class="kw-2">&amp;</span><span class="ident">third_argument</span>,
+                        <span class="ident">arguments_len</span>,
+                        <span class="ident">callee</span>: <span class="kw-2">&amp;</span><span class="ident">callee</span>,
+                    })<span class="question-mark">?</span>
+                } <span class="kw">else</span> {
+                    <span class="bool-val">false</span>
+                };
 
             <span class="kw">let</span> <span class="ident">is_react_hook_with_deps_array</span> <span class="op">=</span>
                 <span class="ident">is_react_hook_with_deps_array</span>(<span class="kw-2">&amp;</span><span class="ident">first_argument</span>, <span class="kw-2">&amp;</span><span class="ident">second_argument</span>)<span class="question-mark">?</span>
@@ -872,20 +897,16 @@
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">memoized</span>())
                 .<span class="ident">collect</span>();
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">any_breaks</span> <span class="op">=</span> <span class="bool-val">false</span>;
             <span class="kw">let</span> <span class="ident">an_argument_breaks</span> <span class="op">=</span>
                 <span class="ident">separated</span>
                     .<span class="ident">iter_mut</span>()
                     .<span class="ident">enumerate</span>()
                     .<span class="ident">any</span>(<span class="op">|</span>(<span class="ident">index</span>, <span class="ident">element</span>)<span class="op">|</span> <span class="kw">match</span> <span class="ident">element</span>.<span class="ident">inspect</span>(<span class="ident">f</span>) {
                         <span class="prelude-val">Ok</span>(<span class="ident">element</span>) =&gt; {
-                            <span class="kw">if</span> <span class="ident">element</span>.<span class="ident">will_break</span>() {
-                                <span class="ident">any_breaks</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                                <span class="ident">should_group_first_argument</span> <span class="op">&amp;&amp;</span> <span class="ident">index</span> <span class="op">&gt;</span> <span class="number">0</span>
-                                    <span class="op">|</span><span class="op">|</span> (<span class="ident">should_group_last_argument</span> <span class="op">&amp;&amp;</span> <span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">args</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>)
-                            } <span class="kw">else</span> {
-                                <span class="bool-val">false</span>
-                            }
+                            <span class="kw">let</span> <span class="ident">in_relevant_range</span> <span class="op">=</span> <span class="ident">should_group_first_argument</span> <span class="op">&amp;&amp;</span> <span class="ident">index</span> <span class="op">&gt;</span> <span class="number">0</span>
+                                <span class="op">|</span><span class="op">|</span> (<span class="ident">should_group_last_argument</span> <span class="op">&amp;&amp;</span> <span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">args</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>);
+
+                            <span class="ident">in_relevant_range</span> <span class="op">&amp;&amp;</span> <span class="ident">element</span>.<span class="ident">will_break</span>()
                         }
                         <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
                     });
@@ -936,10 +957,6 @@
                 <span class="kw">return</span> <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">all_arguments_expanded</span>]);
             }
 
-            <span class="kw">if</span> <span class="ident">any_breaks</span> {
-                <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">expand_parent</span>()])<span class="question-mark">?</span>;
-            }
-
             <span class="kw">let</span> <span class="ident">edge_arguments_do_not_break</span> <span class="op">=</span> <span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
                 <span class="comment">// `should_group_first_argument` and `should_group_last_argument` are mutually exclusive</span>
                 <span class="comment">// which means that if one is `false`, then the other is `true`.</span>
@@ -980,9 +997,9 @@
                         <span class="ident">l_leading_trivia</span>,
                         <span class="ident">l_paren</span>,
                         <span class="ident">l_trailing_trivia</span>,
-                        <span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[<span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
+                        <span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
                             <span class="ident">write_arguments_multi_line</span>(<span class="ident">separated</span>.<span class="ident">iter</span>(), <span class="ident">f</span>)
-                        })]),
+                        })),
                         <span class="ident">r_leading_trivia</span>,
                         <span class="ident">r_paren</span>,
                         <span class="ident">r_trailing_trivia</span>
@@ -996,19 +1013,19 @@
                 <span class="ident">f</span>,
                 [
                     <span class="ident">l_leading_trivia</span>,
-                    <span class="kw-2">&amp;</span><span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
+                    <span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
                         <span class="ident">l_paren</span>,
                         <span class="ident">l_trailing_trivia</span>,
-                        <span class="kw-2">&amp;</span><span class="ident">soft_block_indent</span>(<span class="kw-2">&amp;</span><span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
+                        <span class="ident">soft_block_indent</span>(<span class="kw-2">&amp;</span><span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
                             <span class="kw">let</span> <span class="ident">separated</span> <span class="op">=</span> <span class="ident">args</span>
                                 .<span class="ident">format_separated</span>(<span class="ident">JsSyntaxKind::COMMA</span>)
                                 .<span class="ident">with_trailing_separator</span>(<span class="ident">TrailingSeparator::Omit</span>)
                                 .<span class="ident">nodes_grouped</span>();
                             <span class="ident">write_arguments_multi_line</span>(<span class="ident">separated</span>, <span class="ident">f</span>)
-                        }),),
+                        })),
                         <span class="ident">r_leading_trivia</span>,
                         <span class="ident">r_paren</span>,
-                    ],),
+                    ]),
                     <span class="ident">r_trailing_trivia</span>
                 ]
             )
@@ -1028,38 +1045,39 @@
 
     <span class="kw">let</span> <span class="ident">has_comments</span> <span class="op">=</span> <span class="ident">first</span>.<span class="ident">syntax</span>().<span class="ident">has_comments_direct</span>();
 
-    <span class="kw">let</span> <span class="ident">is_function_like</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">JsAnyCallArgument::JsAnyExpression</span>(<span class="ident">expression</span>) <span class="op">=</span> <span class="ident">first</span> {
-        <span class="kw">match</span> <span class="ident">expression</span> {
-            <span class="ident">JsAnyExpression::JsFunctionExpression</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="ident">JsAnyExpression::JsArrowFunctionExpression</span>(<span class="ident">arrow</span>) =&gt; {
-                <span class="macro">matches!</span>(<span class="ident">arrow</span>.<span class="ident">body</span>()<span class="question-mark">?</span>, <span class="ident">JsAnyFunctionBody::JsFunctionBody</span>(<span class="kw">_</span>))
-            }
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+    <span class="kw">let</span> <span class="ident">is_function_like</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">resolve_call_argument_expression</span>(<span class="kw-2">&amp;</span><span class="ident">first</span>) {
+        <span class="prelude-val">Some</span>(<span class="ident">JsAnyExpression::JsFunctionExpression</span>(<span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">JsAnyExpression::JsArrowFunctionExpression</span>(<span class="ident">arrow</span>)) =&gt; {
+            <span class="macro">matches!</span>(<span class="ident">arrow</span>.<span class="ident">body</span>()<span class="question-mark">?</span>, <span class="ident">JsAnyFunctionBody::JsFunctionBody</span>(<span class="kw">_</span>))
         }
-    } <span class="kw">else</span> {
-        <span class="bool-val">false</span>
+        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">second_arg_is_function_like</span> <span class="op">=</span> <span class="macro">matches!</span>(
-        <span class="ident">second</span>,
-        <span class="ident">JsAnyCallArgument::JsAnyExpression</span>(
-            <span class="ident">JsAnyExpression::JsFunctionExpression</span>(<span class="kw">_</span>)
-                <span class="op">|</span> <span class="ident">JsAnyExpression::JsArrowFunctionExpression</span>(<span class="kw">_</span>)
-                <span class="op">|</span> <span class="ident">JsAnyExpression::JsConditionalExpression</span>(<span class="kw">_</span>)
-        )
-    );
-    <span class="prelude-val">Ok</span>(<span class="op">!</span><span class="ident">has_comments</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">is_function_like</span>
-        <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">second_arg_is_function_like</span>
-        <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">could_group_argument</span>(<span class="kw-2">&amp;</span><span class="ident">second</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>)
+    <span class="kw">let</span> (<span class="ident">second_arg_is_function_like</span>, <span class="ident">can_group</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">resolve_call_argument_expression</span>(<span class="kw-2">&amp;</span><span class="ident">second</span>) {
+        <span class="prelude-val">Some</span>(<span class="ident">second_expression</span>) =&gt; {
+            <span class="kw">let</span> <span class="ident">second_arg_is_function_like</span> <span class="op">=</span> <span class="macro">matches!</span>(
+                <span class="kw-2">&amp;</span><span class="ident">second_expression</span>,
+                <span class="ident">JsAnyExpression::JsFunctionExpression</span>(<span class="kw">_</span>)
+                    <span class="op">|</span> <span class="ident">JsAnyExpression::JsArrowFunctionExpression</span>(<span class="kw">_</span>)
+                    <span class="op">|</span> <span class="ident">JsAnyExpression::JsConditionalExpression</span>(<span class="kw">_</span>)
+            );
+            (
+                <span class="ident">second_arg_is_function_like</span>,
+                <span class="ident">could_group_expression_argument</span>(<span class="kw-2">&amp;</span><span class="ident">second_expression</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>,
+            )
+        }
+        <span class="prelude-val">None</span> =&gt; (<span class="bool-val">false</span>, <span class="bool-val">false</span>),
+    };
+
+    <span class="prelude-val">Ok</span>(<span class="op">!</span><span class="ident">has_comments</span> <span class="op">&amp;&amp;</span> <span class="ident">is_function_like</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">second_arg_is_function_like</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">can_group</span>)
 }
 
 <span class="doccomment">/// Checks if the last group requires grouping</span>
 <span class="kw">fn</span> <span class="ident">should_group_last_argument</span>(<span class="ident">list</span>: <span class="kw-2">&amp;</span><span class="ident">JsCallArgumentList</span>) -&gt; <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">list_len</span> <span class="op">=</span> <span class="ident">list</span>.<span class="ident">len</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">list</span>.<span class="ident">iter</span>().<span class="ident">rev</span>();
-    <span class="kw">let</span> <span class="ident">last</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>();
-    <span class="kw">let</span> <span class="ident">penultimate</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">list</span>.<span class="ident">iter</span>();
+    <span class="kw">let</span> <span class="ident">last</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next_back</span>();
+    <span class="kw">let</span> <span class="ident">penultimate</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next_back</span>();
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">last</span>) <span class="op">=</span> <span class="ident">last</span> {
         <span class="kw">let</span> <span class="ident">last</span> <span class="op">=</span> <span class="ident">last</span><span class="question-mark">?</span>;
@@ -1071,6 +1089,7 @@
                 <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">JsArrayExpression::can_cast</span>(<span class="ident">penultimate</span>.<span class="ident">syntax</span>().<span class="ident">kind</span>())
                 <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">JsArrowFunctionExpression::can_cast</span>(<span class="ident">last</span>.<span class="ident">syntax</span>().<span class="ident">kind</span>());
 
+            <span class="comment">// TODO implement no poor printed array</span>
             <span class="kw">let</span> <span class="ident">_no_poor_printed_array</span> <span class="op">=</span>
                 <span class="op">!</span><span class="ident">list_len</span> <span class="op">&gt;</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">JsArrayExpression::can_cast</span>(<span class="ident">last</span>.<span class="ident">syntax</span>().<span class="ident">kind</span>());
             <span class="ident">different_kind</span> <span class="op">&amp;&amp;</span> <span class="ident">no_array_and_arrow_function</span>
@@ -1078,63 +1097,64 @@
             <span class="bool-val">true</span>
         };
 
-        <span class="prelude-val">Ok</span>(<span class="op">!</span><span class="ident">last</span>.<span class="ident">syntax</span>().<span class="ident">has_comments_direct</span>()
-            <span class="op">&amp;&amp;</span> <span class="ident">could_group_argument</span>(<span class="kw-2">&amp;</span><span class="ident">last</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">check_with_penultimate</span>)
+        <span class="kw">let</span> <span class="ident">can_group</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">last</span> {
+            <span class="ident">JsAnyCallArgument::JsAnyExpression</span>(<span class="ident">expression</span>) =&gt; {
+                <span class="ident">could_group_expression_argument</span>(<span class="ident">expression</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>
+            }
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+        };
+
+        <span class="prelude-val">Ok</span>(<span class="op">!</span><span class="ident">last</span>.<span class="ident">syntax</span>().<span class="ident">has_comments_direct</span>() <span class="op">&amp;&amp;</span> <span class="ident">can_group</span> <span class="op">&amp;&amp;</span> <span class="ident">check_with_penultimate</span>)
     } <span class="kw">else</span> {
         <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>)
     }
 }
 
 <span class="doccomment">/// Checks if the current argument could be grouped</span>
-<span class="kw">fn</span> <span class="ident">could_group_argument</span>(
-    <span class="ident">argument</span>: <span class="kw-2">&amp;</span><span class="ident">JsAnyCallArgument</span>,
+<span class="kw">fn</span> <span class="ident">could_group_expression_argument</span>(
+    <span class="ident">argument</span>: <span class="kw-2">&amp;</span><span class="ident">JsAnyExpression</span>,
     <span class="ident">is_arrow_recursion</span>: <span class="ident">bool</span>,
 ) -&gt; <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">JsAnyCallArgument::JsAnyExpression</span>(<span class="ident">argument</span>) <span class="op">=</span> <span class="ident">argument</span> {
-        <span class="kw">match</span> <span class="ident">argument</span> {
-            <span class="ident">JsAnyExpression::JsObjectExpression</span>(<span class="ident">object_expression</span>) =&gt; {
-                <span class="ident">object_expression</span>.<span class="ident">members</span>().<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span>
-                    <span class="op">|</span><span class="op">|</span> <span class="ident">object_expression</span>
-                        .<span class="ident">syntax</span>()
-                        .<span class="ident">first_or_last_token_have_comments</span>()
-            }
+    <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">argument</span>.<span class="ident">resolve</span>() {
+        <span class="ident">JsAnyExpression::JsObjectExpression</span>(<span class="ident">object_expression</span>) =&gt; {
+            <span class="ident">object_expression</span>.<span class="ident">members</span>().<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span>
+                <span class="op">|</span><span class="op">|</span> <span class="ident">object_expression</span>
+                    .<span class="ident">syntax</span>()
+                    .<span class="ident">first_or_last_token_have_comments</span>()
+        }
 
-            <span class="ident">JsAnyExpression::JsArrayExpression</span>(<span class="ident">array_expression</span>) =&gt; {
-                <span class="ident">array_expression</span>.<span class="ident">elements</span>().<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span>
-                    <span class="op">|</span><span class="op">|</span> <span class="ident">array_expression</span>
-                        .<span class="ident">syntax</span>()
-                        .<span class="ident">first_or_last_token_have_comments</span>()
-            }
-            <span class="ident">JsAnyExpression::TsTypeAssertionExpression</span>(<span class="ident">assertion_expression</span>) =&gt; {
-                <span class="ident">could_group_argument</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">JsAnyCallArgument::JsAnyExpression</span>(<span class="ident">assertion_expression</span>.<span class="ident">expression</span>()<span class="question-mark">?</span>),
-                    <span class="bool-val">false</span>,
-                )<span class="question-mark">?</span>
-            }
+        <span class="ident">JsAnyExpression::JsArrayExpression</span>(<span class="ident">array_expression</span>) =&gt; {
+            <span class="ident">array_expression</span>.<span class="ident">elements</span>().<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span>
+                <span class="op">|</span><span class="op">|</span> <span class="ident">array_expression</span>
+                    .<span class="ident">syntax</span>()
+                    .<span class="ident">first_or_last_token_have_comments</span>()
+        }
+        <span class="ident">JsAnyExpression::TsTypeAssertionExpression</span>(<span class="ident">assertion_expression</span>) =&gt; {
+            <span class="ident">could_group_expression_argument</span>(<span class="kw-2">&amp;</span><span class="ident">assertion_expression</span>.<span class="ident">expression</span>()<span class="question-mark">?</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>
+        }
 
-            <span class="ident">JsAnyExpression::TsAsExpression</span>(<span class="ident">as_expression</span>) =&gt; <span class="ident">could_group_argument</span>(
-                <span class="kw-2">&amp;</span><span class="ident">JsAnyCallArgument::JsAnyExpression</span>(<span class="ident">as_expression</span>.<span class="ident">expression</span>()<span class="question-mark">?</span>),
-                <span class="bool-val">false</span>,
-            )<span class="question-mark">?</span>,
-            <span class="ident">JsAnyExpression::JsArrowFunctionExpression</span>(<span class="ident">arrow_function</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">arrow_function</span>.<span class="ident">body</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">return_type_annotation</span> <span class="op">=</span> <span class="ident">arrow_function</span>.<span class="ident">return_type_annotation</span>();
+        <span class="ident">JsAnyExpression::TsAsExpression</span>(<span class="ident">as_expression</span>) =&gt; {
+            <span class="ident">could_group_expression_argument</span>(<span class="kw-2">&amp;</span><span class="ident">as_expression</span>.<span class="ident">expression</span>()<span class="question-mark">?</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>
+        }
+        <span class="ident">JsAnyExpression::JsArrowFunctionExpression</span>(<span class="ident">arrow_function</span>) =&gt; {
+            <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">arrow_function</span>.<span class="ident">body</span>()<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">return_type_annotation</span> <span class="op">=</span> <span class="ident">arrow_function</span>.<span class="ident">return_type_annotation</span>();
 
-                <span class="comment">// Handles cases like:</span>
-                <span class="comment">//</span>
-                <span class="comment">// app.get(&quot;/&quot;, (req, res): void =&gt; {</span>
-                <span class="comment">//     res.send(&quot;Hello World!&quot;);</span>
-                <span class="comment">// });</span>
-                <span class="comment">//</span>
-                <span class="comment">// export class Thing implements OtherThing {</span>
-                <span class="comment">//   do: (type: Type) =&gt; Provider&lt;Prop&gt; = memoize(</span>
-                <span class="comment">//     (type: ObjectType): Provider&lt;Opts&gt; =&gt; {}</span>
-                <span class="comment">//   );</span>
-                <span class="comment">// }</span>
-                <span class="kw">let</span> <span class="ident">can_group_type</span> <span class="op">=</span> <span class="op">!</span><span class="ident">return_type_annotation</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">rty</span><span class="op">|</span> <span class="ident">rty</span>.<span class="ident">ty</span>().<span class="ident">ok</span>()).<span class="ident">map_or</span>(
-                    <span class="bool-val">false</span>,
-                    <span class="op">|</span><span class="ident">any_type</span><span class="op">|</span> {
+            <span class="comment">// Handles cases like:</span>
+            <span class="comment">//</span>
+            <span class="comment">// app.get(&quot;/&quot;, (req, res): void =&gt; {</span>
+            <span class="comment">//     res.send(&quot;Hello World!&quot;);</span>
+            <span class="comment">// });</span>
+            <span class="comment">//</span>
+            <span class="comment">// export class Thing implements OtherThing {</span>
+            <span class="comment">//   do: (type: Type) =&gt; Provider&lt;Prop&gt; = memoize(</span>
+            <span class="comment">//     (type: ObjectType): Provider&lt;Opts&gt; =&gt; {}</span>
+            <span class="comment">//   );</span>
+            <span class="comment">// }</span>
+            <span class="kw">let</span> <span class="ident">can_group_type</span> <span class="op">=</span>
+                <span class="op">!</span><span class="ident">return_type_annotation</span>
+                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">rty</span><span class="op">|</span> <span class="ident">rty</span>.<span class="ident">ty</span>().<span class="ident">ok</span>())
+                    .<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">any_type</span><span class="op">|</span> {
                         <span class="ident">TsReferenceType::can_cast</span>(<span class="ident">any_type</span>.<span class="ident">syntax</span>().<span class="ident">kind</span>())
                             <span class="op">|</span><span class="op">|</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">JsAnyFunctionBody::JsFunctionBody</span>(<span class="ident">function_body</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">body</span> {
                                 <span class="ident">function_body</span>
@@ -1144,61 +1164,53 @@
                             } <span class="kw">else</span> {
                                 <span class="bool-val">true</span>
                             }
-                    },
+                    });
+
+            <span class="kw">let</span> <span class="ident">expression_body</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">body</span> {
+                <span class="ident">JsAnyFunctionBody::JsFunctionBody</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+                <span class="ident">JsAnyFunctionBody::JsAnyExpression</span>(<span class="ident">expression</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">expression</span>.<span class="ident">resolve</span>()),
+            };
+
+            <span class="kw">let</span> <span class="ident">body_is_delimited</span> <span class="op">=</span> <span class="macro">matches!</span>(<span class="ident">body</span>, <span class="ident">JsAnyFunctionBody::JsFunctionBody</span>(<span class="kw">_</span>))
+                <span class="op">|</span><span class="op">|</span> <span class="macro">matches!</span>(
+                    <span class="ident">expression_body</span>,
+                    <span class="prelude-val">Some</span>(
+                        <span class="ident">JsAnyExpression::JsObjectExpression</span>(<span class="kw">_</span>)
+                            <span class="op">|</span> <span class="ident">JsAnyExpression::JsArrayExpression</span>(<span class="kw">_</span>)
+                    )
                 );
 
-                <span class="kw">let</span> <span class="ident">body_is_delimited</span> <span class="op">=</span> <span class="macro">matches!</span>(
-                    <span class="ident">body</span>,
-                    <span class="ident">JsAnyFunctionBody::JsFunctionBody</span>(<span class="kw">_</span>)
-                        <span class="op">|</span> <span class="ident">JsAnyFunctionBody::JsAnyExpression</span>(<span class="ident">JsAnyExpression::JsObjectExpression</span>(
-                            <span class="kw">_</span>
-                        ))
-                        <span class="op">|</span> <span class="ident">JsAnyFunctionBody::JsAnyExpression</span>(<span class="ident">JsAnyExpression::JsArrayExpression</span>(<span class="kw">_</span>))
-                );
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">any_expression</span>) <span class="op">=</span> <span class="ident">expression_body</span> {
+                <span class="kw">let</span> <span class="ident">is_nested_arrow_function</span> <span class="op">=</span>
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">JsAnyExpression::JsArrowFunctionExpression</span>(<span class="ident">arrow_function_expression</span>) <span class="op">=</span>
+                        <span class="kw-2">&amp;</span><span class="ident">any_expression</span>
+                    {
+                        <span class="ident">arrow_function_expression</span>
+                            .<span class="ident">body</span>()
+                            .<span class="ident">ok</span>()
+                            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">body</span><span class="op">|</span> <span class="ident">body</span>.<span class="ident">as_js_any_expression</span>().<span class="ident">cloned</span>())
+                            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">body</span><span class="op">|</span> <span class="ident">could_group_expression_argument</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>, <span class="bool-val">true</span>).<span class="ident">ok</span>())
+                            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+                    } <span class="kw">else</span> {
+                        <span class="bool-val">false</span>
+                    };
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">JsAnyFunctionBody::JsAnyExpression</span>(<span class="ident">any_expression</span>) <span class="op">=</span> <span class="ident">body</span>.<span class="ident">clone</span>() {
-                    <span class="kw">let</span> <span class="ident">is_nested_arrow_function</span> <span class="op">=</span>
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">JsAnyExpression::JsArrowFunctionExpression</span>(
-                            <span class="ident">arrow_function_expression</span>,
-                        ) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">any_expression</span>
-                        {
-                            <span class="ident">arrow_function_expression</span>
-                                .<span class="ident">body</span>()
-                                .<span class="ident">ok</span>()
-                                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">body</span><span class="op">|</span> <span class="ident">body</span>.<span class="ident">as_js_any_expression</span>().<span class="ident">cloned</span>())
-                                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">body</span><span class="op">|</span> {
-                                    <span class="ident">could_group_argument</span>(
-                                        <span class="kw-2">&amp;</span><span class="ident">JsAnyCallArgument::JsAnyExpression</span>(<span class="ident">body</span>),
-                                        <span class="bool-val">true</span>,
-                                    )
-                                    .<span class="ident">ok</span>()
-                                })
-                                .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
-                        } <span class="kw">else</span> {
-                            <span class="bool-val">false</span>
-                        };
-
-                    <span class="ident">body_is_delimited</span>
-                        <span class="op">&amp;&amp;</span> <span class="ident">is_nested_arrow_function</span>
-                        <span class="op">&amp;&amp;</span> <span class="ident">can_group_type</span>
-                        <span class="op">&amp;&amp;</span> (<span class="op">!</span><span class="ident">is_arrow_recursion</span>
-                            <span class="op">&amp;&amp;</span> (<span class="ident">is_call_like_expression</span>(<span class="kw-2">&amp;</span><span class="ident">any_expression</span>)
-                                <span class="op">|</span><span class="op">|</span> <span class="macro">matches!</span>(
-                                    <span class="ident">body</span>,
-                                    <span class="ident">JsAnyFunctionBody::JsAnyExpression</span>(
-                                        <span class="ident">JsAnyExpression::JsConditionalExpression</span>(<span class="kw">_</span>)
-                                    )
-                                )))
-                } <span class="kw">else</span> {
-                    <span class="ident">body_is_delimited</span> <span class="op">&amp;&amp;</span> <span class="ident">can_group_type</span>
-                }
+                <span class="ident">body_is_delimited</span>
+                    <span class="op">&amp;&amp;</span> <span class="ident">is_nested_arrow_function</span>
+                    <span class="op">&amp;&amp;</span> <span class="ident">can_group_type</span>
+                    <span class="op">&amp;&amp;</span> (<span class="op">!</span><span class="ident">is_arrow_recursion</span>
+                        <span class="op">&amp;&amp;</span> (<span class="ident">is_call_like_expression</span>(<span class="kw-2">&amp;</span><span class="ident">any_expression</span>)
+                            <span class="op">|</span><span class="op">|</span> <span class="macro">matches!</span>(
+                                <span class="ident">any_expression</span>,
+                                <span class="ident">JsAnyExpression::JsConditionalExpression</span>(<span class="kw">_</span>)
+                            )))
+            } <span class="kw">else</span> {
+                <span class="ident">body_is_delimited</span> <span class="op">&amp;&amp;</span> <span class="ident">can_group_type</span>
             }
-
-            <span class="ident">JsAnyExpression::JsFunctionExpression</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
-    } <span class="kw">else</span> {
-        <span class="bool-val">false</span>
+
+        <span class="ident">JsAnyExpression::JsFunctionExpression</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
     };
 
     <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
@@ -1213,9 +1225,14 @@
     <span class="ident">first_argument</span>: <span class="kw-2">&amp;</span><span class="ident">JsAnyCallArgument</span>,
     <span class="ident">second_argument</span>: <span class="kw-2">&amp;</span><span class="ident">JsAnyCallArgument</span>,
 ) -&gt; <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">first_node_matches</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">JsAnyCallArgument::JsAnyExpression</span>(
-        <span class="ident">JsAnyExpression::JsArrowFunctionExpression</span>(<span class="ident">arrow_function</span>),
-    ) <span class="op">=</span> <span class="ident">first_argument</span>
+    <span class="kw">let</span> <span class="ident">first_expression</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">first_argument</span> {
+        <span class="ident">JsAnyCallArgument::JsAnyExpression</span>(<span class="ident">expression</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">expression</span>.<span class="ident">resolve</span>()),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    };
+
+    <span class="kw">let</span> <span class="ident">first_node_matches</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">JsAnyExpression::JsArrowFunctionExpression</span>(
+        <span class="ident">arrow_function</span>,
+    )) <span class="op">=</span> <span class="ident">first_expression</span>
     {
         <span class="kw">let</span> <span class="ident">no_parameters</span> <span class="op">=</span> <span class="ident">arrow_function</span>.<span class="ident">parameters</span>()<span class="question-mark">?</span>.<span class="ident">is_empty</span>();
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">arrow_function</span>.<span class="ident">body</span>()<span class="question-mark">?</span>;
@@ -1296,9 +1313,19 @@
         <span class="ident">arguments_len</span>,
         <span class="ident">callee</span>,
     } <span class="op">=</span> <span class="ident">payload</span>;
+    <span class="kw">let</span> <span class="ident">first_argument_expression</span> <span class="op">=</span> <span class="ident">resolve_call_argument_expression</span>(<span class="ident">first_argument</span>);
+    <span class="kw">let</span> <span class="ident">second_argument_expression</span> <span class="op">=</span> <span class="ident">resolve_call_argument_expression</span>(<span class="ident">second_argument</span>);
+    <span class="kw">let</span> <span class="ident">third_argument_expression</span> <span class="op">=</span>
+        <span class="ident">third_argument</span>
+            .<span class="ident">as_ref</span>()
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">third_argument</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">third_argument</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">argument</span>) =&gt; <span class="ident">resolve_call_argument_expression</span>(<span class="ident">argument</span>),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+            });
+
     <span class="kw">let</span> <span class="ident">first_argument_is_literal_like</span> <span class="op">=</span> <span class="macro">matches!</span>(
-        <span class="ident">first_argument</span>,
-        <span class="ident">JsAnyCallArgument::JsAnyExpression</span>(
+        <span class="ident">first_argument_expression</span>,
+        <span class="prelude-val">Some</span>(
             <span class="ident">JsAnyExpression::JsAnyLiteralExpression</span>(
                 <span class="ident">JsAnyLiteralExpression::JsStringLiteralExpression</span>(<span class="kw">_</span>)
             ) <span class="op">|</span> <span class="ident">JsAnyExpression::JsTemplate</span>(<span class="kw">_</span>)
@@ -1306,35 +1333,31 @@
     );
 
     <span class="kw">if</span> <span class="ident">first_argument_is_literal_like</span> <span class="op">&amp;&amp;</span> <span class="ident">contains_a_test_pattern</span>(<span class="ident">callee</span>)<span class="question-mark">?</span> {
-        <span class="comment">// if the third argument is not a numeric literal, we bail</span>
-        <span class="comment">// example: `it(&quot;name&quot;, () =&gt; { ... }, 2500)`</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">third_argument</span>)) <span class="op">=</span> <span class="ident">third_argument</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="macro">matches!</span>(
-                <span class="ident">third_argument</span>,
-                <span class="ident">JsAnyCallArgument::JsAnyExpression</span>(<span class="ident">JsAnyExpression::JsAnyLiteralExpression</span>(
-                    <span class="ident">JsAnyLiteralExpression::JsNumberLiteralExpression</span>(<span class="kw">_</span>)
-                ))
-            ) {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
-            }
-        }
-
         <span class="kw">if</span> <span class="ident">arguments_len</span> <span class="op">==</span> <span class="number">2</span> {
             <span class="prelude-val">Ok</span>(<span class="macro">matches!</span>(
-                <span class="ident">second_argument</span>,
-                <span class="ident">JsAnyCallArgument::JsAnyExpression</span>(
+                <span class="ident">second_argument_expression</span>,
+                <span class="prelude-val">Some</span>(
                     <span class="ident">JsAnyExpression::JsArrowFunctionExpression</span>(<span class="kw">_</span>)
                         <span class="op">|</span> <span class="ident">JsAnyExpression::JsFunctionExpression</span>(<span class="kw">_</span>)
                 )
             ))
         } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">second_argument</span> {
-                <span class="ident">JsAnyCallArgument::JsAnyExpression</span>(<span class="ident">JsAnyExpression::JsFunctionExpression</span>(<span class="ident">node</span>)) =&gt; {
+            <span class="comment">// if the third argument is not a numeric literal, we bail</span>
+            <span class="comment">// example: `it(&quot;name&quot;, () =&gt; { ... }, 2500)`</span>
+            <span class="kw">if</span> <span class="op">!</span><span class="macro">matches!</span>(
+                <span class="ident">third_argument_expression</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">JsAnyExpression::JsAnyLiteralExpression</span>(
+                    <span class="ident">JsAnyLiteralExpression::JsNumberLiteralExpression</span>(<span class="kw">_</span>)
+                ))
+            ) {
+                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
+            }
+
+            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">second_argument_expression</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">JsAnyExpression::JsFunctionExpression</span>(<span class="ident">node</span>)) =&gt; {
                     <span class="ident">node</span>.<span class="ident">parameters</span>()<span class="question-mark">?</span>.<span class="ident">items</span>().<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span>
                 }
-                <span class="ident">JsAnyCallArgument::JsAnyExpression</span>(<span class="ident">JsAnyExpression::JsArrowFunctionExpression</span>(
-                    <span class="ident">node</span>,
-                )) =&gt; {
+                <span class="prelude-val">Some</span>(<span class="ident">JsAnyExpression::JsArrowFunctionExpression</span>(<span class="ident">node</span>)) =&gt; {
                     <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">body</span>()<span class="question-mark">?</span>;
                     <span class="kw">let</span> <span class="ident">has_enough_parameters</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">parameters</span>()<span class="question-mark">?</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span>;
                     <span class="macro">matches!</span>(<span class="ident">body</span>, <span class="ident">JsAnyFunctionBody::JsFunctionBody</span>(<span class="kw">_</span>)) <span class="op">&amp;&amp;</span> <span class="ident">has_enough_parameters</span>
@@ -1345,6 +1368,15 @@
         }
     } <span class="kw">else</span> {
         <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>)
+    }
+}
+
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">resolve_call_argument_expression</span>(
+    <span class="ident">argument</span>: <span class="kw-2">&amp;</span><span class="ident">JsAnyCallArgument</span>,
+) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JsAnyExpression</span><span class="op">&gt;</span> {
+    <span class="kw">match</span> <span class="ident">argument</span> {
+        <span class="ident">JsAnyCallArgument::JsAnyExpression</span>(<span class="ident">expression</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">expression</span>.<span class="ident">resolve</span>()),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
     }
 }
 
@@ -1433,24 +1465,33 @@
     <span class="kw">const</span> <span class="ident">MAX_DEPTH</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">5</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">test_call</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">MAX_DEPTH</span> <span class="kw">as</span> <span class="ident">usize</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current_node</span> <span class="op">=</span> <span class="ident">callee</span>.<span class="ident">clone</span>();
-    <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">MAX_DEPTH</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">JsAnyExpression::JsIdentifierExpression</span>(<span class="ident">identifier</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">current_node</span> {
-            <span class="kw">let</span> <span class="ident">value_token</span> <span class="op">=</span> <span class="ident">identifier</span>.<span class="ident">name</span>()<span class="question-mark">?</span>.<span class="ident">value_token</span>()<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">value_token</span>.<span class="ident">token_text_trimmed</span>();
-            <span class="ident">test_call</span>.<span class="ident">push</span>(<span class="ident">value</span>);
-            <span class="kw">break</span>;
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">JsAnyExpression::JsStaticMemberExpression</span>(<span class="ident">member_expression</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">current_node</span> {
-            <span class="kw">match</span> <span class="ident">member_expression</span>.<span class="ident">member</span>()<span class="question-mark">?</span> {
-                <span class="ident">JsAnyName::JsName</span>(<span class="ident">name</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">value_token</span>()<span class="question-mark">?</span>;
-                    <span class="ident">test_call</span>.<span class="ident">push</span>(<span class="ident">value</span>.<span class="ident">token_text_trimmed</span>());
-                    <span class="ident">current_node</span> <span class="op">=</span> <span class="ident">member_expression</span>.<span class="ident">object</span>()<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
+
+    <span class="kw">while</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">MAX_DEPTH</span> {
+        <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="ident">current_node</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">current_node</span> {
+            <span class="ident">JsAnyExpression::JsIdentifierExpression</span>(<span class="ident">identifier</span>) =&gt; {
+                <span class="kw">let</span> <span class="ident">value_token</span> <span class="op">=</span> <span class="ident">identifier</span>.<span class="ident">name</span>()<span class="question-mark">?</span>.<span class="ident">value_token</span>()<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">value_token</span>.<span class="ident">token_text_trimmed</span>();
+                <span class="ident">test_call</span>.<span class="ident">push</span>(<span class="ident">value</span>);
+                <span class="kw">break</span>;
+            }
+            <span class="ident">JsAnyExpression::JsStaticMemberExpression</span>(<span class="ident">member_expression</span>) =&gt; {
+                <span class="kw">match</span> <span class="ident">member_expression</span>.<span class="ident">member</span>()<span class="question-mark">?</span> {
+                    <span class="ident">JsAnyName::JsName</span>(<span class="ident">name</span>) =&gt; {
+                        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">value_token</span>()<span class="question-mark">?</span>;
+                        <span class="ident">test_call</span>.<span class="ident">push</span>(<span class="ident">value</span>.<span class="ident">token_text_trimmed</span>());
+                        <span class="ident">member_expression</span>.<span class="ident">object</span>()<span class="question-mark">?</span>
+                    }
+                    <span class="kw">_</span> =&gt; <span class="kw">break</span>,
                 }
-                <span class="kw">_</span> =&gt; <span class="kw">break</span>,
-            };
-        } <span class="kw">else</span> {
-            <span class="kw">break</span>;
-        }
+            }
+            <span class="ident">JsAnyExpression::JsParenthesizedExpression</span>(<span class="ident">parenthesized</span>) =&gt; {
+                <span class="ident">i</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>; <span class="comment">// Don&#39;t increment the depth</span>
+                <span class="ident">parenthesized</span>.<span class="ident">expression</span>()<span class="question-mark">?</span>
+            }
+            <span class="kw">_</span> =&gt; <span class="kw">break</span>,
+        };
     }
     <span class="ident">test_call</span>.<span class="ident">reverse</span>();
     <span class="prelude-val">Ok</span>(<span class="ident">test_call</span>)
@@ -1513,6 +1554,15 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">matches_static_member_expression_deep</span>() {
         <span class="kw">let</span> <span class="ident">call_expression</span> <span class="op">=</span> <span class="ident">extract_call_expression</span>(<span class="string">&quot;test.describe.parallel.only();&quot;</span>);
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">contains_a_test_pattern</span>(<span class="kw-2">&amp;</span><span class="ident">call_expression</span>.<span class="ident">callee</span>().<span class="ident">unwrap</span>()),
+            <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)
+        );
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">matches_parentheses</span>() {
+        <span class="kw">let</span> <span class="ident">call_expression</span> <span class="op">=</span> <span class="ident">extract_call_expression</span>(<span class="string">&quot;(test.describe.parallel).only();&quot;</span>);
         <span class="macro">assert_eq!</span>(
             <span class="ident">contains_a_test_pattern</span>(<span class="kw-2">&amp;</span><span class="ident">call_expression</span>.<span class="ident">callee</span>().<span class="ident">unwrap</span>()),
             <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)

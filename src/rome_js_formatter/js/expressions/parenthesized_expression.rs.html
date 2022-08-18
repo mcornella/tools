@@ -186,43 +186,19 @@
 <span id="180">180</span>
 <span id="181">181</span>
 <span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>::{
-    <span class="ident">binary_argument_needs_parens</span>, <span class="ident">is_simple_expression</span>, <span class="ident">resolve_expression</span>, <span class="ident">FormatPrecedence</span>,
+    <span class="ident">binary_argument_needs_parens</span>, <span class="ident">is_simple_expression</span>, <span class="ident">FormatPrecedence</span>,
     <span class="ident">JsAnyBinaryLikeLeftExpression</span>,
 };
 <span class="kw">use</span> <span class="ident">rome_formatter::write</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::JsAnyBinaryLikeExpression</span>;
 
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parentheses</span>::{<span class="ident">ExpressionNode</span>, <span class="ident">NeedsParentheses</span>};
 <span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{
-    <span class="ident">JsAnyExpression</span>, <span class="ident">JsAnyLiteralExpression</span>, <span class="ident">JsParenthesizedExpression</span>,
-    <span class="ident">JsParenthesizedExpressionFields</span>, <span class="ident">JsSyntaxKind</span>,
+    <span class="ident">JsAnyExpression</span>, <span class="ident">JsParenthesizedExpression</span>, <span class="ident">JsParenthesizedExpressionFields</span>, <span class="ident">JsSyntaxKind</span>,
+    <span class="ident">JsSyntaxNode</span>,
 };
 <span class="kw">use</span> <span class="ident">rome_rowan</span>::{<span class="ident">AstNode</span>, <span class="ident">SyntaxResult</span>};
 
@@ -241,26 +217,22 @@
             <span class="ident">r_paren_token</span>,
         } <span class="op">=</span> <span class="ident">node</span>.<span class="ident">as_fields</span>();
 
-        <span class="kw">let</span> <span class="ident">parenthesis_can_be_omitted</span> <span class="op">=</span> <span class="ident">parenthesis_can_be_omitted</span>(<span class="ident">node</span>)<span class="question-mark">?</span>;
-
         <span class="kw">let</span> <span class="ident">expression</span> <span class="op">=</span> <span class="ident">expression</span><span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">is_simple_parenthesized_expression</span>(<span class="ident">node</span>)<span class="question-mark">?</span> {
-            <span class="kw">if</span> <span class="ident">parenthesis_can_be_omitted</span> {
-                <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">format_removed</span>(<span class="kw-2">&amp;</span><span class="ident">l_paren_token</span><span class="question-mark">?</span>)])<span class="question-mark">?</span>;
-            } <span class="kw">else</span> {
-                <span class="macro">write!</span>[<span class="ident">f</span>, [<span class="ident">l_paren_token</span>.<span class="ident">format</span>()]]<span class="question-mark">?</span>;
-            };
+        <span class="kw">if</span> <span class="ident">is_expression_handling_parens</span>(<span class="kw-2">&amp;</span><span class="ident">expression</span>) {
+            <span class="kw">return</span> <span class="macro">write!</span>(
+                <span class="ident">f</span>,
+                [
+                    <span class="ident">format_removed</span>(<span class="kw-2">&amp;</span><span class="ident">l_paren_token</span><span class="question-mark">?</span>),
+                    <span class="ident">expression</span>.<span class="ident">format</span>(),
+                    <span class="ident">format_removed</span>(<span class="kw-2">&amp;</span><span class="ident">r_paren_token</span><span class="question-mark">?</span>)
+                ]
+            );
+        }
 
-            <span class="macro">write!</span>[<span class="ident">f</span>, [<span class="ident">expression</span>.<span class="ident">format</span>()]]<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">parenthesis_can_be_omitted</span> <span class="op">=</span> <span class="ident">parenthesis_can_be_omitted</span>(<span class="ident">node</span>, <span class="kw-2">&amp;</span><span class="ident">expression</span>)<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="ident">parenthesis_can_be_omitted</span> {
-                <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">format_removed</span>(<span class="kw-2">&amp;</span><span class="ident">r_paren_token</span><span class="question-mark">?</span>)])<span class="question-mark">?</span>;
-            } <span class="kw">else</span> {
-                <span class="macro">write!</span>[<span class="ident">f</span>, [<span class="ident">r_paren_token</span>.<span class="ident">format</span>()]]<span class="question-mark">?</span>;
-            }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">parenthesis_can_be_omitted</span> {
-            <span class="comment">// we mimic the format delimited utility function</span>
+        <span class="kw">if</span> <span class="ident">parenthesis_can_be_omitted</span> {
             <span class="macro">write!</span>[
                 <span class="ident">f</span>,
                 [
@@ -268,61 +240,29 @@
                     <span class="ident">expression</span>.<span class="ident">format</span>(),
                     <span class="ident">format_removed</span>(<span class="kw-2">&amp;</span><span class="ident">r_paren_token</span><span class="question-mark">?</span>),
                 ]
-            ]<span class="question-mark">?</span>;
+            ]
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">is_simple_parenthesized_expression</span>(<span class="ident">node</span>)<span class="question-mark">?</span> {
+            <span class="macro">write!</span>[
+                <span class="ident">f</span>,
+                [
+                    <span class="ident">l_paren_token</span>.<span class="ident">format</span>(),
+                    <span class="ident">expression</span>.<span class="ident">format</span>(),
+                    <span class="ident">r_paren_token</span>.<span class="ident">format</span>()
+                ]
+            ]
         } <span class="kw">else</span> {
-            <span class="kw">match</span> <span class="ident">expression</span> {
-                <span class="comment">// if the expression inside the parenthesis is a stringLiteralExpression, we should leave it as is rather than</span>
-                <span class="comment">// add extra soft_block_indent, for example:</span>
-                <span class="comment">// ```js</span>
-                <span class="comment">// (&quot;escaped carriage return \</span>
-                <span class="comment">// &quot;);</span>
-                <span class="comment">// ```</span>
-                <span class="comment">// if we add soft_block_indent, we will get:</span>
-                <span class="comment">// ```js</span>
-                <span class="comment">// (</span>
-                <span class="comment">// &quot;escaped carriage return \</span>
-                <span class="comment">// &quot;</span>
-                <span class="comment">// );</span>
-                <span class="comment">// ```</span>
-                <span class="comment">// which will not match prettier&#39;s formatting behavior, if we add this extra branch to handle this case, it become:</span>
-                <span class="comment">// ```js</span>
-                <span class="comment">// (&quot;escaped carriage return \</span>
-                <span class="comment">// &quot;);</span>
-                <span class="comment">// ```</span>
-                <span class="comment">// this is what we want</span>
-                <span class="ident">JsAnyExpression::JsAnyLiteralExpression</span>(
-                    <span class="ident">JsAnyLiteralExpression::JsStringLiteralExpression</span>(<span class="kw">_</span>),
-                ) =&gt; {
-                    <span class="macro">write!</span>[
-                        <span class="ident">f</span>,
-                        [
-                            <span class="ident">l_paren_token</span>.<span class="ident">format</span>(),
-                            <span class="ident">expression</span>.<span class="ident">format</span>(),
-                            <span class="ident">r_paren_token</span>.<span class="ident">format</span>(),
-                        ]
-                    ]
-                }
-                <span class="ident">JsAnyExpression::JsxTagExpression</span>(<span class="ident">expression</span>) =&gt; {
-                    <span class="macro">write!</span>[
-                        <span class="ident">f</span>,
-                        [
-                            <span class="ident">format_removed</span>(<span class="kw-2">&amp;</span><span class="ident">l_paren_token</span><span class="question-mark">?</span>),
-                            <span class="ident">expression</span>.<span class="ident">format</span>(),
-                            <span class="ident">format_removed</span>(<span class="kw-2">&amp;</span><span class="ident">r_paren_token</span><span class="question-mark">?</span>),
-                        ]
-                    ]
-                }
-                <span class="kw">_</span> =&gt; <span class="macro">write!</span>[
-                    <span class="ident">f</span>,
-                    [
-                        <span class="ident">format_delimited</span>(<span class="kw-2">&amp;</span><span class="ident">l_paren_token</span><span class="question-mark">?</span>, <span class="kw-2">&amp;</span><span class="ident">expression</span>.<span class="ident">format</span>(), <span class="kw-2">&amp;</span><span class="ident">r_paren_token</span><span class="question-mark">?</span>,)
-                            .<span class="ident">soft_block_indent</span>()
-                    ]
-                ],
-            }<span class="question-mark">?</span>;
+            <span class="macro">write!</span>[
+                <span class="ident">f</span>,
+                [
+                    <span class="ident">format_delimited</span>(<span class="kw-2">&amp;</span><span class="ident">l_paren_token</span><span class="question-mark">?</span>, <span class="kw-2">&amp;</span><span class="ident">expression</span>.<span class="ident">format</span>(), <span class="kw-2">&amp;</span><span class="ident">r_paren_token</span><span class="question-mark">?</span>,)
+                        .<span class="ident">soft_block_indent</span>()
+                ]
+            ]
         }
+    }
 
-        <span class="prelude-val">Ok</span>(())
+    <span class="kw">fn</span> <span class="ident">needs_parentheses</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">JsParenthesizedExpression</span>) -&gt; <span class="ident">bool</span> {
+        <span class="ident">item</span>.<span class="ident">needs_parentheses</span>()
     }
 }
 
@@ -344,10 +284,32 @@
     <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">parenthesis_can_be_omitted</span>(<span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">JsParenthesizedExpression</span>) -&gt; <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">parent</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">syntax</span>().<span class="ident">parent</span>();
+<span class="comment">// Allow list of nodes that use the new `need_parens` formatting to determine if parentheses are necessary or not.</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_expression_handling_parens</span>(<span class="ident">expression</span>: <span class="kw-2">&amp;</span><span class="ident">JsAnyExpression</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">use</span> <span class="ident">JsAnyExpression</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">let</span> <span class="ident">expression</span> <span class="op">=</span> <span class="ident">resolve_expression</span>(<span class="ident">node</span>.<span class="ident">expression</span>()<span class="question-mark">?</span>);
+    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">JsAnyExpression::JsParenthesizedExpression</span>(<span class="ident">inner</span>) <span class="op">=</span> <span class="ident">expression</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">inner</span>) <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">expression</span>() {
+            <span class="ident">is_expression_handling_parens</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>)
+        } <span class="kw">else</span> {
+            <span class="bool-val">false</span>
+        }
+    } <span class="kw">else</span> {
+        <span class="op">!</span><span class="macro">matches!</span>(
+            <span class="ident">expression</span>,
+            <span class="ident">JsInstanceofExpression</span>(<span class="kw">_</span>)
+                <span class="op">|</span> <span class="ident">JsBinaryExpression</span>(<span class="kw">_</span>)
+                <span class="op">|</span> <span class="ident">JsInExpression</span>(<span class="kw">_</span>)
+                <span class="op">|</span> <span class="ident">JsLogicalExpression</span>(<span class="kw">_</span>)
+        )
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">parenthesis_can_be_omitted</span>(
+    <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">JsParenthesizedExpression</span>,
+    <span class="ident">expression</span>: <span class="kw-2">&amp;</span><span class="ident">JsAnyExpression</span>,
+) -&gt; <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">parent</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">syntax</span>().<span class="ident">parent</span>();
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">parent</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">parent</span> {
         <span class="kw">match</span> <span class="ident">parent</span>.<span class="ident">kind</span>() {
@@ -355,45 +317,14 @@
             <span class="ident">JsSyntaxKind::JS_RETURN_STATEMENT</span> <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_THROW_STATEMENT</span> =&gt; {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)
             }
-            <span class="ident">JsSyntaxKind::JS_PARENTHESIZED_EXPRESSION</span> =&gt; {
-                <span class="comment">// Nested parentheses can always be removed</span>
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>);
-            }
+            <span class="ident">JsSyntaxKind::JS_PARENTHESIZED_EXPRESSION</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
             <span class="kw">_</span> =&gt; {
                 <span class="comment">// fall through</span>
             }
         }
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">JsAnyExpression::JsConditionalExpression</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">expression</span> {
-            <span class="comment">// The formatting of conditional expression makes sure to insert parens if needed</span>
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>);
-        }
     }
 
-    <span class="comment">// if expression is a StringLiteralExpression, we need to check it before precedence comparison, here is an example:</span>
-    <span class="comment">// ```js</span>
-    <span class="comment">// a[(&quot;test&quot;)]</span>
-    <span class="comment">// ```</span>
-    <span class="comment">// if we use precedence comparison, we will get:</span>
-    <span class="comment">// parent_precedence should be `High` due to the parenthesized_expression&#39;s parent is ComputedMemberExpression,</span>
-    <span class="comment">// and node_precedence should be `Low` due to expression is StringLiteralExpression. `parent_precedence &gt; node_precedence` will return false,</span>
-    <span class="comment">// the parenthesis will not be omitted.</span>
-    <span class="comment">// But the expected behavior is that the parenthesis will be omitted. The code above should be formatted as:</span>
-    <span class="comment">// ```js</span>
-    <span class="comment">// a[&quot;test&quot;]</span>
-    <span class="comment">// ```</span>
-    <span class="comment">// So we need to add extra branch to handle this case.</span>
-    <span class="kw">if</span> <span class="macro">matches!</span>(
-        <span class="ident">expression</span>,
-        <span class="ident">JsAnyExpression::JsAnyLiteralExpression</span>(<span class="ident">JsAnyLiteralExpression::JsStringLiteralExpression</span>(
-            <span class="kw">_</span>
-        ))
-    ) {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="op">!</span><span class="macro">matches!</span>(
-            <span class="ident">parent</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">kind</span>()),
-            <span class="prelude-val">Some</span>(<span class="ident">JsSyntaxKind::JS_EXPRESSION_STATEMENT</span>)
-        ));
-    }
+    <span class="kw">let</span> <span class="ident">expression</span> <span class="op">=</span> <span class="ident">expression</span>.<span class="ident">resolve</span>();
 
     <span class="kw">let</span> <span class="ident">parent_precedence</span> <span class="op">=</span> <span class="ident">FormatPrecedence::with_precedence_for_parenthesis</span>(<span class="ident">parent</span>.<span class="ident">as_ref</span>());
 
@@ -402,21 +333,40 @@
     }
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">parent</span>) <span class="op">=</span> <span class="ident">parent</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">binary_like</span>) <span class="op">=</span> <span class="ident">JsAnyBinaryLikeExpression::cast</span>(<span class="ident">parent</span>) {
-            <span class="kw">let</span> <span class="ident">operator</span> <span class="op">=</span> <span class="ident">binary_like</span>.<span class="ident">operator</span>()<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">is_right</span> <span class="op">=</span> <span class="ident">expression</span>.<span class="ident">syntax</span>() <span class="op">==</span> <span class="ident">binary_like</span>.<span class="ident">right</span>()<span class="question-mark">?</span>.<span class="ident">syntax</span>();
-
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">binary_argument_needs_parens</span>(
-                <span class="ident">operator</span>,
-                <span class="kw-2">&amp;</span><span class="ident">JsAnyBinaryLikeLeftExpression::from</span>(<span class="ident">expression</span>),
-                <span class="ident">is_right</span>,
-            )<span class="question-mark">?</span> {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>);
-            }
+        <span class="kw">if</span> <span class="ident">JsAnyBinaryLikeExpression::can_cast</span>(<span class="ident">parent</span>.<span class="ident">kind</span>())
+            <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">binary_argument_needs_parens</span>(<span class="kw-2">&amp;</span><span class="ident">JsAnyBinaryLikeLeftExpression::from</span>(<span class="ident">expression</span>))
+        {
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>);
         }
     }
 
     <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>)
+}
+
+<span class="kw">impl</span> <span class="ident">NeedsParentheses</span> <span class="kw">for</span> <span class="ident">JsParenthesizedExpression</span> {
+    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+    <span class="kw">fn</span> <span class="ident">needs_parentheses</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="bool-val">false</span>
+    }
+
+    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+    <span class="kw">fn</span> <span class="ident">needs_parentheses_with_parent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_parent</span>: <span class="kw-2">&amp;</span><span class="ident">JsSyntaxNode</span>) -&gt; <span class="ident">bool</span> {
+        <span class="bool-val">false</span>
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">ExpressionNode</span> <span class="kw">for</span> <span class="ident">JsParenthesizedExpression</span> {
+    <span class="kw">fn</span> <span class="ident">resolve</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">JsAnyExpression</span> {
+        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">expression</span>();
+
+        <span class="ident">inner</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">into</span>())
+    }
+
+    <span class="kw">fn</span> <span class="ident">into_resolved</span>(<span class="self">self</span>) -&gt; <span class="ident">JsAnyExpression</span> {
+        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">expression</span>();
+
+        <span class="ident">inner</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">into</span>())
+    }
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="rome_js_formatter" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>

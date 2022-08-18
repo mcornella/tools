@@ -1167,10 +1167,50 @@
 <span id="1161">1161</span>
 <span id="1162">1162</span>
 <span id="1163">1163</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
+<span id="1164">1164</span>
+<span id="1165">1165</span>
+<span id="1166">1166</span>
+<span id="1167">1167</span>
+<span id="1168">1168</span>
+<span id="1169">1169</span>
+<span id="1170">1170</span>
+<span id="1171">1171</span>
+<span id="1172">1172</span>
+<span id="1173">1173</span>
+<span id="1174">1174</span>
+<span id="1175">1175</span>
+<span id="1176">1176</span>
+<span id="1177">1177</span>
+<span id="1178">1178</span>
+<span id="1179">1179</span>
+<span id="1180">1180</span>
+<span id="1181">1181</span>
+<span id="1182">1182</span>
+<span id="1183">1183</span>
+<span id="1184">1184</span>
+<span id="1185">1185</span>
+<span id="1186">1186</span>
+<span id="1187">1187</span>
+<span id="1188">1188</span>
+<span id="1189">1189</span>
+<span id="1190">1190</span>
+<span id="1191">1191</span>
+<span id="1192">1192</span>
+<span id="1193">1193</span>
+<span id="1194">1194</span>
+<span id="1195">1195</span>
+<span id="1196">1196</span>
+<span id="1197">1197</span>
+<span id="1198">1198</span>
+<span id="1199">1199</span>
+<span id="1200">1200</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parentheses</span>::{
+    <span class="ident">get_expression_left_side</span>, <span class="ident">resolve_parent</span>, <span class="ident">ExpressionNode</span>, <span class="ident">NeedsParentheses</span>,
+};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::member_chain::is_member_call_chain</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::object::write_member_name</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::JsAnyBinaryLikeExpression</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>::{<span class="ident">JsAnyBinaryLikeExpression</span>, <span class="ident">JsAnyBinaryLikeLeftExpression</span>};
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">format_args</span>, <span class="ident">write</span>, <span class="ident">CstFormatContext</span>, <span class="ident">VecBuffer</span>};
 <span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{
     <span class="ident">JsAnyAssignmentPattern</span>, <span class="ident">JsAnyBindingPattern</span>, <span class="ident">JsAnyCallArgument</span>, <span class="ident">JsAnyClassMemberName</span>,
@@ -1364,7 +1404,7 @@
 <span class="doccomment">/// - Assignment</span>
 <span class="doccomment">/// - Object property member</span>
 <span class="doccomment">/// - Variable declaration</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">AssignmentLikeLayout</span> {
     <span class="doccomment">/// This is a special layout usually used for variable declarations.</span>
     <span class="doccomment">/// This layout is hit, usually, when a [variable declarator](JsVariableDeclarator) doesn&#39;t have initializer:</span>
@@ -1475,29 +1515,29 @@
 
 <span class="kw">impl</span> <span class="ident">JsAnyAssignmentLike</span> {
     <span class="kw">fn</span> <span class="ident">right</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">RightAssignmentLike</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">JsAnyAssignmentLike::JsPropertyObjectMember</span>(<span class="ident">property</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">property</span>.<span class="ident">value</span>()<span class="question-mark">?</span>.<span class="ident">into</span>()),
-            <span class="ident">JsAnyAssignmentLike::JsAssignmentExpression</span>(<span class="ident">assignment</span>) =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">assignment</span>.<span class="ident">right</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
-            }
+        <span class="kw">let</span> <span class="ident">right</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">JsAnyAssignmentLike::JsPropertyObjectMember</span>(<span class="ident">property</span>) =&gt; <span class="ident">property</span>.<span class="ident">value</span>()<span class="question-mark">?</span>.<span class="ident">into</span>(),
+            <span class="ident">JsAnyAssignmentLike::JsAssignmentExpression</span>(<span class="ident">assignment</span>) =&gt; <span class="ident">assignment</span>.<span class="ident">right</span>()<span class="question-mark">?</span>.<span class="ident">into</span>(),
             <span class="ident">JsAnyAssignmentLike::JsObjectAssignmentPatternProperty</span>(<span class="ident">assignment_pattern</span>) =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">assignment_pattern</span>.<span class="ident">pattern</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+                <span class="ident">assignment_pattern</span>.<span class="ident">pattern</span>()<span class="question-mark">?</span>.<span class="ident">into</span>()
             }
             <span class="ident">JsAnyAssignmentLike::JsVariableDeclarator</span>(<span class="ident">variable_declarator</span>) =&gt; {
                 <span class="comment">// SAFETY: Calling `unwrap` here is safe because we check `has_only_left_hand_side` variant at the beginning of the `layout` function</span>
-                <span class="prelude-val">Ok</span>(<span class="ident">variable_declarator</span>.<span class="ident">initializer</span>().<span class="ident">unwrap</span>().<span class="ident">into</span>())
+                <span class="ident">variable_declarator</span>.<span class="ident">initializer</span>().<span class="ident">unwrap</span>().<span class="ident">into</span>()
             }
             <span class="ident">JsAnyAssignmentLike::TsTypeAliasDeclaration</span>(<span class="ident">type_alias_declaration</span>) =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">type_alias_declaration</span>.<span class="ident">ty</span>()<span class="question-mark">?</span>.<span class="ident">into</span>())
+                <span class="ident">type_alias_declaration</span>.<span class="ident">ty</span>()<span class="question-mark">?</span>.<span class="ident">into</span>()
             }
             <span class="ident">JsAnyAssignmentLike::JsPropertyClassMember</span>(<span class="ident">n</span>) =&gt; {
                 <span class="comment">// SAFETY: Calling `unwrap` here is safe because we check `has_only_left_hand_side` variant at the beginning of the `layout` function</span>
-                <span class="prelude-val">Ok</span>(<span class="ident">n</span>.<span class="ident">value</span>().<span class="ident">unwrap</span>().<span class="ident">into</span>())
+                <span class="ident">n</span>.<span class="ident">value</span>().<span class="ident">unwrap</span>().<span class="ident">into</span>()
             }
             <span class="ident">JsAnyAssignmentLike::TsPropertySignatureClassMember</span>(<span class="kw">_</span>) =&gt; {
                 <span class="macro">unreachable!</span>(<span class="string">&quot;TsPropertySignatureClassMember doesn&#39;t have any right side. If you&#39;re here, `has_only_left_hand_side` hasn&#39;t been called&quot;</span>)
             }
-        }
+        };
+
+        <span class="prelude-val">Ok</span>(<span class="ident">right</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">left</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">LeftAssignmentLike</span><span class="op">&gt;</span> {
@@ -1754,12 +1794,11 @@
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">AssignmentLikeLayout::SuppressedInitializer</span>);
             }
         }
+        <span class="kw">let</span> <span class="ident">right_expression</span> <span class="op">=</span> <span class="ident">right</span>.<span class="ident">as_expression</span>().<span class="ident">map</span>(<span class="ident">ExpressionNode::into_resolved</span>);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">layout</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">chain_formatting_layout</span>(<span class="kw-2">&amp;</span><span class="ident">right</span>)<span class="question-mark">?</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">layout</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">chain_formatting_layout</span>(<span class="ident">right_expression</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span> {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">layout</span>);
         }
-
-        <span class="kw">let</span> <span class="ident">right_expression</span> <span class="op">=</span> <span class="ident">right</span>.<span class="ident">as_expression</span>();
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">JsAnyExpression::JsCallExpression</span>(<span class="ident">call_expression</span>)) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">right_expression</span> {
             <span class="kw">if</span> <span class="ident">call_expression</span>.<span class="ident">callee</span>()<span class="question-mark">?</span>.<span class="ident">syntax</span>().<span class="ident">text</span>() <span class="op">==</span> <span class="string">&quot;require&quot;</span> {
@@ -1771,7 +1810,7 @@
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">AssignmentLikeLayout::BreakLeftHandSide</span>);
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">should_break_after_operator</span>()<span class="question-mark">?</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">should_break_after_operator</span>(<span class="kw-2">&amp;</span><span class="ident">right</span>)<span class="question-mark">?</span> {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">AssignmentLikeLayout::BreakAfterOperator</span>);
         }
 
@@ -1788,6 +1827,9 @@
         <span class="kw">let</span> <span class="ident">right_expression</span> <span class="op">=</span> <span class="ident">iter::successors</span>(<span class="ident">right_expression</span>, <span class="op">|</span><span class="ident">expression</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">expression</span> {
             <span class="ident">JsAnyExpression::JsUnaryExpression</span>(<span class="ident">unary</span>) =&gt; <span class="ident">unary</span>.<span class="ident">argument</span>().<span class="ident">ok</span>(),
             <span class="ident">JsAnyExpression::TsNonNullAssertionExpression</span>(<span class="ident">assertion</span>) =&gt; <span class="ident">assertion</span>.<span class="ident">expression</span>().<span class="ident">ok</span>(),
+            <span class="ident">JsAnyExpression::JsParenthesizedExpression</span>(<span class="ident">parenthesized</span>) =&gt; {
+                <span class="ident">parenthesized</span>.<span class="ident">expression</span>().<span class="ident">ok</span>()
+            }
             <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         })
         .<span class="ident">last</span>();
@@ -1801,7 +1843,7 @@
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">AssignmentLikeLayout::BreakAfterOperator</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">is_poorly_breakable</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">right_expression</span> {
+        <span class="kw">let</span> <span class="ident">is_poorly_breakable</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">right_expression</span> {
             <span class="prelude-val">Some</span>(<span class="ident">expression</span>) =&gt; <span class="ident">is_poorly_breakable_member_or_call_chain</span>(<span class="ident">expression</span>, <span class="ident">f</span>)<span class="question-mark">?</span>,
             <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
         };
@@ -1811,7 +1853,7 @@
         }
 
         <span class="kw">if</span> <span class="macro">matches!</span>(
-            <span class="self">self</span>.<span class="ident">right</span>()<span class="question-mark">?</span>.<span class="ident">as_expression</span>(),
+            <span class="ident">right_expression</span>,
             <span class="prelude-val">Some</span>(
                 <span class="ident">JsAnyExpression::JsClassExpression</span>(<span class="kw">_</span>)
                     <span class="op">|</span> <span class="ident">JsAnyExpression::JsTemplate</span>(<span class="kw">_</span>)
@@ -1845,11 +1887,11 @@
     <span class="doccomment">/// and if so, it return the layout type</span>
     <span class="kw">fn</span> <span class="ident">chain_formatting_layout</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">right</span>: <span class="kw-2">&amp;</span><span class="ident">RightAssignmentLike</span>,
+        <span class="ident">right_expression</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">JsAnyExpression</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AssignmentLikeLayout</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">right_is_tail</span> <span class="op">=</span> <span class="op">!</span><span class="macro">matches!</span>(
-            <span class="ident">right</span>,
-            <span class="ident">RightAssignmentLike::JsAnyExpression</span>(<span class="ident">JsAnyExpression::JsAssignmentExpression</span>(<span class="kw">_</span>))
+            <span class="ident">right_expression</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">JsAnyExpression::JsAssignmentExpression</span>(<span class="kw">_</span>))
         );
 
         <span class="comment">// The chain goes up two levels, by checking up to the great parent if all the conditions</span>
@@ -1857,14 +1899,14 @@
         <span class="kw">let</span> <span class="ident">upper_chain_is_eligible</span> <span class="op">=</span>
             <span class="comment">// First, we check if the current node is an assignment expression</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">JsAnyAssignmentLike::JsAssignmentExpression</span>(<span class="ident">assignment</span>) <span class="op">=</span> <span class="self">self</span> {
-                <span class="ident">assignment</span>.<span class="ident">syntax</span>().<span class="ident">parent</span>().<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">parent</span><span class="op">|</span> {
+                <span class="ident">assignment</span>.<span class="ident">resolve_parent</span>().<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">parent</span><span class="op">|</span> {
                     <span class="comment">// Then we check if the parent is assignment expression or variable declarator</span>
                     <span class="kw">if</span> <span class="macro">matches!</span>(
                         <span class="ident">parent</span>.<span class="ident">kind</span>(),
                         <span class="ident">JsSyntaxKind::JS_ASSIGNMENT_EXPRESSION</span>
-                            <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_VARIABLE_DECLARATOR</span>
+                            <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_INITIALIZER_CLAUSE</span>
                     ) {
-                        <span class="kw">let</span> <span class="ident">great_parent_kind</span> <span class="op">=</span> <span class="ident">parent</span>.<span class="ident">parent</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">kind</span>());
+                        <span class="kw">let</span> <span class="ident">great_parent_kind</span> <span class="op">=</span> <span class="ident">resolve_parent</span>(<span class="kw-2">&amp;</span><span class="ident">parent</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">kind</span>());
                         <span class="comment">// Finally, we check the great parent.</span>
                         <span class="comment">// The great parent triggers the eligibility when</span>
                         <span class="comment">// - the current node that we were inspecting is not a &quot;tail&quot;</span>
@@ -1889,20 +1931,21 @@
             <span class="kw">if</span> <span class="op">!</span><span class="ident">right_is_tail</span> {
                 <span class="prelude-val">Some</span>(<span class="ident">AssignmentLikeLayout::Chain</span>)
             } <span class="kw">else</span> {
-                <span class="kw">match</span> <span class="ident">right</span> {
-                    <span class="ident">RightAssignmentLike::JsAnyExpression</span>(
-                        <span class="ident">JsAnyExpression::JsArrowFunctionExpression</span>(<span class="ident">arrow</span>),
-                    ) =&gt; {
+                <span class="kw">match</span> <span class="ident">right_expression</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">JsAnyExpression::JsArrowFunctionExpression</span>(<span class="ident">arrow</span>)) =&gt; {
                         <span class="kw">let</span> <span class="ident">this_body</span> <span class="op">=</span> <span class="ident">arrow</span>.<span class="ident">body</span>()<span class="question-mark">?</span>;
-                        <span class="kw">if</span> <span class="macro">matches!</span>(
-                            <span class="ident">this_body</span>,
-                            <span class="ident">JsAnyFunctionBody::JsAnyExpression</span>(
-                                <span class="ident">JsAnyExpression::JsArrowFunctionExpression</span>(<span class="kw">_</span>)
-                            )
-                        ) {
-                            <span class="prelude-val">Some</span>(<span class="ident">AssignmentLikeLayout::ChainTailArrowFunction</span>)
-                        } <span class="kw">else</span> {
-                            <span class="prelude-val">Some</span>(<span class="ident">AssignmentLikeLayout::ChainTail</span>)
+                        <span class="kw">match</span> <span class="ident">this_body</span> {
+                            <span class="ident">JsAnyFunctionBody::JsAnyExpression</span>(<span class="ident">expression</span>) =&gt; {
+                                <span class="kw">if</span> <span class="macro">matches!</span>(
+                                    <span class="ident">expression</span>.<span class="ident">resolve</span>(),
+                                    <span class="ident">JsAnyExpression::JsArrowFunctionExpression</span>(<span class="kw">_</span>)
+                                ) {
+                                    <span class="prelude-val">Some</span>(<span class="ident">AssignmentLikeLayout::ChainTailArrowFunction</span>)
+                                } <span class="kw">else</span> {
+                                    <span class="prelude-val">Some</span>(<span class="ident">AssignmentLikeLayout::ChainTail</span>)
+                                }
+                            }
+                            <span class="kw">_</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">AssignmentLikeLayout::ChainTail</span>),
                         }
                     }
 
@@ -1968,13 +2011,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This function is small wrapper around [should_break_after_operator] because it has to work</span>
     <span class="doccomment">/// for nodes that belong to TypeScript too.</span>
-    <span class="kw">fn</span> <span class="ident">should_break_after_operator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">right</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">right</span>()<span class="question-mark">?</span>;
-
+    <span class="kw">fn</span> <span class="ident">should_break_after_operator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">right</span>: <span class="kw-2">&amp;</span><span class="ident">RightAssignmentLike</span>) -&gt; <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">expression</span>) <span class="op">=</span> <span class="ident">right</span>.<span class="ident">as_expression</span>() {
             <span class="ident">should_break_after_operator</span>(<span class="kw-2">&amp;</span><span class="ident">expression</span>)<span class="question-mark">?</span>
         } <span class="kw">else</span> {
-            <span class="ident">has_new_line_before_comment</span>(<span class="ident">right</span>.<span class="ident">syntax</span>())
+            <span class="ident">has_leading_own_line_comment</span>(<span class="ident">right</span>.<span class="ident">syntax</span>())
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
@@ -1983,15 +2024,30 @@
 
 <span class="doccomment">/// Checks if the function is entitled to be printed with layout [AssignmentLikeLayout::BreakAfterOperator]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">should_break_after_operator</span>(<span class="ident">right</span>: <span class="kw-2">&amp;</span><span class="ident">JsAnyExpression</span>) -&gt; <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">has_new_line_before_comment</span>(<span class="ident">right</span>.<span class="ident">syntax</span>()) {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>);
+    <span class="comment">// Traverse from the right expression to the left most node and check if any has a leading comment</span>
+    <span class="comment">// that causes a line break.</span>
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current</span>: <span class="ident">JsAnyBinaryLikeLeftExpression</span> <span class="op">=</span> <span class="ident">right</span>.<span class="ident">clone</span>().<span class="ident">into</span>();
+    <span class="kw">loop</span> {
+        <span class="kw">if</span> <span class="ident">has_leading_own_line_comment</span>(<span class="ident">current</span>.<span class="ident">syntax</span>()) {
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>);
+        }
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">JsAnyBinaryLikeLeftExpression::JsAnyExpression</span>(<span class="ident">expression</span>) <span class="op">=</span> <span class="ident">current</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">left</span>) <span class="op">=</span> <span class="ident">get_expression_left_side</span>(<span class="kw-2">&amp;</span><span class="ident">expression</span>) {
+                <span class="ident">current</span> <span class="op">=</span> <span class="ident">left</span>;
+                <span class="kw">continue</span>;
+            }
+        }
+        <span class="kw">break</span>;
     }
+
+    <span class="kw">let</span> <span class="ident">right</span> <span class="op">=</span> <span class="ident">right</span>.<span class="ident">resolve</span>();
 
     <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">right</span> {
         <span class="comment">// head is a long chain, meaning that right -&gt; right are both assignment expressions</span>
         <span class="ident">JsAnyExpression::JsAssignmentExpression</span>(<span class="ident">assignment</span>) =&gt; {
             <span class="macro">matches!</span>(
-                <span class="ident">assignment</span>.<span class="ident">right</span>()<span class="question-mark">?</span>,
+                <span class="ident">assignment</span>.<span class="ident">right</span>()<span class="question-mark">?</span>.<span class="ident">resolve</span>(),
                 <span class="ident">JsAnyExpression::JsAssignmentExpression</span>(<span class="kw">_</span>)
             )
         }
@@ -2013,16 +2069,29 @@
 
     <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
 }
-<span class="doccomment">/// If checks if among leading trivias, we there&#39;s a sequence of [Newline, Comment]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">has_new_line_before_comment</span>(<span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">JsSyntaxNode</span>) -&gt; <span class="ident">bool</span> {
+<span class="doccomment">/// Tests if the node has any leading comment that will be placed on its own line.</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">has_leading_own_line_comment</span>(<span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">JsSyntaxNode</span>) -&gt; <span class="ident">bool</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">leading_trivia</span>) <span class="op">=</span> <span class="ident">node</span>.<span class="ident">first_leading_trivia</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seen_newline</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">first_comment</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">after_comment</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">after_new_line</span> <span class="op">=</span> <span class="bool-val">false</span>;
+
         <span class="kw">for</span> <span class="ident">piece</span> <span class="kw">in</span> <span class="ident">leading_trivia</span>.<span class="ident">pieces</span>() {
-            <span class="kw">if</span> <span class="ident">piece</span>.<span class="ident">is_comments</span>() <span class="op">&amp;&amp;</span> <span class="ident">seen_newline</span> {
-                <span class="kw">return</span> <span class="bool-val">true</span>;
-            }
-            <span class="kw">if</span> <span class="ident">piece</span>.<span class="ident">is_newline</span>() {
-                <span class="ident">seen_newline</span> <span class="op">=</span> <span class="bool-val">true</span>
+            <span class="kw">if</span> <span class="ident">piece</span>.<span class="ident">is_comments</span>() {
+                <span class="kw">if</span> <span class="ident">after_new_line</span> <span class="op">&amp;&amp;</span> <span class="ident">first_comment</span> {
+                    <span class="kw">return</span> <span class="bool-val">true</span>;
+                } <span class="kw">else</span> {
+                    <span class="ident">first_comment</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                    <span class="ident">after_comment</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                }
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">piece</span>.<span class="ident">is_newline</span>() {
+                <span class="kw">if</span> <span class="ident">after_comment</span> {
+                    <span class="kw">return</span> <span class="bool-val">true</span>;
+                } <span class="kw">else</span> {
+                    <span class="ident">after_new_line</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                }
+            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">piece</span>.<span class="ident">is_skipped</span>() {
+                <span class="kw">return</span> <span class="bool-val">false</span>;
             }
         }
     }
@@ -2164,7 +2233,7 @@
 <span class="doccomment">/// or have only one which [is_short_argument], except for member call chains</span>
 <span class="doccomment">/// [Prettier applies]: https://github.com/prettier/prettier/blob/a043ac0d733c4d53f980aa73807a63fc914f23bd/src/language-js/print/assignment.js#L329</span>
 <span class="kw">fn</span> <span class="ident">is_poorly_breakable_member_or_call_chain</span>(
-    <span class="ident">expression</span>: <span class="ident">JsAnyExpression</span>,
+    <span class="ident">expression</span>: <span class="kw-2">&amp;</span><span class="ident">JsAnyExpression</span>,
     <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="ident">JsFormatContext</span><span class="op">&gt;</span>,
 ) -&gt; <span class="ident">SyntaxResult</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">threshold</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">context</span>().<span class="ident">line_width</span>().<span class="ident">value</span>() <span class="op">/</span> <span class="number">4</span>;
@@ -2181,27 +2250,32 @@
     <span class="comment">// Keeping track of all call expressions in the chain to check them later</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">call_expressions</span> <span class="op">=</span> <span class="macro">vec!</span>[];
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">expression</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">expression</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">expression</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">expression</span>.<span class="ident">clone</span>());
 
     <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">node</span>) <span class="op">=</span> <span class="ident">expression</span>.<span class="ident">take</span>() {
-        <span class="kw">match</span> <span class="ident">node</span> {
+        <span class="ident">expression</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">node</span> {
             <span class="ident">JsAnyExpression::JsCallExpression</span>(<span class="ident">call_expression</span>) =&gt; {
                 <span class="ident">is_chain</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                <span class="ident">expression</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">call_expression</span>.<span class="ident">callee</span>()<span class="question-mark">?</span>);
+                <span class="kw">let</span> <span class="ident">callee</span> <span class="op">=</span> <span class="ident">call_expression</span>.<span class="ident">callee</span>()<span class="question-mark">?</span>;
                 <span class="ident">call_expressions</span>.<span class="ident">push</span>(<span class="ident">call_expression</span>);
+                <span class="prelude-val">Some</span>(<span class="ident">callee</span>)
             }
             <span class="ident">JsAnyExpression::JsStaticMemberExpression</span>(<span class="ident">node</span>) =&gt; {
                 <span class="ident">is_chain</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                <span class="ident">expression</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">node</span>.<span class="ident">object</span>()<span class="question-mark">?</span>);
+                <span class="prelude-val">Some</span>(<span class="ident">node</span>.<span class="ident">object</span>()<span class="question-mark">?</span>)
             }
             <span class="ident">JsAnyExpression::JsComputedMemberExpression</span>(<span class="ident">node</span>) =&gt; {
                 <span class="ident">is_chain</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                <span class="ident">expression</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">node</span>.<span class="ident">object</span>()<span class="question-mark">?</span>);
+                <span class="prelude-val">Some</span>(<span class="ident">node</span>.<span class="ident">object</span>()<span class="question-mark">?</span>)
             }
+            <span class="ident">JsAnyExpression::JsParenthesizedExpression</span>(<span class="ident">node</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">node</span>.<span class="ident">expression</span>()<span class="question-mark">?</span>),
             <span class="ident">JsAnyExpression::JsIdentifierExpression</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">JsAnyExpression::JsThisExpression</span>(<span class="kw">_</span>) =&gt; {
                 <span class="ident">is_chain_head_simple</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                <span class="kw">break</span>;
             }
-            <span class="kw">_</span> =&gt; {}
+            <span class="kw">_</span> =&gt; {
+                <span class="kw">break</span>;
+            }
         }
     }
 
@@ -2252,7 +2326,7 @@
     }
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">JsAnyCallArgument::JsAnyExpression</span>(<span class="ident">expression</span>) <span class="op">=</span> <span class="ident">argument</span> {
-        <span class="kw">let</span> <span class="ident">is_short_argument</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">expression</span> {
+        <span class="kw">let</span> <span class="ident">is_short_argument</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">expression</span>.<span class="ident">resolve</span>() {
             <span class="ident">JsAnyExpression::JsThisExpression</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
             <span class="ident">JsAnyExpression::JsIdentifierExpression</span>(<span class="ident">identifier</span>) =&gt; {
                 <span class="ident">identifier</span>.<span class="ident">name</span>()<span class="question-mark">?</span>.<span class="ident">value_token</span>()<span class="question-mark">?</span>.<span class="ident">text_trimmed</span>().<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">threshold</span> <span class="kw">as</span> <span class="ident">usize</span>
