@@ -264,6 +264,57 @@
 <span id="258">258</span>
 <span id="259">259</span>
 <span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_formatter::printer::PrinterOptions</span>;
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{
     <span class="ident">CommentKind</span>, <span class="ident">CommentStyle</span>, <span class="ident">Comments</span>, <span class="ident">CstFormatContext</span>, <span class="ident">FormatContext</span>, <span class="ident">IndentStyle</span>, <span class="ident">LineWidth</span>,
@@ -286,6 +337,9 @@
 
     <span class="doccomment">/// The style for quotes. Defaults to double.</span>
     <span class="ident">quote_style</span>: <span class="ident">QuoteStyle</span>,
+
+    <span class="doccomment">/// When properties in objects are quoted. Defaults to as-needed.</span>
+    <span class="ident">quote_properties</span>: <span class="ident">QuoteProperties</span>,
 
     <span class="doccomment">/// Information relative to the current file</span>
     <span class="ident">source_type</span>: <span class="ident">SourceType</span>,
@@ -317,6 +371,11 @@
         <span class="self">self</span>
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_quote_properties</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">quote_properties</span>: <span class="ident">QuoteProperties</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">quote_properties</span> <span class="op">=</span> <span class="ident">quote_properties</span>;
+        <span class="self">self</span>
+    }
+
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_source_type</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">source_type</span>: <span class="ident">SourceType</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">source_type</span> <span class="op">=</span> <span class="ident">source_type</span>;
         <span class="self">self</span>
@@ -328,6 +387,10 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quote_style</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">QuoteStyle</span> {
         <span class="self">self</span>.<span class="ident">quote_style</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quote_properties</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">QuoteProperties</span> {
+        <span class="self">self</span>.<span class="ident">quote_properties</span>
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">source_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SourceType</span> {
@@ -379,7 +442,8 @@
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;Indent style: {}&quot;</span>, <span class="self">self</span>.<span class="ident">indent_style</span>)<span class="question-mark">?</span>;
         <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;Line width: {}&quot;</span>, <span class="self">self</span>.<span class="ident">line_width</span>.<span class="ident">value</span>())<span class="question-mark">?</span>;
-        <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;Quote style: {}&quot;</span>, <span class="self">self</span>.<span class="ident">quote_style</span>)
+        <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;Quote style: {}&quot;</span>, <span class="self">self</span>.<span class="ident">quote_style</span>)<span class="question-mark">?</span>;
+        <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;Quote properties: {}&quot;</span>, <span class="self">self</span>.<span class="ident">quote_properties</span>)
     }
 }
 
@@ -521,6 +585,44 @@
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">QuoteStyle::Double</span> =&gt; <span class="ident">QuoteStyle::Single</span>,
             <span class="ident">QuoteStyle::Single</span> =&gt; <span class="ident">QuoteStyle::Double</span>,
+        }
+    }
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>,
+    <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">schemars::JsonSchema</span>)
+)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">QuoteProperties</span> {
+    <span class="ident">AsNeeded</span>,
+    <span class="ident">Preserve</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">QuoteProperties</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::AsNeeded</span>
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">QuoteProperties</span> {
+    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
+
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="ident">s</span> {
+            <span class="string">&quot;as-needed&quot;</span> <span class="op">|</span> <span class="string">&quot;AsNeeded&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::AsNeeded</span>),
+            <span class="string">&quot;preserve&quot;</span> <span class="op">|</span> <span class="string">&quot;Preserve&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Preserve</span>),
+            <span class="comment">// TODO: replace this error with a diagnostic</span>
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;Value not supported for QuoteProperties&quot;</span>),
+        }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">QuoteProperties</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">QuoteProperties::AsNeeded</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;As needed&quot;</span>),
+            <span class="ident">QuoteProperties::Preserve</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Preserve&quot;</span>),
         }
     }
 }

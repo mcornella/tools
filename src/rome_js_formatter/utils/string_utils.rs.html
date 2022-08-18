@@ -742,7 +742,54 @@
 <span id="736">736</span>
 <span id="737">737</span>
 <span id="738">738</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::context::QuoteStyle</span>;
+<span id="739">739</span>
+<span id="740">740</span>
+<span id="741">741</span>
+<span id="742">742</span>
+<span id="743">743</span>
+<span id="744">744</span>
+<span id="745">745</span>
+<span id="746">746</span>
+<span id="747">747</span>
+<span id="748">748</span>
+<span id="749">749</span>
+<span id="750">750</span>
+<span id="751">751</span>
+<span id="752">752</span>
+<span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::context</span>::{<span class="ident">QuoteProperties</span>, <span class="ident">QuoteStyle</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::string_utils::CharSignal::AlreadyPrinted</span>;
 <span class="kw">use</span> <span class="ident">rome_js_syntax::JsSyntaxKind::JS_STRING_LITERAL</span>;
@@ -819,7 +866,10 @@
         <span class="macro">debug_assert_eq!</span>(<span class="ident">token</span>.<span class="ident">kind</span>(), <span class="ident">JS_STRING_LITERAL</span>);
 
         <span class="kw">let</span> <span class="ident">chosen_quote_style</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">quote_style</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">string_cleaner</span> <span class="op">=</span> <span class="ident">LiteralStringNormaliser::new</span>(<span class="self">self</span>, <span class="ident">chosen_quote_style</span>);
+        <span class="kw">let</span> <span class="ident">chosen_quote_properties</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">quote_properties</span>();
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">string_cleaner</span> <span class="op">=</span>
+            <span class="ident">LiteralStringNormaliser::new</span>(<span class="self">self</span>, <span class="ident">chosen_quote_style</span>, <span class="ident">chosen_quote_properties</span>);
 
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">string_cleaner</span>.<span class="ident">normalise_text</span>(<span class="ident">context</span>.<span class="ident">source_type</span>().<span class="ident">into</span>());
         <span class="kw">let</span> <span class="ident">normalized_text_width</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">width</span>();
@@ -953,7 +1003,9 @@
     <span class="doccomment">/// The current token</span>
     <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;token</span> <span class="ident">FormatLiteralStringToken</span><span class="op">&lt;</span><span class="lifetime">&#39;token</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The quote that was set inside the configuration</span>
-    <span class="ident">chosen_quote</span>: <span class="ident">QuoteStyle</span>,
+    <span class="ident">chosen_quote_style</span>: <span class="ident">QuoteStyle</span>,
+    <span class="doccomment">/// When properties in objects are quoted that was set inside the configuration</span>
+    <span class="ident">chosen_quote_properties</span>: <span class="ident">QuoteProperties</span>,
 }
 
 <span class="doccomment">/// Convenience enum to map [rome_js_syntax::SourceType] by just reading</span>
@@ -975,15 +1027,22 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;token</span><span class="op">&gt;</span> <span class="ident">LiteralStringNormaliser</span><span class="op">&lt;</span><span class="lifetime">&#39;token</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;token</span> <span class="ident">FormatLiteralStringToken</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">chosen_quote</span>: <span class="ident">QuoteStyle</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
+        <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;token</span> <span class="ident">FormatLiteralStringToken</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">chosen_quote_style</span>: <span class="ident">QuoteStyle</span>,
+        <span class="ident">chosen_quote_properties</span>: <span class="ident">QuoteProperties</span>,
+    ) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">token</span>,
-            <span class="ident">chosen_quote</span>,
+            <span class="ident">chosen_quote_style</span>,
+            <span class="ident">chosen_quote_properties</span>,
         }
     }
 
     <span class="kw">fn</span> <span class="ident">normalise_text</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">file_source</span>: <span class="ident">SourceFileKind</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;token</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">string_information</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">compute_string_information</span>(<span class="self">self</span>.<span class="ident">chosen_quote</span>);
+        <span class="kw">let</span> <span class="ident">string_information</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">token</span>
+            .<span class="ident">compute_string_information</span>(<span class="self">self</span>.<span class="ident">chosen_quote_style</span>);
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">token</span>.<span class="ident">parent_kind</span> {
             <span class="ident">StringLiteralParentKind::Expression</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">normalise_string_literal</span>(<span class="ident">string_information</span>)
@@ -1021,6 +1080,10 @@
 
     <span class="doccomment">/// We can change the text only if there are alphanumeric or alphabetic characters, depending on the file source</span>
     <span class="kw">fn</span> <span class="ident">can_remove_quotes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">file_source</span>: <span class="ident">SourceFileKind</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">chosen_quote_properties</span> <span class="op">==</span> <span class="ident">QuoteProperties::Preserve</span> {
+            <span class="kw">return</span> <span class="bool-val">false</span>;
+        }
+
         <span class="kw">let</span> <span class="ident">text_to_check</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">raw_content</span>();
         <span class="comment">// Text here is quoteless. If it&#39;s empty, it means it is an empty string and we can&#39;t</span>
         <span class="comment">// do any transformation</span>
@@ -1377,12 +1440,14 @@
     <span class="kw">fn</span> <span class="ident">assert_borrowed_token</span>(
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">quote</span>: <span class="ident">QuoteStyle</span>,
+        <span class="ident">quote_properties</span>: <span class="ident">QuoteProperties</span>,
         <span class="ident">as_token</span>: <span class="ident">AsToken</span>,
         <span class="ident">source</span>: <span class="ident">SourceFileKind</span>,
     ) {
         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">generate_syntax_token</span>(<span class="ident">input</span>);
         <span class="kw">let</span> <span class="ident">string_token</span> <span class="op">=</span> <span class="ident">as_token</span>.<span class="ident">into_token</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">string_cleaner</span> <span class="op">=</span> <span class="ident">LiteralStringNormaliser::new</span>(<span class="kw-2">&amp;</span><span class="ident">string_token</span>, <span class="ident">quote</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">string_cleaner</span> <span class="op">=</span>
+            <span class="ident">LiteralStringNormaliser::new</span>(<span class="kw-2">&amp;</span><span class="ident">string_token</span>, <span class="ident">quote</span>, <span class="ident">quote_properties</span>);
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">string_cleaner</span>.<span class="ident">normalise_text</span>(<span class="ident">source</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="ident">Cow::Borrowed</span>(<span class="ident">input</span>))
     }
@@ -1391,12 +1456,14 @@
         <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">quote</span>: <span class="ident">QuoteStyle</span>,
+        <span class="ident">quote_properties</span>: <span class="ident">QuoteProperties</span>,
         <span class="ident">as_token</span>: <span class="ident">AsToken</span>,
         <span class="ident">source</span>: <span class="ident">SourceFileKind</span>,
     ) {
         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">generate_syntax_token</span>(<span class="ident">input</span>);
         <span class="kw">let</span> <span class="ident">string_token</span> <span class="op">=</span> <span class="ident">as_token</span>.<span class="ident">into_token</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">string_cleaner</span> <span class="op">=</span> <span class="ident">LiteralStringNormaliser::new</span>(<span class="kw-2">&amp;</span><span class="ident">string_token</span>, <span class="ident">quote</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">string_cleaner</span> <span class="op">=</span>
+            <span class="ident">LiteralStringNormaliser::new</span>(<span class="kw-2">&amp;</span><span class="ident">string_token</span>, <span class="ident">quote</span>, <span class="ident">quote_properties</span>);
         <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">string_cleaner</span>.<span class="ident">normalise_text</span>(<span class="ident">source</span>);
         <span class="kw">let</span> <span class="ident">owned</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Cow::Owned</span>(<span class="ident">output</span>.<span class="ident">to_string</span>());
         <span class="macro">assert_eq!</span>(<span class="ident">content</span>, <span class="ident">owned</span>)
@@ -1405,15 +1472,23 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">string_borrowed</span>() {
         <span class="kw">let</span> <span class="ident">quote</span> <span class="op">=</span> <span class="ident">QuoteStyle::Double</span>;
+        <span class="kw">let</span> <span class="ident">quote_properties</span> <span class="op">=</span> <span class="ident">QuoteProperties::AsNeeded</span>;
         <span class="kw">let</span> <span class="ident">inputs</span> <span class="op">=</span> [<span class="string">r#&quot;&quot;content&quot;&quot;#</span>, <span class="string">r#&quot;&quot;content with single &#39; quote &quot;&quot;#</span>];
         <span class="kw">for</span> <span class="ident">input</span> <span class="kw">in</span> <span class="ident">inputs</span> {
-            <span class="ident">assert_borrowed_token</span>(<span class="ident">input</span>, <span class="ident">quote</span>, <span class="ident">AsToken::String</span>, <span class="ident">SourceFileKind::JavaScript</span>)
+            <span class="ident">assert_borrowed_token</span>(
+                <span class="ident">input</span>,
+                <span class="ident">quote</span>,
+                <span class="ident">quote_properties</span>,
+                <span class="ident">AsToken::String</span>,
+                <span class="ident">SourceFileKind::JavaScript</span>,
+            )
         }
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">string_owned</span>() {
         <span class="kw">let</span> <span class="ident">quote</span> <span class="op">=</span> <span class="ident">QuoteStyle::Double</span>;
+        <span class="kw">let</span> <span class="ident">quote_properties</span> <span class="op">=</span> <span class="ident">QuoteProperties::AsNeeded</span>;
         <span class="kw">let</span> <span class="ident">inputs</span> <span class="op">=</span> [
             (<span class="string">r#&quot;&quot; content &#39;&#39; \&quot;\&quot;\&quot; &quot;&quot;#</span>, <span class="string">r#&quot;&#39; content \&#39;\&#39; &quot;&quot;&quot; &#39;&quot;#</span>),
             (<span class="string">r#&quot;&quot; content \&quot;\&quot;\&quot;\&quot; &#39;&#39; &quot;&quot;#</span>, <span class="string">r#&quot;&#39; content &quot;&quot;&quot;&quot; \&#39;\&#39; &#39;&quot;#</span>),
@@ -1426,6 +1501,7 @@
                 <span class="ident">input</span>,
                 <span class="ident">output</span>,
                 <span class="ident">quote</span>,
+                <span class="ident">quote_properties</span>,
                 <span class="ident">AsToken::String</span>,
                 <span class="ident">SourceFileKind::JavaScript</span>,
             )
@@ -1435,21 +1511,30 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">directive_borrowed</span>() {
         <span class="kw">let</span> <span class="ident">quote</span> <span class="op">=</span> <span class="ident">QuoteStyle::Double</span>;
+        <span class="kw">let</span> <span class="ident">quote_properties</span> <span class="op">=</span> <span class="ident">QuoteProperties::AsNeeded</span>;
         <span class="kw">let</span> <span class="ident">inputs</span> <span class="op">=</span> [<span class="string">r#&quot;&quot;use strict &#39;&quot;&quot;#</span>];
         <span class="kw">for</span> <span class="ident">input</span> <span class="kw">in</span> <span class="ident">inputs</span> {
-            <span class="ident">assert_borrowed_token</span>(<span class="ident">input</span>, <span class="ident">quote</span>, <span class="ident">AsToken::Directive</span>, <span class="ident">SourceFileKind::JavaScript</span>)
+            <span class="ident">assert_borrowed_token</span>(
+                <span class="ident">input</span>,
+                <span class="ident">quote</span>,
+                <span class="ident">quote_properties</span>,
+                <span class="ident">AsToken::Directive</span>,
+                <span class="ident">SourceFileKind::JavaScript</span>,
+            )
         }
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">directive_owned</span>() {
         <span class="kw">let</span> <span class="ident">quote</span> <span class="op">=</span> <span class="ident">QuoteStyle::Double</span>;
+        <span class="kw">let</span> <span class="ident">quote_properties</span> <span class="op">=</span> <span class="ident">QuoteProperties::AsNeeded</span>;
         <span class="kw">let</span> <span class="ident">inputs</span> <span class="op">=</span> [(<span class="string">r#&quot;&#39; use strict &#39;&quot;#</span>, <span class="string">r#&quot;&quot; use strict &quot;&quot;#</span>)];
         <span class="kw">for</span> (<span class="ident">input</span>, <span class="ident">output</span>) <span class="kw">in</span> <span class="ident">inputs</span> {
             <span class="ident">assert_owned_token</span>(
                 <span class="ident">input</span>,
                 <span class="ident">output</span>,
                 <span class="ident">quote</span>,
+                <span class="ident">quote_properties</span>,
                 <span class="ident">AsToken::Directive</span>,
                 <span class="ident">SourceFileKind::JavaScript</span>,
             )
@@ -1459,21 +1544,30 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">member_borrowed</span>() {
         <span class="kw">let</span> <span class="ident">quote</span> <span class="op">=</span> <span class="ident">QuoteStyle::Double</span>;
+        <span class="kw">let</span> <span class="ident">quote_properties</span> <span class="op">=</span> <span class="ident">QuoteProperties::AsNeeded</span>;
         <span class="kw">let</span> <span class="ident">inputs</span> <span class="op">=</span> [<span class="string">r#&quot;&quot;cant @ be moved&quot;&quot;#</span>, <span class="string">r#&quot;&quot;1674&quot;&quot;#</span>, <span class="string">r#&quot;&quot;33n&quot;&quot;#</span>];
         <span class="kw">for</span> <span class="ident">input</span> <span class="kw">in</span> <span class="ident">inputs</span> {
-            <span class="ident">assert_borrowed_token</span>(<span class="ident">input</span>, <span class="ident">quote</span>, <span class="ident">AsToken::Member</span>, <span class="ident">SourceFileKind::TypeScript</span>)
+            <span class="ident">assert_borrowed_token</span>(
+                <span class="ident">input</span>,
+                <span class="ident">quote</span>,
+                <span class="ident">quote_properties</span>,
+                <span class="ident">AsToken::Member</span>,
+                <span class="ident">SourceFileKind::TypeScript</span>,
+            )
         }
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">member_owned</span>() {
         <span class="kw">let</span> <span class="ident">quote</span> <span class="op">=</span> <span class="ident">QuoteStyle::Double</span>;
+        <span class="kw">let</span> <span class="ident">quote_properties</span> <span class="op">=</span> <span class="ident">QuoteProperties::AsNeeded</span>;
         <span class="kw">let</span> <span class="ident">inputs</span> <span class="op">=</span> [(<span class="string">r#&quot;&quot;string&quot;&quot;#</span>, <span class="string">r#&quot;string&quot;#</span>)];
         <span class="kw">for</span> (<span class="ident">input</span>, <span class="ident">output</span>) <span class="kw">in</span> <span class="ident">inputs</span> {
             <span class="ident">assert_owned_token</span>(
                 <span class="ident">input</span>,
                 <span class="ident">output</span>,
                 <span class="ident">quote</span>,
+                <span class="ident">quote_properties</span>,
                 <span class="ident">AsToken::Member</span>,
                 <span class="ident">SourceFileKind::TypeScript</span>,
             )

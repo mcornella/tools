@@ -121,6 +121,22 @@
 <span id="115">115</span>
 <span id="116">116</span>
 <span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_formatter::IndentStyle</span>;
 <span class="kw">use</span> <span class="ident">rome_service</span>::{<span class="ident">load_config</span>, <span class="ident">settings::WorkspaceSettings</span>, <span class="ident">workspace::UpdateSettingsParams</span>};
 <span class="kw">use</span> <span class="ident">std::path::PathBuf</span>;
@@ -222,6 +238,22 @@
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">quote_style</span>) <span class="op">=</span> <span class="ident">quote_style</span> {
         <span class="ident">workspace_settings</span>.<span class="ident">languages</span>.<span class="ident">javascript</span>.<span class="ident">format</span>.<span class="ident">quote_style</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">quote_style</span>);
+    }
+
+    <span class="kw">let</span> <span class="ident">quote_properties</span> <span class="op">=</span> <span class="ident">session</span>
+        .<span class="ident">args</span>
+        .<span class="ident">opt_value_from_str</span>(<span class="string">&quot;--quote-properties&quot;</span>)
+        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">source</span><span class="op">|</span> <span class="ident">Termination::ParseError</span> {
+            <span class="ident">argument</span>: <span class="string">&quot;--quote-properties&quot;</span>,
+            <span class="ident">source</span>,
+        })<span class="question-mark">?</span>;
+
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">quote_properties</span>) <span class="op">=</span> <span class="ident">quote_properties</span> {
+        <span class="ident">workspace_settings</span>
+            .<span class="ident">languages</span>
+            .<span class="ident">javascript</span>
+            .<span class="ident">format</span>
+            .<span class="ident">quote_properties</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">quote_properties</span>);
     }
 
     <span class="kw">let</span> <span class="ident">line_width</span> <span class="op">=</span> <span class="ident">session</span>

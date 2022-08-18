@@ -99,8 +99,20 @@
 <span id="93">93</span>
 <span id="94">94</span>
 <span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">indexmap::IndexSet</span>;
-<span class="kw">use</span> <span class="ident">rome_js_formatter::context::QuoteStyle</span>;
+<span class="kw">use</span> <span class="ident">rome_js_formatter::context</span>::{<span class="ident">QuoteProperties</span>, <span class="ident">QuoteStyle</span>};
 <span class="kw">use</span> <span class="ident">serde::de</span>::{<span class="ident">SeqAccess</span>, <span class="ident">Visitor</span>};
 <span class="kw">use</span> <span class="ident">serde::ser::SerializeSeq</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
@@ -184,6 +196,9 @@
     <span class="doccomment">/// The style for quotes. Defaults to double.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;PlainQuoteStyle&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">quote_style</span>: <span class="ident">QuoteStyle</span>,
+    <span class="doccomment">/// When properties in objects are quoted. Defaults to as-needed.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;PlainQuoteProperties&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">quote_properties</span>: <span class="ident">QuoteProperties</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Default</span>)]</span>
@@ -193,6 +208,15 @@
     <span class="attribute">#[<span class="ident">default</span>]</span>
     <span class="ident">Double</span>,
     <span class="ident">Single</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;schemars&quot;</span>, <span class="ident">derive</span>(<span class="ident">schemars::JsonSchema</span>))]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>, <span class="ident">remote</span> <span class="op">=</span> <span class="string">&quot;QuoteProperties&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PlainQuoteProperties</span> {
+    <span class="attribute">#[<span class="ident">default</span>]</span>
+    <span class="ident">AsNeeded</span>,
+    <span class="ident">Preserve</span>,
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rome_service" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>

@@ -210,6 +210,7 @@
 <span id="204">204</span>
 <span id="205">205</span>
 <span id="206">206</span>
+<span id="207">207</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Configuration</span>, <span class="ident">Rules</span>};
 <span class="kw">use</span> <span class="ident">indexmap::IndexSet</span>;
 <span class="kw">use</span> <span class="ident">rome_console::codespan::Severity</span>;
@@ -246,6 +247,7 @@
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">j</span><span class="op">|</span> <span class="ident">j</span>.<span class="ident">formatter</span>.<span class="ident">as_ref</span>());
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">formatter</span>) <span class="op">=</span> <span class="ident">formatter</span> {
             <span class="self">self</span>.<span class="ident">languages</span>.<span class="ident">javascript</span>.<span class="ident">format</span>.<span class="ident">quote_style</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">formatter</span>.<span class="ident">quote_style</span>);
+            <span class="self">self</span>.<span class="ident">languages</span>.<span class="ident">javascript</span>.<span class="ident">format</span>.<span class="ident">quote_properties</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">formatter</span>.<span class="ident">quote_properties</span>);
         }
 
         <span class="comment">// linter part</span>
