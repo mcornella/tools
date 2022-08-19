@@ -289,79 +289,10 @@
 <span id="283">283</span>
 <span id="284">284</span>
 <span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
-<span id="288">288</span>
-<span id="289">289</span>
-<span id="290">290</span>
-<span id="291">291</span>
-<span id="292">292</span>
-<span id="293">293</span>
-<span id="294">294</span>
-<span id="295">295</span>
-<span id="296">296</span>
-<span id="297">297</span>
-<span id="298">298</span>
-<span id="299">299</span>
-<span id="300">300</span>
-<span id="301">301</span>
-<span id="302">302</span>
-<span id="303">303</span>
-<span id="304">304</span>
-<span id="305">305</span>
-<span id="306">306</span>
-<span id="307">307</span>
-<span id="308">308</span>
-<span id="309">309</span>
-<span id="310">310</span>
-<span id="311">311</span>
-<span id="312">312</span>
-<span id="313">313</span>
-<span id="314">314</span>
-<span id="315">315</span>
-<span id="316">316</span>
-<span id="317">317</span>
-<span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
-<span id="321">321</span>
-<span id="322">322</span>
-<span id="323">323</span>
-<span id="324">324</span>
-<span id="325">325</span>
-<span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
-<span id="331">331</span>
-<span id="332">332</span>
-<span id="333">333</span>
-<span id="334">334</span>
-<span id="335">335</span>
-<span id="336">336</span>
-<span id="337">337</span>
-<span id="338">338</span>
-<span id="339">339</span>
-<span id="340">340</span>
-<span id="341">341</span>
-<span id="342">342</span>
-<span id="343">343</span>
-<span id="344">344</span>
-<span id="345">345</span>
-<span id="346">346</span>
-<span id="347">347</span>
-<span id="348">348</span>
-<span id="349">349</span>
-<span id="350">350</span>
-<span id="351">351</span>
-<span id="352">352</span>
-<span id="353">353</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">array</span>;
 <span class="kw">mod</span> <span class="ident">assignment_like</span>;
 <span class="kw">mod</span> <span class="ident">binary_like_expression</span>;
 <span class="kw">mod</span> <span class="ident">conditional</span>;
-<span class="kw">mod</span> <span class="ident">simple</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">string_utils</span>;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">format_class</span>;
@@ -376,10 +307,9 @@
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parentheses::resolve_left_most_expression</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">assignment_like</span>::{<span class="ident">should_break_after_operator</span>, <span class="ident">JsAnyAssignmentLike</span>};
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">assignment_like::JsAnyAssignmentLike</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">binary_like_expression</span>::{
-    <span class="ident">binary_argument_needs_parens</span>, <span class="ident">format_binary_like_expression</span>, <span class="ident">needs_binary_like_parentheses</span>,
-    <span class="ident">JsAnyBinaryLikeExpression</span>, <span class="ident">JsAnyBinaryLikeLeftExpression</span>,
+    <span class="ident">needs_binary_like_parentheses</span>, <span class="ident">JsAnyBinaryLikeExpression</span>, <span class="ident">JsAnyBinaryLikeLeftExpression</span>,
 };
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">conditional::JsAnyConditional</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">member_chain::get_member_chain</span>;
@@ -389,7 +319,6 @@
 <span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{<span class="ident">JsAnyExpression</span>, <span class="ident">JsAnyStatement</span>, <span class="ident">JsInitializerClause</span>, <span class="ident">JsLanguage</span>, <span class="ident">Modifiers</span>};
 <span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{<span class="ident">JsSyntaxKind</span>, <span class="ident">JsSyntaxNode</span>, <span class="ident">JsSyntaxToken</span>};
 <span class="kw">use</span> <span class="ident">rome_rowan</span>::{<span class="ident">AstNode</span>, <span class="ident">AstNodeList</span>, <span class="ident">Direction</span>};
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">simple</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">string_utils</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">typescript::should_hug_type</span>;
 
@@ -565,71 +494,6 @@
     <span class="ident">nodes_and_modifiers</span>.<span class="ident">sort_unstable_by_key</span>(<span class="op">|</span><span class="ident">node</span><span class="op">|</span> <span class="ident">Modifiers::from</span>(<span class="ident">node</span>));
 
     <span class="ident">nodes_and_modifiers</span>
-}
-
-<span class="doccomment">/// This enum is used to extract a precedence from certain nodes. By comparing the precedence</span>
-<span class="doccomment">/// of two nodes, it&#39;s possible to change the way certain node should be formatted.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A use case, for example, is when comparing a node with its parent. If the parent has a lower</span>
-<span class="doccomment">/// precedence, then the node can change its formatting.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">FormatPrecedence</span> {
-    <span class="doccomment">/// No precedence given to these nodes</span>
-    <span class="prelude-val">None</span>,
-
-    <span class="doccomment">/// Low priority</span>
-    <span class="ident">Low</span>,
-
-    <span class="doccomment">/// High priority</span>
-    <span class="ident">High</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">FormatPrecedence</span> {
-    <span class="doccomment">/// Use this function when you want to extract the precedence of the current node</span>
-    <span class="doccomment">/// based on whether it can parenthesised or not.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is useful when we want to compare a node against its parent. If the parent has</span>
-    <span class="doccomment">/// lower precedence, it means that we can remove the parenthesis from the current node.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An example can be:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```js</span>
-    <span class="doccomment">/// let a = (&quot;simple expression&quot;) + &quot; or not&quot;;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In this case, we have a parenthesised expression and its parent is a binary expression.</span>
-    <span class="doccomment">/// The first one will have [FormatPrecedence::Low] as priority and the second has</span>
-    <span class="doccomment">/// [FormatPrecedence::None] as priority. In this case, the parenthesis can be omitted.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_precedence_for_parenthesis</span>(<span class="ident">node</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">JsSyntaxNode</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">node</span>.<span class="ident">map_or</span>(<span class="ident">FormatPrecedence::None</span>, <span class="op">|</span><span class="ident">node</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">node</span>.<span class="ident">kind</span>() {
-            <span class="ident">JsSyntaxKind::JS_PARENTHESIZED_EXPRESSION</span> =&gt; <span class="ident">FormatPrecedence::Low</span>,
-
-            <span class="ident">JsSyntaxKind::TS_AS_EXPRESSION</span>
-            <span class="op">|</span> <span class="ident">JsSyntaxKind::TS_NON_NULL_ASSERTION_EXPRESSION</span>
-            <span class="op">|</span> <span class="ident">JsSyntaxKind::TS_TYPE_ASSERTION_EXPRESSION</span>
-            <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_UNARY_EXPRESSION</span>
-            <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_LOGICAL_EXPRESSION</span>
-            <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_BINARY_EXPRESSION</span>
-            <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_TEMPLATE</span>
-            <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_SPREAD</span>
-            <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_STATIC_MEMBER_EXPRESSION</span>
-            <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_STATIC_MEMBER_ASSIGNMENT</span>
-            <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_CALL_EXPRESSION</span>
-            <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_NEW_EXPRESSION</span>
-            <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_CONDITIONAL_EXPRESSION</span>
-            <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_EXTENDS_CLAUSE</span>
-            <span class="op">|</span> <span class="ident">JsSyntaxKind::TS_IMPLEMENTS_CLAUSE</span>
-            <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_AWAIT_EXPRESSION</span>
-            <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_YIELD_ARGUMENT</span>
-            <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_ARROW_FUNCTION_EXPRESSION</span>
-            <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_EXPRESSION_STATEMENT</span>
-            <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_RETURN_STATEMENT</span>
-            <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_COMPUTED_MEMBER_EXPRESSION</span>
-            <span class="op">|</span> <span class="ident">JsSyntaxKind::JS_COMPUTED_MEMBER_ASSIGNMENT</span> =&gt; <span class="ident">FormatPrecedence::High</span>,
-
-            <span class="kw">_</span> =&gt; <span class="ident">FormatPrecedence::None</span>,
-        })
-    }
 }
 
 <span class="doccomment">/// Format a some code followed by an optional semicolon, and performs</span>

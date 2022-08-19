@@ -320,22 +320,7 @@
 <span id="314">314</span>
 <span id="315">315</span>
 <span id="316">316</span>
-<span id="317">317</span>
-<span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
-<span id="321">321</span>
-<span id="322">322</span>
-<span id="323">323</span>
-<span id="324">324</span>
-<span id="325">325</span>
-<span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::context::TabWidth</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::js::expressions::parenthesized_expression::is_expression_handling_parens</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">rome_formatter::write</span>;
 <span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{
@@ -438,20 +423,11 @@
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="ident">JsFormatContext</span><span class="op">&gt;</span>) -&gt; <span class="ident">FormatResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">parentheses</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">top_most_parentheses</span>();
 
-        <span class="kw">let</span> <span class="ident">handles_parens</span> <span class="op">=</span> <span class="ident">JsAnyExpression::cast</span>(<span class="self">self</span>.<span class="ident">member</span>().<span class="ident">syntax</span>().<span class="ident">clone</span>())
-            .<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">expression</span><span class="op">|</span> {
-                <span class="ident">is_expression_handling_parens</span>(<span class="kw-2">&amp;</span><span class="ident">expression</span>)
-            });
-
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">parentheses</span>) <span class="op">=</span> <span class="ident">parentheses</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current</span> <span class="op">=</span> <span class="ident">parentheses</span>.<span class="ident">clone</span>();
 
             <span class="kw">loop</span> {
-                <span class="kw">if</span> <span class="ident">handles_parens</span> {
-                    <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">format_removed</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>.<span class="ident">l_paren_token</span>()<span class="question-mark">?</span>)])<span class="question-mark">?</span>;
-                } <span class="kw">else</span> {
-                    <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">current</span>.<span class="ident">l_paren_token</span>().<span class="ident">format</span>()])<span class="question-mark">?</span>;
-                }
+                <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">format_removed</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>.<span class="ident">l_paren_token</span>()<span class="question-mark">?</span>)])<span class="question-mark">?</span>;
 
                 <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">expression</span>()<span class="question-mark">?</span> {
                     <span class="ident">JsAnyExpression::JsParenthesizedExpression</span>(<span class="ident">inner</span>) =&gt; {
@@ -468,11 +444,7 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current</span> <span class="op">=</span> <span class="ident">parentheses</span>.<span class="ident">clone</span>();
 
             <span class="kw">loop</span> {
-                <span class="kw">if</span> <span class="ident">handles_parens</span> {
-                    <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">format_removed</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>.<span class="ident">r_paren_token</span>()<span class="question-mark">?</span>)])<span class="question-mark">?</span>;
-                } <span class="kw">else</span> {
-                    <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">current</span>.<span class="ident">r_paren_token</span>().<span class="ident">format</span>()])<span class="question-mark">?</span>;
-                }
+                <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">format_removed</span>(<span class="kw-2">&amp;</span><span class="ident">current</span>.<span class="ident">r_paren_token</span>()<span class="question-mark">?</span>)])<span class="question-mark">?</span>;
 
                 <span class="kw">match</span> <span class="ident">current</span>.<span class="ident">expression</span>()<span class="question-mark">?</span> {
                     <span class="ident">JsAnyExpression::JsParenthesizedExpression</span>(<span class="ident">inner</span>) =&gt; {
