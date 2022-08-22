@@ -289,7 +289,6 @@
 <span id="283">283</span>
 <span id="284">284</span>
 <span id="285">285</span>
-<span id="286">286</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_js_semantic</span>::{<span class="ident">AllReferencesExtensions</span>, <span class="ident">SemanticModel</span>};
 <span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{
     <span class="ident">JsIdentifierAssignment</span>, <span class="ident">JsIdentifierBinding</span>, <span class="ident">JsLanguage</span>, <span class="ident">JsReferenceIdentifier</span>, <span class="ident">JsSyntaxKind</span>,
@@ -490,8 +489,7 @@
             <span class="kw">let</span> <span class="ident">scope</span> <span class="op">=</span> <span class="ident">reference</span>.<span class="ident">scope</span>();
             <span class="kw">if</span> <span class="ident">scope</span>
                 .<span class="ident">ancestors</span>()
-                .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">scope</span><span class="op">|</span> <span class="ident">scope</span>.<span class="ident">get_binding</span>(<span class="ident">new_name</span>))
-                .<span class="ident">next</span>()
+                .<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">scope</span><span class="op">|</span> <span class="ident">scope</span>.<span class="ident">get_binding</span>(<span class="ident">new_name</span>))
                 .<span class="ident">is_some</span>()
             {
                 <span class="kw">return</span> <span class="bool-val">false</span>;
