@@ -129,6 +129,18 @@
 <span id="123">123</span>
 <span id="124">124</span>
 <span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::syntax::SyntaxTrivia</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">cursor</span>, <span class="ident">Language</span>, <span class="ident">NodeOrToken</span>, <span class="ident">SyntaxNode</span>, <span class="ident">SyntaxToken</span>};
 <span class="kw">use</span> <span class="ident">std::iter</span>;
@@ -138,7 +150,7 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SyntaxElement</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">NodeOrToken</span><span class="op">&lt;</span><span class="ident">SyntaxNode</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>, <span class="ident">SyntaxToken</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">Language</span><span class="op">&gt;</span> <span class="ident">SyntaxElement</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">NonNull</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">TextSize</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SyntaxElementKey</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">NodeOrToken::Node</span>(<span class="ident">it</span>) =&gt; <span class="ident">it</span>.<span class="ident">key</span>(),
             <span class="ident">NodeOrToken::Token</span>(<span class="ident">it</span>) =&gt; <span class="ident">it</span>.<span class="ident">key</span>(),
@@ -252,6 +264,18 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">Language</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SyntaxNode</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SyntaxElement</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">node</span>: <span class="ident">SyntaxNode</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>) -&gt; <span class="ident">SyntaxElement</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span> {
         <span class="ident">NodeOrToken::Node</span>(<span class="ident">node</span>)
+    }
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SyntaxElementKey</span> {
+    <span class="ident">node_data</span>: <span class="ident">NonNull</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
+    <span class="ident">offset</span>: <span class="ident">TextSize</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">SyntaxElementKey</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">node_data</span>: <span class="ident">NonNull</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">offset</span>: <span class="ident">TextSize</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> { <span class="ident">node_data</span>, <span class="ident">offset</span> }
     }
 }
 </code></pre></div>

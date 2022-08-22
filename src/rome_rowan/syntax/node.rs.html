@@ -798,7 +798,7 @@
 <span id="792">792</span>
 <span id="793">793</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::green::GreenElement</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::syntax::element::SyntaxElement</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::syntax::element</span>::{<span class="ident">SyntaxElement</span>, <span class="ident">SyntaxElementKey</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::syntax::SyntaxTrivia</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">cursor</span>, <span class="ident">Direction</span>, <span class="ident">GreenNode</span>, <span class="ident">Language</span>, <span class="ident">NodeOrToken</span>, <span class="ident">SyntaxKind</span>, <span class="ident">SyntaxList</span>, <span class="ident">SyntaxNodeText</span>,
@@ -810,7 +810,6 @@
 <span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Formatter</span>};
 <span class="kw">use</span> <span class="ident">std::iter::FusedIterator</span>;
 <span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std::ptr::NonNull</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">ops</span>};
 <span class="kw">use</span> <span class="ident">text_size</span>::{<span class="ident">TextRange</span>, <span class="ident">TextSize</span>};
 
@@ -850,8 +849,9 @@
         <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">green</span>().<span class="ident">to_owned</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">NonNull</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">TextSize</span>) {
-        <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">key</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SyntaxElementKey</span> {
+        <span class="kw">let</span> (<span class="ident">node_data</span>, <span class="ident">offset</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">raw</span>.<span class="ident">key</span>();
+        <span class="ident">SyntaxElementKey::new</span>(<span class="ident">node_data</span>, <span class="ident">offset</span>)
     }
 
     <span class="doccomment">/// Returns the element stored in the slot with the given index. Returns [None] if the slot is empty.</span>
