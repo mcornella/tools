@@ -221,15 +221,16 @@
 <span id="215">215</span>
 <span id="216">216</span>
 <span id="217">217</span>
+<span id="218">218</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::js::expressions::computed_member_expression::JsAnyComputedMemberLike</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parentheses</span>::{<span class="ident">resolve_parent</span>, <span class="ident">ExpressionNode</span>, <span class="ident">NeedsParentheses</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parentheses</span>::{<span class="ident">resolve_parent</span>, <span class="ident">AssignmentNode</span>, <span class="ident">ExpressionNode</span>, <span class="ident">NeedsParentheses</span>};
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{<span class="ident">format_args</span>, <span class="ident">write</span>};
 <span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{
     <span class="ident">JsAnyAssignment</span>, <span class="ident">JsAnyAssignmentPattern</span>, <span class="ident">JsAnyExpression</span>, <span class="ident">JsAnyName</span>, <span class="ident">JsAssignmentExpression</span>,
-    <span class="ident">JsInitializerClause</span>, <span class="ident">JsParenthesizedExpression</span>, <span class="ident">JsStaticMemberAssignment</span>,
-    <span class="ident">JsStaticMemberExpression</span>, <span class="ident">JsSyntaxKind</span>, <span class="ident">JsSyntaxNode</span>, <span class="ident">JsSyntaxToken</span>,
+    <span class="ident">JsInitializerClause</span>, <span class="ident">JsParenthesizedAssignment</span>, <span class="ident">JsParenthesizedExpression</span>,
+    <span class="ident">JsStaticMemberAssignment</span>, <span class="ident">JsStaticMemberExpression</span>, <span class="ident">JsSyntaxKind</span>, <span class="ident">JsSyntaxNode</span>, <span class="ident">JsSyntaxToken</span>,
 };
 <span class="kw">use</span> <span class="ident">rome_rowan</span>::{<span class="ident">declare_node_union</span>, <span class="ident">AstNode</span>, <span class="ident">SyntaxResult</span>};
 
@@ -349,14 +350,15 @@
         <span class="kw">let</span> <span class="ident">first_non_static_member_ancestor</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">syntax</span>().<span class="ident">ancestors</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">parent</span><span class="op">|</span> {
             <span class="op">!</span>(<span class="ident">JsAnyStaticMemberLike::can_cast</span>(<span class="ident">parent</span>.<span class="ident">kind</span>())
                 <span class="op">|</span><span class="op">|</span> <span class="ident">JsAnyComputedMemberLike::can_cast</span>(<span class="ident">parent</span>.<span class="ident">kind</span>())
-                <span class="op">|</span><span class="op">|</span> <span class="ident">JsParenthesizedExpression::can_cast</span>(<span class="ident">parent</span>.<span class="ident">kind</span>()))
+                <span class="op">|</span><span class="op">|</span> <span class="ident">JsParenthesizedExpression::can_cast</span>(<span class="ident">parent</span>.<span class="ident">kind</span>())
+                <span class="op">|</span><span class="op">|</span> <span class="ident">JsParenthesizedAssignment::can_cast</span>(<span class="ident">parent</span>.<span class="ident">kind</span>()))
         });
 
         <span class="kw">let</span> <span class="ident">layout</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">first_non_static_member_ancestor</span>.<span class="ident">and_then</span>(<span class="ident">JsAnyExpression::cast</span>) {
             <span class="prelude-val">Some</span>(<span class="ident">JsAnyExpression::JsNewExpression</span>(<span class="kw">_</span>)) =&gt; <span class="ident">StaticMemberLikeLayout::NoBreak</span>,
             <span class="prelude-val">Some</span>(<span class="ident">JsAnyExpression::JsAssignmentExpression</span>(<span class="ident">assignment</span>)) =&gt; {
                 <span class="kw">if</span> <span class="macro">matches!</span>(
-                    <span class="ident">assignment</span>.<span class="ident">left</span>()<span class="question-mark">?</span>,
+                    <span class="ident">assignment</span>.<span class="ident">left</span>()<span class="question-mark">?</span>.<span class="ident">resolve</span>(),
                     <span class="ident">JsAnyAssignmentPattern::JsAnyAssignment</span>(
                         <span class="ident">JsAnyAssignment::JsIdentifierAssignment</span>(<span class="kw">_</span>)
                     )
