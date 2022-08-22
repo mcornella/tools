@@ -137,7 +137,6 @@
 <span id="131">131</span>
 <span id="132">132</span>
 <span id="133">133</span>
-<span id="134">134</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_analyze</span>::{
     <span class="ident">context::RuleContext</span>, <span class="ident">declare_rule</span>, <span class="ident">ActionCategory</span>, <span class="ident">Ast</span>, <span class="ident">Rule</span>, <span class="ident">RuleCategory</span>, <span class="ident">RuleDiagnostic</span>,
 };
@@ -237,9 +236,8 @@
         <span class="kw">let</span> <span class="ident">last_token_of_name_syntax</span> <span class="op">=</span> <span class="ident">name_syntax</span>.<span class="ident">last_token</span>()<span class="question-mark">?</span>;
         <span class="comment">// drop the trailing trivia of name_syntax, at CST level it means</span>
         <span class="comment">// clean the trailing trivia of last token of name_syntax</span>
-        <span class="kw">let</span> <span class="ident">next_last_token_of_name_syntax</span> <span class="op">=</span> <span class="ident">last_token_of_name_syntax</span>
-            .<span class="ident">clone</span>()
-            .<span class="ident">with_trailing_trivia</span>(<span class="ident">std::iter::empty</span>());
+        <span class="kw">let</span> <span class="ident">next_last_token_of_name_syntax</span> <span class="op">=</span>
+            <span class="ident">last_token_of_name_syntax</span>.<span class="ident">with_trailing_trivia</span>(<span class="ident">std::iter::empty</span>());
 
         <span class="kw">let</span> <span class="ident">next_name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">replace_token_discard_trivia</span>(
             <span class="ident">last_token_of_name_syntax</span>,
