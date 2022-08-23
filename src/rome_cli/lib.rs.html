@@ -100,6 +100,11 @@
 <span id="94">94</span>
 <span id="95">95</span>
 <span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This is where the main CLI session starts. The module is responsible</span>
 <span class="doccomment">//! to parse commands and arguments, redirect the execution of the commands and</span>
 <span class="doccomment">//! execute the traversal of directory and files, based on the command that were passed.</span>
@@ -114,11 +119,16 @@
 <span class="kw">mod</span> <span class="ident">execute</span>;
 <span class="kw">mod</span> <span class="ident">metrics</span>;
 <span class="kw">mod</span> <span class="ident">panic</span>;
+<span class="kw">mod</span> <span class="ident">reports</span>;
 <span class="kw">mod</span> <span class="ident">termination</span>;
 <span class="kw">mod</span> <span class="ident">traversal</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">execute</span>::{<span class="ident">execute_mode</span>, <span class="ident">ExecutionMode</span>};
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">execute</span>::{<span class="ident">execute_mode</span>, <span class="ident">Execution</span>, <span class="ident">TraversalMode</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">panic::setup_panic_handler</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">reports</span>::{
+    <span class="ident">formatter</span>::{<span class="ident">FormatterReport</span>, <span class="ident">FormatterReportFileDetail</span>, <span class="ident">FormatterReportSummary</span>},
+    <span class="ident">Report</span>, <span class="ident">ReportDiagnostic</span>, <span class="ident">ReportDiff</span>, <span class="ident">ReportErrorKind</span>, <span class="ident">ReportKind</span>,
+};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">termination::Termination</span>;
 
 <span class="doccomment">/// Global context for an execution of the CLI</span>

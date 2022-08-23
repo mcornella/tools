@@ -1,6 +1,6 @@
 var sourcesIndex = {};
 sourcesIndex["rome_analyze"] = {"name":"","files":["categories.rs","context.rs","lib.rs","matcher.rs","query.rs","registry.rs","rule.rs","services.rs","signals.rs","syntax.rs","visitor.rs"]};
-sourcesIndex["rome_cli"] = {"name":"","dirs":[{"name":"commands","files":["check.rs","ci.rs","format.rs","help.rs","init.rs","mod.rs"]}],"files":["execute.rs","lib.rs","metrics.rs","panic.rs","termination.rs","traversal.rs"]};
+sourcesIndex["rome_cli"] = {"name":"","dirs":[{"name":"commands","files":["check.rs","ci.rs","format.rs","help.rs","init.rs","mod.rs"]},{"name":"reports","files":["formatter.rs","mod.rs"]}],"files":["execute.rs","lib.rs","metrics.rs","panic.rs","termination.rs","traversal.rs"]};
 sourcesIndex["rome_console"] = {"name":"","dirs":[{"name":"codespan","files":["mod.rs","render.rs"]},{"name":"write","files":["html.rs","termcolor.rs"]}],"files":["diff.rs","fmt.rs","lib.rs","markup.rs","write.rs"]};
 sourcesIndex["rome_control_flow"] = {"name":"","files":["builder.rs","lib.rs"]};
 sourcesIndex["rome_css_factory"] = {"name":"","dirs":[{"name":"generated","files":["node_factory.rs","syntax_factory.rs"]}],"files":["generated.rs","lib.rs"]};
