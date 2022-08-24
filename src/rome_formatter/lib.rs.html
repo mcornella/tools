@@ -1429,6 +1429,17 @@
 <span id="1423">1423</span>
 <span id="1424">1424</span>
 <span id="1425">1425</span>
+<span id="1426">1426</span>
+<span id="1427">1427</span>
+<span id="1428">1428</span>
+<span id="1429">1429</span>
+<span id="1430">1430</span>
+<span id="1431">1431</span>
+<span id="1432">1432</span>
+<span id="1433">1433</span>
+<span id="1434">1434</span>
+<span id="1435">1435</span>
+<span id="1436">1436</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Infrastructure for code formatting</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This module defines [FormatElement], an IR to format code documents and provides a mean to print</span>
@@ -1809,6 +1820,12 @@
         <span class="self">self</span>.<span class="ident">sourcemap</span>
     }
 
+    <span class="doccomment">/// Takes the list of [SourceMarker] mapping byte positions in the output string</span>
+    <span class="doccomment">/// to the input source code.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_sourcemap</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SourceMarker</span><span class="op">&gt;</span> {
+        <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">sourcemap</span>)
+    }
+
     <span class="doccomment">/// Access the resulting code, borrowing the result</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">code</span>
@@ -1829,6 +1846,11 @@
     <span class="doccomment">/// Ranges of the formatted code that have been formatted as verbatim.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verbatim_ranges</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">TextRange</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">verbatim_ranges</span>
+    }
+
+    <span class="doccomment">/// Takes the ranges of nodes that have been formatted as verbatim, replacing them with an empty list.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_verbatim_ranges</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TextRange</span><span class="op">&gt;</span> {
+        <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">verbatim_ranges</span>)
     }
 }
 
@@ -2457,7 +2479,7 @@
 
     <span class="comment">// Perform the actual formatting of the root node with</span>
     <span class="comment">// an appropriate indentation level</span>
-    <span class="kw">let</span> <span class="ident">formatted</span> <span class="op">=</span> <span class="ident">format_sub_tree</span>(
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">printed</span> <span class="op">=</span> <span class="ident">format_sub_tree</span>(
         <span class="ident">context</span>,
         <span class="kw-2">&amp;</span><span class="ident">FormatRefWithRule</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">R</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">common_root</span>, <span class="ident">R::default</span>()),
     )<span class="question-mark">?</span>;
@@ -2469,8 +2491,8 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">range_start</span> <span class="op">=</span> <span class="prelude-val">None</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">range_end</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
-    <span class="kw">let</span> <span class="ident">sourcemap</span> <span class="op">=</span> <span class="ident">Vec::from</span>(<span class="ident">formatted</span>.<span class="ident">sourcemap</span>());
-    <span class="kw">for</span> <span class="ident">marker</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">sourcemap</span> {
+    <span class="kw">let</span> <span class="ident">sourcemap</span> <span class="op">=</span> <span class="ident">printed</span>.<span class="ident">sourcemap</span>();
+    <span class="kw">for</span> <span class="ident">marker</span> <span class="kw">in</span> <span class="ident">sourcemap</span> {
         <span class="comment">// marker.source &lt;= range.start()</span>
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">start_dist</span>) <span class="op">=</span> <span class="ident">range</span>.<span class="ident">start</span>().<span class="ident">checked_sub</span>(<span class="ident">marker</span>.<span class="ident">source</span>) {
             <span class="ident">range_start</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">range_start</span> {
@@ -2512,15 +2534,15 @@
         <span class="prelude-val">Some</span>((<span class="ident">end_marker</span>, <span class="kw">_</span>)) =&gt; (<span class="ident">end_marker</span>.<span class="ident">source</span>, <span class="ident">end_marker</span>.<span class="ident">dest</span>),
         <span class="prelude-val">None</span> =&gt; (
             <span class="ident">common_root</span>.<span class="ident">text_range</span>().<span class="ident">end</span>(),
-            <span class="ident">TextSize::try_from</span>(<span class="ident">formatted</span>.<span class="ident">as_code</span>().<span class="ident">len</span>()).<span class="ident">expect</span>(<span class="string">&quot;code length out of bounds&quot;</span>),
+            <span class="ident">TextSize::try_from</span>(<span class="ident">printed</span>.<span class="ident">as_code</span>().<span class="ident">len</span>()).<span class="ident">expect</span>(<span class="string">&quot;code length out of bounds&quot;</span>),
         ),
     };
 
     <span class="kw">let</span> <span class="ident">input_range</span> <span class="op">=</span> <span class="ident">TextRange::new</span>(<span class="ident">start_source</span>, <span class="ident">end_source</span>);
     <span class="kw">let</span> <span class="ident">output_range</span> <span class="op">=</span> <span class="ident">TextRange::new</span>(<span class="ident">start_dest</span>, <span class="ident">end_dest</span>);
-    <span class="kw">let</span> <span class="ident">sourcemap</span> <span class="op">=</span> <span class="ident">Vec::from</span>(<span class="ident">formatted</span>.<span class="ident">sourcemap</span>());
-    <span class="kw">let</span> <span class="ident">verbatim_ranges</span> <span class="op">=</span> <span class="ident">Vec::from</span>(<span class="ident">formatted</span>.<span class="ident">verbatim_ranges</span>());
-    <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">formatted</span>.<span class="ident">into_code</span>()[<span class="ident">output_range</span>];
+    <span class="kw">let</span> <span class="ident">sourcemap</span> <span class="op">=</span> <span class="ident">printed</span>.<span class="ident">take_sourcemap</span>();
+    <span class="kw">let</span> <span class="ident">verbatim_ranges</span> <span class="op">=</span> <span class="ident">printed</span>.<span class="ident">take_verbatim_ranges</span>();
+    <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">printed</span>.<span class="ident">into_code</span>()[<span class="ident">output_range</span>];
     <span class="prelude-val">Ok</span>(<span class="ident">Printed::new</span>(
         <span class="ident">code</span>.<span class="ident">into</span>(),
         <span class="prelude-val">Some</span>(<span class="ident">input_range</span>),
@@ -2596,9 +2618,9 @@
     };
 
     <span class="kw">let</span> <span class="ident">formatted</span> <span class="op">=</span> <span class="ident">format_node</span>(<span class="ident">context</span>, <span class="ident">root</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">printed</span> <span class="op">=</span> <span class="ident">formatted</span>.<span class="ident">print_with_indent</span>(<span class="ident">initial_indent</span>);
-    <span class="kw">let</span> <span class="ident">sourcemap</span> <span class="op">=</span> <span class="ident">Vec::from</span>(<span class="ident">printed</span>.<span class="ident">sourcemap</span>());
-    <span class="kw">let</span> <span class="ident">verbatim_ranges</span> <span class="op">=</span> <span class="ident">Vec::from</span>(<span class="ident">printed</span>.<span class="ident">verbatim_ranges</span>());
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">printed</span> <span class="op">=</span> <span class="ident">formatted</span>.<span class="ident">print_with_indent</span>(<span class="ident">initial_indent</span>);
+    <span class="kw">let</span> <span class="ident">sourcemap</span> <span class="op">=</span> <span class="ident">printed</span>.<span class="ident">take_sourcemap</span>();
+    <span class="kw">let</span> <span class="ident">verbatim_ranges</span> <span class="op">=</span> <span class="ident">printed</span>.<span class="ident">take_verbatim_ranges</span>();
     <span class="prelude-val">Ok</span>(<span class="ident">Printed::new</span>(
         <span class="ident">printed</span>.<span class="ident">into_code</span>(),
         <span class="prelude-val">Some</span>(<span class="ident">syntax</span>.<span class="ident">text_range</span>()),
