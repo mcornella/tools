@@ -280,9 +280,7 @@
 <span id="274">274</span>
 <span id="275">275</span>
 <span id="276">276</span>
-<span id="277">277</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::CstFormatContext</span>;
-<span class="kw">use</span> <span class="ident">rome_rowan</span>::{
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_rowan</span>::{
     <span class="ident">Direction</span>, <span class="ident">Language</span>, <span class="ident">SyntaxElement</span>, <span class="ident">SyntaxKind</span>, <span class="ident">SyntaxNode</span>, <span class="ident">SyntaxTriviaPieceComments</span>,
     <span class="ident">WalkEvent</span>,
 };
@@ -441,9 +439,9 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">Language</span><span class="op">&gt;</span> <span class="ident">Comments</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Extracts all the suppressions from `root` and its child nodes.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_node</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>(<span class="ident">root</span>: <span class="kw-2">&amp;</span><span class="ident">SyntaxNode</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_node</span><span class="op">&lt;</span><span class="ident">FormatLanguage</span><span class="op">&gt;</span>(<span class="ident">root</span>: <span class="kw-2">&amp;</span><span class="ident">SyntaxNode</span><span class="op">&lt;</span><span class="ident">L</span><span class="op">&gt;</span>, <span class="ident">language</span>: <span class="kw-2">&amp;</span><span class="ident">FormatLanguage</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">Context</span>: <span class="ident">CstFormatContext</span><span class="op">&lt;</span><span class="ident">Language</span> <span class="op">=</span> <span class="ident">L</span><span class="op">&gt;</span>,
+        <span class="ident">FormatLanguage</span>: <span class="ident"><span class="kw">crate</span>::FormatLanguage</span><span class="op">&lt;</span><span class="ident">SyntaxLanguage</span> <span class="op">=</span> <span class="ident">L</span><span class="op">&gt;</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">suppressed_nodes</span> <span class="op">=</span> <span class="ident">HashSet::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current_node</span> <span class="op">=</span> <span class="prelude-val">None</span>;
@@ -473,7 +471,7 @@
                             .<span class="ident">pieces</span>()
                             .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">piece</span><span class="op">|</span> <span class="ident">piece</span>.<span class="ident">as_comments</span>())
                         {
-                            <span class="kw">if</span> <span class="ident">context</span>.<span class="ident">comment_style</span>().<span class="ident">is_suppression</span>(<span class="ident">comment</span>.<span class="ident">text</span>()) {
+                            <span class="kw">if</span> <span class="ident">language</span>.<span class="ident">comment_style</span>().<span class="ident">is_suppression</span>(<span class="ident">comment</span>.<span class="ident">text</span>()) {
                                 <span class="ident">suppressed_nodes</span>.<span class="ident">insert</span>(<span class="ident">current_node</span>);
                                 <span class="kw">break</span>;
                             }

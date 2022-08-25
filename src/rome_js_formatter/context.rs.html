@@ -331,11 +331,6 @@
 <span id="325">325</span>
 <span id="326">326</span>
 <span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
-<span id="331">331</span>
-<span id="332">332</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_formatter::printer::PrinterOptions</span>;
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{
     <span class="ident">CommentKind</span>, <span class="ident">CommentStyle</span>, <span class="ident">Comments</span>, <span class="ident">CstFormatContext</span>, <span class="ident">FormatContext</span>, <span class="ident">FormatOptions</span>,
@@ -358,10 +353,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">JsFormatContext</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">options</span>: <span class="ident">JsFormatOptions</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">options</span>: <span class="ident">JsFormatOptions</span>, <span class="ident">comments</span>: <span class="ident">Comments</span><span class="op">&lt;</span><span class="ident">JsLanguage</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">options</span>,
-            ..<span class="ident">JsFormatContext::default</span>()
+            <span class="ident">comments</span>: <span class="ident">Rc::new</span>(<span class="ident">comments</span>),
         }
     }
 }
@@ -399,11 +394,6 @@
 
     <span class="kw">fn</span> <span class="ident">comments</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">Comments</span><span class="op">&lt;</span><span class="ident">JsLanguage</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">comments</span>.<span class="ident">clone</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">with_comments</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">comments</span>: <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">Comments</span><span class="op">&lt;</span><span class="ident">JsLanguage</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">comments</span> <span class="op">=</span> <span class="ident">comments</span>;
-        <span class="self">self</span>
     }
 }
 
