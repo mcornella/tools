@@ -346,7 +346,7 @@
 
 <span class="kw">impl</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">JsFormatContext</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">JsxSpace</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">JsFormatter</span>) -&gt; <span class="ident">FormatResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">jsx_space</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">formatter</span>.<span class="ident">context</span>().<span class="ident">quote_style</span>() {
+        <span class="kw">let</span> <span class="ident">jsx_space</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">formatter</span>.<span class="ident">options</span>().<span class="ident">quote_style</span>() {
             <span class="ident">QuoteStyle::Double</span> =&gt; <span class="string">&quot;{\&quot; \&quot;}&quot;</span>,
             <span class="ident">QuoteStyle::Single</span> =&gt; <span class="string">&quot;{\&#39; \&#39;}&quot;</span>,
         };

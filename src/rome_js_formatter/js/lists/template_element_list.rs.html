@@ -352,7 +352,7 @@
                     <span class="kw">let</span> <span class="ident">chunk_token</span> <span class="op">=</span> <span class="ident">chunk</span>.<span class="ident">template_chunk_token</span>()<span class="question-mark">?</span>;
                     <span class="kw">let</span> <span class="ident">chunk_text</span> <span class="op">=</span> <span class="ident">chunk_token</span>.<span class="ident">text</span>();
 
-                    <span class="kw">let</span> <span class="ident">tab_width</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">context</span>().<span class="ident">tab_width</span>();
+                    <span class="kw">let</span> <span class="ident">tab_width</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">options</span>().<span class="ident">tab_width</span>();
 
                     <span class="ident">indention</span> <span class="op">=</span>
                         <span class="ident">TemplateElementIndention::after_last_new_line</span>(<span class="ident">chunk_text</span>, <span class="ident">tab_width</span>);

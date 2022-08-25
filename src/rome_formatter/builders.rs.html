@@ -2246,13 +2246,13 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Soft line breaks are emitted if the enclosing `Group` doesn&#39;t fit on a single line</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// use rome_formatter::{format, format_args, LineWidth};</span>
+<span class="doccomment">/// use rome_formatter::{format, format_args, LineWidth, SimpleFormatOptions};</span>
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let context = SimpleFormatContext {</span>
+<span class="doccomment">/// let context = SimpleFormatContext::new(SimpleFormatOptions {</span>
 <span class="doccomment">///     line_width: LineWidth::try_from(10).unwrap(),</span>
-<span class="doccomment">///     ..SimpleFormatContext::default()</span>
-<span class="doccomment">/// };</span>
+<span class="doccomment">///     ..SimpleFormatOptions::default()</span>
+<span class="doccomment">/// });</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(context, [</span>
 <span class="doccomment">///     group(&amp;format_args![</span>
@@ -2355,13 +2355,13 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The printer breaks the lines if the enclosing `Group` doesn&#39;t fit on a single line:</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// use rome_formatter::{format_args, format, LineWidth};</span>
+<span class="doccomment">/// use rome_formatter::{format_args, format, LineWidth, SimpleFormatOptions};</span>
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let context = SimpleFormatContext {</span>
+<span class="doccomment">/// let context = SimpleFormatContext::new(SimpleFormatOptions {</span>
 <span class="doccomment">///     line_width: LineWidth::try_from(10).unwrap(),</span>
-<span class="doccomment">///     ..SimpleFormatContext::default()</span>
-<span class="doccomment">/// };</span>
+<span class="doccomment">///     ..SimpleFormatOptions::default()</span>
+<span class="doccomment">/// });</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(context, [</span>
 <span class="doccomment">///     group(&amp;format_args![</span>
@@ -3058,13 +3058,13 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// use std::num::NonZeroU8;</span>
-<span class="doccomment">/// use rome_formatter::{format, format_args, IndentStyle};</span>
+<span class="doccomment">/// use rome_formatter::{format, format_args, IndentStyle, SimpleFormatOptions};</span>
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let context = SimpleFormatContext {</span>
+<span class="doccomment">/// let context = SimpleFormatContext::new(SimpleFormatOptions {</span>
 <span class="doccomment">///     indent_style: IndentStyle::Space(4),</span>
-<span class="doccomment">///     ..SimpleFormatContext::default()</span>
-<span class="doccomment">/// };</span>
+<span class="doccomment">///     ..SimpleFormatOptions::default()</span>
+<span class="doccomment">/// });</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let block = format!(context, [</span>
 <span class="doccomment">///     text(&quot;a&quot;),</span>
@@ -3189,13 +3189,13 @@
 <span class="doccomment">/// Indents the content by one level and puts in new lines if the enclosing `Group` doesn&#39;t fit on a single line</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// use rome_formatter::{format, format_args, LineWidth};</span>
+<span class="doccomment">/// use rome_formatter::{format, format_args, LineWidth, SimpleFormatOptions};</span>
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let context = SimpleFormatContext {</span>
+<span class="doccomment">/// let context = SimpleFormatContext::new(SimpleFormatOptions {</span>
 <span class="doccomment">///     line_width: LineWidth::try_from(10).unwrap(),</span>
-<span class="doccomment">///     ..SimpleFormatContext::default()</span>
-<span class="doccomment">/// };</span>
+<span class="doccomment">///     ..SimpleFormatOptions::default()</span>
+<span class="doccomment">/// });</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(context, [</span>
 <span class="doccomment">///     group(&amp;format_args![</span>
@@ -3257,13 +3257,13 @@
 <span class="doccomment">/// fit on a single line. Otherwise, just inserts a space.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// use rome_formatter::{format, format_args, LineWidth};</span>
+<span class="doccomment">/// use rome_formatter::{format, format_args, LineWidth, SimpleFormatOptions};</span>
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let context = SimpleFormatContext {</span>
+<span class="doccomment">/// let context = SimpleFormatContext::new(SimpleFormatOptions {</span>
 <span class="doccomment">///     line_width: LineWidth::try_from(10).unwrap(),</span>
-<span class="doccomment">///     ..SimpleFormatContext::default()</span>
-<span class="doccomment">/// };</span>
+<span class="doccomment">///     ..SimpleFormatOptions::default()</span>
+<span class="doccomment">/// });</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(context, [</span>
 <span class="doccomment">///     group(&amp;format_args![</span>
@@ -3408,13 +3408,13 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The printer breaks the `Group` over multiple lines if its content doesn&#39;t fit on a single line</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// use rome_formatter::{format, format_args, LineWidth};</span>
+<span class="doccomment">/// use rome_formatter::{format, format_args, LineWidth, SimpleFormatOptions};</span>
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let context = SimpleFormatContext {</span>
+<span class="doccomment">/// let context = SimpleFormatContext::new(SimpleFormatOptions {</span>
 <span class="doccomment">///     line_width: LineWidth::try_from(20).unwrap(),</span>
-<span class="doccomment">///     ..SimpleFormatContext::default()</span>
-<span class="doccomment">/// };</span>
+<span class="doccomment">///     ..SimpleFormatOptions::default()</span>
+<span class="doccomment">/// });</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(context, [</span>
 <span class="doccomment">///     group(&amp;format_args![</span>
@@ -3711,14 +3711,14 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Prints the trailing comma for the last array element if the `Group` doesn&#39;t fit on a single line</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// use rome_formatter::{format_args, format, LineWidth};</span>
+<span class="doccomment">/// use rome_formatter::{format_args, format, LineWidth, SimpleFormatOptions};</span>
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">/// use rome_formatter::printer::PrintWidth;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let context = SimpleFormatContext {</span>
+<span class="doccomment">/// let context = SimpleFormatContext::new(SimpleFormatOptions {</span>
 <span class="doccomment">///     line_width: LineWidth::try_from(20).unwrap(),</span>
-<span class="doccomment">///     ..SimpleFormatContext::default()</span>
-<span class="doccomment">/// };</span>
+<span class="doccomment">///     ..SimpleFormatOptions::default()</span>
+<span class="doccomment">/// });</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let elements = format!(context, [</span>
 <span class="doccomment">///     group(&amp;format_args![</span>
@@ -3787,13 +3787,13 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Omits the trailing comma for the last array element if the `Group` doesn&#39;t fit on a single line</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// use rome_formatter::{format, format_args, LineWidth};</span>
+<span class="doccomment">/// use rome_formatter::{format, format_args, LineWidth, SimpleFormatOptions};</span>
 <span class="doccomment">/// use rome_formatter::prelude::*;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let context = SimpleFormatContext {</span>
+<span class="doccomment">/// let context = SimpleFormatContext::new(SimpleFormatOptions {</span>
 <span class="doccomment">///     line_width: LineWidth::try_from(20).unwrap(),</span>
-<span class="doccomment">///     ..SimpleFormatContext::default()</span>
-<span class="doccomment">/// };</span>
+<span class="doccomment">///     ..SimpleFormatOptions::default()</span>
+<span class="doccomment">/// });</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let formatted = format!(context, [</span>
 <span class="doccomment">///     group(&amp;format_args![</span>
@@ -3846,13 +3846,13 @@
     <span class="doccomment">/// The item `[4]` in this example fits on a single line but the trailing comma should still be printed</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use rome_formatter::{format, format_args, write, LineWidth};</span>
+    <span class="doccomment">/// use rome_formatter::{format, format_args, write, LineWidth, SimpleFormatOptions};</span>
     <span class="doccomment">/// use rome_formatter::prelude::*;</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let context = SimpleFormatContext {</span>
+    <span class="doccomment">/// let context = SimpleFormatContext::new(SimpleFormatOptions {</span>
     <span class="doccomment">///     line_width: LineWidth::try_from(20).unwrap(),</span>
-    <span class="doccomment">///     ..SimpleFormatContext::default()</span>
-    <span class="doccomment">/// };</span>
+    <span class="doccomment">///     ..SimpleFormatOptions::default()</span>
+    <span class="doccomment">/// });</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let formatted = format!(context, [format_with(|f| {</span>
     <span class="doccomment">///     let group_id = f.group_id(&quot;array&quot;);</span>

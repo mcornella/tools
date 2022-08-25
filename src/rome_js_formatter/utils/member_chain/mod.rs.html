@@ -770,7 +770,7 @@
 ) -&gt; <span class="ident">MemberChainGroups</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">has_seen_call_expression</span> <span class="op">=</span> <span class="bool-val">false</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">groups_builder</span> <span class="op">=</span>
-        <span class="ident">MemberChainGroupsBuilder::new</span>(<span class="ident">in_expression_statement</span>, <span class="ident">f</span>.<span class="ident">context</span>().<span class="ident">tab_width</span>());
+        <span class="ident">MemberChainGroupsBuilder::new</span>(<span class="ident">in_expression_statement</span>, <span class="ident">f</span>.<span class="ident">options</span>().<span class="ident">tab_width</span>());
     <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">flatten_items</span> {
         <span class="kw">let</span> <span class="ident">has_trailing_comments</span> <span class="op">=</span> <span class="ident">item</span>.<span class="ident">member</span>().<span class="ident">syntax</span>().<span class="ident">has_trailing_comments</span>();
 
