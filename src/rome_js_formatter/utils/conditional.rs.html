@@ -600,16 +600,6 @@
 <span id="594">594</span>
 <span id="595">595</span>
 <span id="596">596</span>
-<span id="597">597</span>
-<span id="598">598</span>
-<span id="599">599</span>
-<span id="600">600</span>
-<span id="601">601</span>
-<span id="602">602</span>
-<span id="603">603</span>
-<span id="604">604</span>
-<span id="605">605</span>
-<span id="606">606</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">rome_formatter::write</span>;
 
@@ -621,7 +611,7 @@
     <span class="ident">JsThrowStatement</span>, <span class="ident">JsUnaryExpression</span>, <span class="ident">JsYieldArgument</span>, <span class="ident">TsAsExpression</span>, <span class="ident">TsConditionalType</span>,
     <span class="ident">TsNonNullAssertionExpression</span>, <span class="ident">TsType</span>,
 };
-<span class="kw">use</span> <span class="ident">rome_rowan</span>::{<span class="ident">declare_node_union</span>, <span class="ident">AstNode</span>, <span class="ident">SyntaxResult</span>};
+<span class="kw">use</span> <span class="ident">rome_rowan</span>::{<span class="ident">declare_node_union</span>, <span class="ident">match_ast</span>, <span class="ident">AstNode</span>, <span class="ident">SyntaxResult</span>};
 
 <span class="macro">declare_node_union!</span> {
     <span class="kw">pub</span> <span class="ident">JsAnyConditional</span> <span class="op">=</span> <span class="ident">JsConditionalExpression</span> <span class="op">|</span> <span class="ident">TsConditionalType</span>
@@ -1051,98 +1041,88 @@
         <span class="comment">// expression, while skipping parenthesized expression.</span>
         <span class="comment">// The iteration &quot;breaks&quot; as soon as a non-member-chain node is found.</span>
         <span class="kw">for</span> <span class="ident">ancestor</span> <span class="kw">in</span> <span class="ident">ancestors</span> {
-            <span class="kw">let</span> <span class="ident">ancestor</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ancestor</span>.<span class="ident">kind</span>() {
-                <span class="ident">JsSyntaxKind::JS_CALL_EXPRESSION</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">call_expression</span> <span class="op">=</span> <span class="ident">JsCallExpression::unwrap_cast</span>(<span class="ident">ancestor</span>);
+            <span class="kw">let</span> <span class="ident">ancestor</span> <span class="op">=</span> <span class="macro">match_ast!</span> {
+                <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">ancestor</span> {
+                    <span class="ident">JsCallExpression</span>(<span class="ident">call_expression</span>) =&gt; {
+                        <span class="kw">if</span> <span class="ident">call_expression</span>
+                            .<span class="ident">callee</span>()
+                            .<span class="ident">map</span>(<span class="ident">ExpressionNode::into_resolved</span>)
+                            .<span class="ident">as_ref</span>()
+                            <span class="op">==</span> <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="ident">expression</span>)
+                        {
+                            <span class="ident">Ancestor::MemberChain</span>(<span class="ident">call_expression</span>.<span class="ident">into</span>())
+                        } <span class="kw">else</span> {
+                            <span class="ident">Ancestor::Root</span>(<span class="ident">call_expression</span>.<span class="ident">into_syntax</span>())
+                        }
+                    },
 
-                    <span class="kw">if</span> <span class="ident">call_expression</span>
-                        .<span class="ident">callee</span>()
-                        .<span class="ident">map</span>(<span class="ident">ExpressionNode::into_resolved</span>)
-                        .<span class="ident">as_ref</span>()
-                        <span class="op">==</span> <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="ident">expression</span>)
-                    {
-                        <span class="ident">Ancestor::MemberChain</span>(<span class="ident">call_expression</span>.<span class="ident">into</span>())
-                    } <span class="kw">else</span> {
-                        <span class="ident">Ancestor::Root</span>(<span class="ident">call_expression</span>.<span class="ident">into_syntax</span>())
-                    }
+                    <span class="ident">JsStaticMemberExpression</span>(<span class="ident">member_expression</span>) =&gt; {
+                        <span class="kw">if</span> <span class="ident">member_expression</span>
+                            .<span class="ident">object</span>()
+                            .<span class="ident">map</span>(<span class="ident">ExpressionNode::into_resolved</span>)
+                            .<span class="ident">as_ref</span>()
+                            <span class="op">==</span> <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="ident">expression</span>)
+                        {
+                            <span class="ident">Ancestor::MemberChain</span>(<span class="ident">member_expression</span>.<span class="ident">into</span>())
+                        } <span class="kw">else</span> {
+                            <span class="ident">Ancestor::Root</span>(<span class="ident">member_expression</span>.<span class="ident">into_syntax</span>())
+                        }
+                    },
+                    <span class="ident">JsComputedMemberExpression</span>(<span class="ident">member_expression</span>) =&gt; {
+                        <span class="kw">if</span> <span class="ident">member_expression</span>
+                            .<span class="ident">object</span>()
+                            .<span class="ident">map</span>(<span class="ident">ExpressionNode::into_resolved</span>)
+                            .<span class="ident">as_ref</span>()
+                            <span class="op">==</span> <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="ident">expression</span>)
+                        {
+                            <span class="ident">Ancestor::MemberChain</span>(<span class="ident">member_expression</span>.<span class="ident">into</span>())
+                        } <span class="kw">else</span> {
+                            <span class="ident">Ancestor::Root</span>(<span class="ident">member_expression</span>.<span class="ident">into_syntax</span>())
+                        }
+                    },
+                    <span class="ident">TsNonNullAssertionExpression</span>(<span class="ident">non_null_assertion</span>) =&gt; {
+                        <span class="kw">if</span> <span class="ident">non_null_assertion</span>
+                            .<span class="ident">expression</span>()
+                            .<span class="ident">map</span>(<span class="ident">ExpressionNode::into_resolved</span>)
+                            .<span class="ident">as_ref</span>()
+                            <span class="op">==</span> <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="ident">expression</span>)
+                        {
+                            <span class="ident">Ancestor::MemberChain</span>(<span class="ident">non_null_assertion</span>.<span class="ident">into</span>())
+                        } <span class="kw">else</span> {
+                            <span class="ident">Ancestor::Root</span>(<span class="ident">non_null_assertion</span>.<span class="ident">into_syntax</span>())
+                        }
+                    },
+                    <span class="ident">JsNewExpression</span>(<span class="ident">new_expression</span>) =&gt; {
+                        <span class="comment">// Skip over new expressions</span>
+                        <span class="kw">if</span> <span class="ident">new_expression</span>
+                            .<span class="ident">callee</span>()
+                            .<span class="ident">map</span>(<span class="ident">ExpressionNode::into_resolved</span>)
+                            .<span class="ident">as_ref</span>()
+                            <span class="op">==</span> <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="ident">expression</span>)
+                        {
+                            <span class="ident">parent</span> <span class="op">=</span> <span class="ident">new_expression</span>.<span class="ident">resolve_parent</span>();
+                            <span class="ident">expression</span> <span class="op">=</span> <span class="ident">new_expression</span>.<span class="ident">into</span>();
+                            <span class="kw">break</span>;
+                        }
+
+                        <span class="ident">Ancestor::Root</span>(<span class="ident">new_expression</span>.<span class="ident">into_syntax</span>())
+                    },
+                    <span class="ident">TsAsExpression</span>(<span class="ident">as_expression</span>) =&gt; {
+                        <span class="kw">if</span> <span class="ident">as_expression</span>
+                            .<span class="ident">expression</span>()
+                            .<span class="ident">map</span>(<span class="ident">ExpressionNode::into_resolved</span>)
+                            .<span class="ident">as_ref</span>()
+                            <span class="op">==</span> <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="ident">expression</span>)
+                        {
+                            <span class="ident">parent</span> <span class="op">=</span> <span class="ident">as_expression</span>.<span class="ident">resolve_parent</span>();
+                            <span class="ident">expression</span> <span class="op">=</span> <span class="ident">as_expression</span>.<span class="ident">into</span>();
+                            <span class="kw">break</span>;
+                        }
+
+                        <span class="ident">Ancestor::Root</span>(<span class="ident">as_expression</span>.<span class="ident">into_syntax</span>())
+                    },
+                    <span class="kw">_</span> =&gt; <span class="ident">Ancestor::Root</span>(<span class="ident">ancestor</span>),
                 }
-
-                <span class="ident">JsSyntaxKind::JS_STATIC_MEMBER_EXPRESSION</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">member_expression</span> <span class="op">=</span> <span class="ident">JsStaticMemberExpression::unwrap_cast</span>(<span class="ident">ancestor</span>);
-
-                    <span class="kw">if</span> <span class="ident">member_expression</span>
-                        .<span class="ident">object</span>()
-                        .<span class="ident">map</span>(<span class="ident">ExpressionNode::into_resolved</span>)
-                        .<span class="ident">as_ref</span>()
-                        <span class="op">==</span> <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="ident">expression</span>)
-                    {
-                        <span class="ident">Ancestor::MemberChain</span>(<span class="ident">member_expression</span>.<span class="ident">into</span>())
-                    } <span class="kw">else</span> {
-                        <span class="ident">Ancestor::Root</span>(<span class="ident">member_expression</span>.<span class="ident">into_syntax</span>())
-                    }
-                }
-                <span class="ident">JsSyntaxKind::JS_COMPUTED_MEMBER_EXPRESSION</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">member_expression</span> <span class="op">=</span> <span class="ident">JsComputedMemberExpression::unwrap_cast</span>(<span class="ident">ancestor</span>);
-
-                    <span class="kw">if</span> <span class="ident">member_expression</span>
-                        .<span class="ident">object</span>()
-                        .<span class="ident">map</span>(<span class="ident">ExpressionNode::into_resolved</span>)
-                        .<span class="ident">as_ref</span>()
-                        <span class="op">==</span> <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="ident">expression</span>)
-                    {
-                        <span class="ident">Ancestor::MemberChain</span>(<span class="ident">member_expression</span>.<span class="ident">into</span>())
-                    } <span class="kw">else</span> {
-                        <span class="ident">Ancestor::Root</span>(<span class="ident">member_expression</span>.<span class="ident">into_syntax</span>())
-                    }
-                }
-                <span class="ident">JsSyntaxKind::TS_NON_NULL_ASSERTION_EXPRESSION</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">non_null_assertion</span> <span class="op">=</span> <span class="ident">TsNonNullAssertionExpression::unwrap_cast</span>(<span class="ident">ancestor</span>);
-
-                    <span class="kw">if</span> <span class="ident">non_null_assertion</span>
-                        .<span class="ident">expression</span>()
-                        .<span class="ident">map</span>(<span class="ident">ExpressionNode::into_resolved</span>)
-                        .<span class="ident">as_ref</span>()
-                        <span class="op">==</span> <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="ident">expression</span>)
-                    {
-                        <span class="ident">Ancestor::MemberChain</span>(<span class="ident">non_null_assertion</span>.<span class="ident">into</span>())
-                    } <span class="kw">else</span> {
-                        <span class="ident">Ancestor::Root</span>(<span class="ident">non_null_assertion</span>.<span class="ident">into_syntax</span>())
-                    }
-                }
-                <span class="ident">JsSyntaxKind::JS_NEW_EXPRESSION</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">new_expression</span> <span class="op">=</span> <span class="ident">JsNewExpression::unwrap_cast</span>(<span class="ident">ancestor</span>);
-
-                    <span class="comment">// Skip over new expressions</span>
-                    <span class="kw">if</span> <span class="ident">new_expression</span>
-                        .<span class="ident">callee</span>()
-                        .<span class="ident">map</span>(<span class="ident">ExpressionNode::into_resolved</span>)
-                        .<span class="ident">as_ref</span>()
-                        <span class="op">==</span> <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="ident">expression</span>)
-                    {
-                        <span class="ident">parent</span> <span class="op">=</span> <span class="ident">new_expression</span>.<span class="ident">resolve_parent</span>();
-                        <span class="ident">expression</span> <span class="op">=</span> <span class="ident">new_expression</span>.<span class="ident">into</span>();
-                        <span class="kw">break</span>;
-                    }
-
-                    <span class="ident">Ancestor::Root</span>(<span class="ident">new_expression</span>.<span class="ident">into_syntax</span>())
-                }
-                <span class="ident">JsSyntaxKind::TS_AS_EXPRESSION</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">as_expression</span> <span class="op">=</span> <span class="ident">TsAsExpression::unwrap_cast</span>(<span class="ident">ancestor</span>.<span class="ident">clone</span>());
-
-                    <span class="kw">if</span> <span class="ident">as_expression</span>
-                        .<span class="ident">expression</span>()
-                        .<span class="ident">map</span>(<span class="ident">ExpressionNode::into_resolved</span>)
-                        .<span class="ident">as_ref</span>()
-                        <span class="op">==</span> <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="ident">expression</span>)
-                    {
-                        <span class="ident">parent</span> <span class="op">=</span> <span class="ident">as_expression</span>.<span class="ident">resolve_parent</span>();
-                        <span class="ident">expression</span> <span class="op">=</span> <span class="ident">as_expression</span>.<span class="ident">into</span>();
-                        <span class="kw">break</span>;
-                    }
-
-                    <span class="ident">Ancestor::Root</span>(<span class="ident">as_expression</span>.<span class="ident">into_syntax</span>())
-                }
-                <span class="kw">_</span> =&gt; <span class="ident">Ancestor::Root</span>(<span class="ident">ancestor</span>),
             };
 
             <span class="kw">match</span> <span class="ident">ancestor</span> {
