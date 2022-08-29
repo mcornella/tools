@@ -1085,35 +1085,6 @@
 <span id="1079">1079</span>
 <span id="1080">1080</span>
 <span id="1081">1081</span>
-<span id="1082">1082</span>
-<span id="1083">1083</span>
-<span id="1084">1084</span>
-<span id="1085">1085</span>
-<span id="1086">1086</span>
-<span id="1087">1087</span>
-<span id="1088">1088</span>
-<span id="1089">1089</span>
-<span id="1090">1090</span>
-<span id="1091">1091</span>
-<span id="1092">1092</span>
-<span id="1093">1093</span>
-<span id="1094">1094</span>
-<span id="1095">1095</span>
-<span id="1096">1096</span>
-<span id="1097">1097</span>
-<span id="1098">1098</span>
-<span id="1099">1099</span>
-<span id="1100">1100</span>
-<span id="1101">1101</span>
-<span id="1102">1102</span>
-<span id="1103">1103</span>
-<span id="1104">1104</span>
-<span id="1105">1105</span>
-<span id="1106">1106</span>
-<span id="1107">1107</span>
-<span id="1108">1108</span>
-<span id="1109">1109</span>
-<span id="1110">1110</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">dynamic_text</span>, <span class="ident">format_with</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::printer::LineEnding</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -1182,8 +1153,9 @@
     <span class="ident">List</span>(<span class="ident">List</span>),
 
     <span class="doccomment">/// Concatenates multiple elements together with a given separator printed in either</span>
-    <span class="doccomment">/// flat or expanded mode to fill the print width. See [crate::Formatter::fill].</span>
-    <span class="ident">Fill</span>(<span class="ident">Fill</span>),
+    <span class="doccomment">/// flat or expanded mode to fill the print width. Expect that the content is a list of alternating</span>
+    <span class="doccomment">/// [element, separator] See [crate::Formatter::fill].</span>
+    <span class="ident">Fill</span>(<span class="ident">Content</span>),
 
     <span class="doccomment">/// A text that should be printed as is, see [crate::text] for documentation and examples.</span>
     <span class="ident">Text</span>(<span class="ident">Text</span>),
@@ -1365,26 +1337,6 @@
 
     <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">content</span>
-    }
-}
-
-<span class="doccomment">/// Fill is a list of [FormatElement]s along with a separator.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The printer prints this list delimited by a separator, wrapping the list when it</span>
-<span class="doccomment">/// reaches the specified `line_width`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Fill</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">content</span>: <span class="ident">Content</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">separator</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">FormatElement</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Fill</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">FormatElement</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">content</span>
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">separator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">FormatElement</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">separator</span>
     }
 }
 
@@ -1804,7 +1756,7 @@
             <span class="op">|</span> <span class="ident">FormatElement::ConditionalGroupContent</span>(<span class="ident">ConditionalGroupContent</span> { <span class="ident">content</span>, .. })
             <span class="op">|</span> <span class="ident">FormatElement::IndentIfGroupBreaks</span>(<span class="ident">IndentIfGroupBreaks</span> { <span class="ident">content</span>, .. })
             <span class="op">|</span> <span class="ident">FormatElement::Comment</span>(<span class="ident">content</span>)
-            <span class="op">|</span> <span class="ident">FormatElement::Fill</span>(<span class="ident">Fill</span> { <span class="ident">content</span>, .. })
+            <span class="op">|</span> <span class="ident">FormatElement::Fill</span>(<span class="ident">content</span>)
             <span class="op">|</span> <span class="ident">FormatElement::Verbatim</span>(<span class="ident">Verbatim</span> { <span class="ident">content</span>, .. })
             <span class="op">|</span> <span class="ident">FormatElement::Label</span>(<span class="ident">Label</span> { <span class="ident">content</span>, .. })
             <span class="op">|</span> <span class="ident">FormatElement::Indent</span>(<span class="ident">content</span>)
@@ -2092,18 +2044,8 @@
                     ]
                 )
             }
-            <span class="ident">FormatElement::Fill</span>(<span class="ident">fill</span>) =&gt; {
-                <span class="macro">write!</span>(
-                    <span class="ident">f</span>,
-                    [
-                        <span class="ident">text</span>(<span class="string">&quot;fill(&quot;</span>),
-                        <span class="ident">fill</span>.<span class="ident">separator</span>.<span class="ident">as_ref</span>(),
-                        <span class="ident">text</span>(<span class="string">&quot;,&quot;</span>),
-                        <span class="ident">space</span>(),
-                        <span class="ident">fill</span>.<span class="ident">content</span>(),
-                        <span class="ident">text</span>(<span class="string">&quot;)&quot;</span>)
-                    ]
-                )
+            <span class="ident">FormatElement::Fill</span>(<span class="ident">content</span>) =&gt; {
+                <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">text</span>(<span class="string">&quot;fill(&quot;</span>), <span class="ident">content</span>.<span class="ident">as_ref</span>(), <span class="ident">text</span>(<span class="string">&quot;)&quot;</span>)])
             }
 
             <span class="ident">FormatElement::BestFitting</span>(<span class="ident">best_fitting</span>) =&gt; {
