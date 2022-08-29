@@ -1071,6 +1071,49 @@
 <span id="1065">1065</span>
 <span id="1066">1066</span>
 <span id="1067">1067</span>
+<span id="1068">1068</span>
+<span id="1069">1069</span>
+<span id="1070">1070</span>
+<span id="1071">1071</span>
+<span id="1072">1072</span>
+<span id="1073">1073</span>
+<span id="1074">1074</span>
+<span id="1075">1075</span>
+<span id="1076">1076</span>
+<span id="1077">1077</span>
+<span id="1078">1078</span>
+<span id="1079">1079</span>
+<span id="1080">1080</span>
+<span id="1081">1081</span>
+<span id="1082">1082</span>
+<span id="1083">1083</span>
+<span id="1084">1084</span>
+<span id="1085">1085</span>
+<span id="1086">1086</span>
+<span id="1087">1087</span>
+<span id="1088">1088</span>
+<span id="1089">1089</span>
+<span id="1090">1090</span>
+<span id="1091">1091</span>
+<span id="1092">1092</span>
+<span id="1093">1093</span>
+<span id="1094">1094</span>
+<span id="1095">1095</span>
+<span id="1096">1096</span>
+<span id="1097">1097</span>
+<span id="1098">1098</span>
+<span id="1099">1099</span>
+<span id="1100">1100</span>
+<span id="1101">1101</span>
+<span id="1102">1102</span>
+<span id="1103">1103</span>
+<span id="1104">1104</span>
+<span id="1105">1105</span>
+<span id="1106">1106</span>
+<span id="1107">1107</span>
+<span id="1108">1108</span>
+<span id="1109">1109</span>
+<span id="1110">1110</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::{<span class="ident">dynamic_text</span>, <span class="ident">format_with</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::printer::LineEnding</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -1130,6 +1173,10 @@
     <span class="doccomment">/// Allows to specify content that gets printed depending on whatever the enclosing group</span>
     <span class="doccomment">/// is printed on a single line or multiple lines. See [crate::if_group_breaks] for examples.</span>
     <span class="ident">ConditionalGroupContent</span>(<span class="ident">ConditionalGroupContent</span>),
+
+    <span class="doccomment">/// Optimized version of [FormatElement::ConditionalGroupContent] for the case where some content</span>
+    <span class="doccomment">/// should be indented if the specified group breaks.</span>
+    <span class="ident">IndentIfGroupBreaks</span>(<span class="ident">IndentIfGroupBreaks</span>),
 
     <span class="doccomment">/// Concatenates multiple elements together. See [crate::Formatter::join_with] for examples.</span>
     <span class="ident">List</span>(<span class="ident">List</span>),
@@ -1249,6 +1296,7 @@
                 <span class="ident">content</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>)
             }
             <span class="ident">FormatElement::ConditionalGroupContent</span>(<span class="ident">content</span>) =&gt; <span class="ident">content</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>),
+            <span class="ident">FormatElement::IndentIfGroupBreaks</span>(<span class="ident">content</span>) =&gt; <span class="ident">content</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>),
             <span class="ident">FormatElement::List</span>(<span class="ident">content</span>) =&gt; {
                 <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;List &quot;</span>)<span class="question-mark">?</span>;
                 <span class="ident">content</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>)
@@ -1582,6 +1630,19 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IndentIfGroupBreaks</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">content</span>: <span class="ident">Content</span>,
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">group_id</span>: <span class="ident">GroupId</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">IndentIfGroupBreaks</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">content</span>: <span class="ident">Content</span>, <span class="ident">group_id</span>: <span class="ident">GroupId</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> { <span class="ident">content</span>, <span class="ident">group_id</span> }
+    }
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConditionalGroupContent</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">content</span>: <span class="ident">Content</span>,
 
@@ -1741,6 +1802,7 @@
             <span class="ident">FormatElement::Line</span>(<span class="ident">line_mode</span>) =&gt; <span class="macro">matches!</span>(<span class="ident">line_mode</span>, <span class="ident">LineMode::Hard</span> <span class="op">|</span> <span class="ident">LineMode::Empty</span>),
             <span class="ident">FormatElement::Group</span>(<span class="ident">Group</span> { <span class="ident">content</span>, .. })
             <span class="op">|</span> <span class="ident">FormatElement::ConditionalGroupContent</span>(<span class="ident">ConditionalGroupContent</span> { <span class="ident">content</span>, .. })
+            <span class="op">|</span> <span class="ident">FormatElement::IndentIfGroupBreaks</span>(<span class="ident">IndentIfGroupBreaks</span> { <span class="ident">content</span>, .. })
             <span class="op">|</span> <span class="ident">FormatElement::Comment</span>(<span class="ident">content</span>)
             <span class="op">|</span> <span class="ident">FormatElement::Fill</span>(<span class="ident">Fill</span> { <span class="ident">content</span>, .. })
             <span class="op">|</span> <span class="ident">FormatElement::Verbatim</span>(<span class="ident">Verbatim</span> { <span class="ident">content</span>, .. })
@@ -1956,6 +2018,30 @@
                 }
 
                 <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">text</span>(<span class="string">&quot;)&quot;</span>)])
+            }
+            <span class="ident">FormatElement::IndentIfGroupBreaks</span>(<span class="ident">content</span>) =&gt; {
+                <span class="macro">write!</span>(
+                    <span class="ident">f</span>,
+                    [
+                        <span class="ident">text</span>(<span class="string">&quot;indent_if_group_breaks(&quot;</span>),
+                        <span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="ident">soft_block_indent</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
+                            <span class="ident">content</span>.<span class="ident">content</span>.<span class="ident">as_ref</span>(),
+                            <span class="ident">text</span>(<span class="string">&quot;,&quot;</span>),
+                            <span class="ident">soft_line_break_or_space</span>(),
+                            <span class="ident">text</span>(<span class="string">&quot;{&quot;</span>),
+                            <span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[<span class="ident">soft_line_indent_or_space</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
+                                <span class="ident">text</span>(<span class="string">&quot;group-id:&quot;</span>),
+                                <span class="ident">space</span>(),
+                                <span class="ident">dynamic_text</span>(
+                                    <span class="kw-2">&amp;</span><span class="macro">std::format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">content</span>.<span class="ident">group_id</span>),
+                                    <span class="ident">TextSize::default</span>()
+                                ),
+                                <span class="ident">soft_line_break_or_space</span>()
+                            ])]),
+                            <span class="ident">text</span>(<span class="string">&quot;}&quot;</span>)
+                        ]))
+                    ]
+                )
             }
             <span class="ident">FormatElement::ConditionalGroupContent</span>(<span class="ident">content</span>) =&gt; {
                 <span class="kw">match</span> <span class="ident">content</span>.<span class="ident">mode</span> {

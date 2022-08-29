@@ -1071,7 +1071,6 @@
 <span id="1065">1065</span>
 <span id="1066">1066</span>
 <span id="1067">1067</span>
-<span id="1068">1068</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module implements the formatting of binary like nodes. Binary like nodes are nodes with</span>
 <span class="doccomment">//! `left` and `right` expressions. Today, this includes:</span>
 <span class="doccomment">//! * [JsBinaryExpression]</span>
@@ -1224,13 +1223,12 @@
 
             <span class="kw">if</span> <span class="ident">last_is_jsx</span> {
                 <span class="comment">// SAFETY: `last_is_jsx` is only true if parts is not empty</span>
-                <span class="kw">let</span> <span class="ident">jsx_element</span> <span class="op">=</span> <span class="ident">parts</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>().<span class="ident">memoized</span>();
+                <span class="kw">let</span> <span class="ident">jsx_element</span> <span class="op">=</span> <span class="ident">parts</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>();
                 <span class="macro">write!</span>(
                     <span class="ident">f</span>,
                     [<span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="macro">format_args!</span>[
                         <span class="ident">format_non_jsx_parts</span>,
-                        <span class="ident">if_group_breaks</span>(<span class="kw-2">&amp;</span><span class="ident">block_indent</span>(<span class="kw-2">&amp;</span><span class="ident">jsx_element</span>)).<span class="ident">with_group_id</span>(<span class="prelude-val">Some</span>(<span class="ident">group_id</span>)),
-                        <span class="ident">if_group_fits_on_line</span>(<span class="kw-2">&amp;</span><span class="ident">jsx_element</span>).<span class="ident">with_group_id</span>(<span class="prelude-val">Some</span>(<span class="ident">group_id</span>))
+                        <span class="ident">indent_if_group_breaks</span>(<span class="kw-2">&amp;</span><span class="ident">jsx_element</span>, <span class="ident">group_id</span>),
                     ])]
                 )
             } <span class="kw">else</span> {

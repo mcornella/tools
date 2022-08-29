@@ -1205,7 +1205,6 @@
 <span id="1199">1199</span>
 <span id="1200">1200</span>
 <span id="1201">1201</span>
-<span id="1202">1202</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parentheses</span>::{
     <span class="ident">get_expression_left_side</span>, <span class="ident">resolve_parent</span>, <span class="ident">ExpressionNode</span>, <span class="ident">NeedsParentheses</span>,
 };
@@ -2144,7 +2143,7 @@
                 }
             });
 
-            <span class="kw">let</span> <span class="ident">right</span> <span class="op">=</span> <span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write_right</span>(<span class="ident">f</span>)).<span class="ident">memoized</span>();
+            <span class="kw">let</span> <span class="ident">right</span> <span class="op">=</span> <span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write_right</span>(<span class="ident">f</span>));
 
             <span class="kw">let</span> <span class="ident">inner_content</span> <span class="op">=</span> <span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
                 <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">left</span>])<span class="question-mark">?</span>;
@@ -2164,8 +2163,7 @@
                                 <span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="ident">indent</span>(<span class="kw-2">&amp;</span><span class="ident">soft_line_break_or_space</span>()),)
                                     .<span class="ident">with_group_id</span>(<span class="prelude-val">Some</span>(<span class="ident">group_id</span>)),
                                 <span class="ident">line_suffix_boundary</span>(),
-                                <span class="ident">if_group_breaks</span>(<span class="kw-2">&amp;</span><span class="ident">indent</span>(<span class="kw-2">&amp;</span><span class="ident">right</span>)).<span class="ident">with_group_id</span>(<span class="prelude-val">Some</span>(<span class="ident">group_id</span>)),
-                                <span class="ident">if_group_fits_on_line</span>(<span class="kw-2">&amp;</span><span class="ident">right</span>).<span class="ident">with_group_id</span>(<span class="prelude-val">Some</span>(<span class="ident">group_id</span>)),
+                                <span class="ident">indent_if_group_breaks</span>(<span class="kw-2">&amp;</span><span class="ident">right</span>, <span class="ident">group_id</span>)
                             ]
                         ]
                     }
