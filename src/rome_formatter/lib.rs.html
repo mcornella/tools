@@ -1459,21 +1459,6 @@
 <span id="1453">1453</span>
 <span id="1454">1454</span>
 <span id="1455">1455</span>
-<span id="1456">1456</span>
-<span id="1457">1457</span>
-<span id="1458">1458</span>
-<span id="1459">1459</span>
-<span id="1460">1460</span>
-<span id="1461">1461</span>
-<span id="1462">1462</span>
-<span id="1463">1463</span>
-<span id="1464">1464</span>
-<span id="1465">1465</span>
-<span id="1466">1466</span>
-<span id="1467">1467</span>
-<span id="1468">1468</span>
-<span id="1469">1469</span>
-<span id="1470">1470</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Infrastructure for code formatting</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This module defines [FormatElement], an IR to format code documents and provides a mean to print</span>
@@ -1541,7 +1526,6 @@
 };
 <span class="kw">use</span> <span class="ident">std::error::Error</span>;
 <span class="kw">use</span> <span class="ident">std::num::ParseIntError</span>;
-<span class="kw">use</span> <span class="ident">std::rc::Rc</span>;
 <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Hash</span>)]</span>
@@ -1709,22 +1693,8 @@
     <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Prefer FormatLanguage::comment_style&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">comment_style</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Style</span>;
 
-    <span class="doccomment">/// Returns a ref counted [Comments].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The use of a [Rc] is necessary to achieve that [Comments] has a lifetime that is independent of the [crate::Formatter].</span>
-    <span class="doccomment">/// Having independent lifetimes is necessary to support the use case where a (formattable object)[Format]</span>
-    <span class="doccomment">/// iterates over all comments and writes them into the [crate::Formatter] (mutably borrowing the [crate::Formatter] and in turn this context).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```block</span>
-    <span class="doccomment">/// for leading in f.context().comments().leading_comments(node) {</span>
-    <span class="doccomment">///     ^</span>
-    <span class="doccomment">///     |- Borrows comments</span>
-    <span class="doccomment">///   write!(f, [comment(leading.piece.text())])?;</span>
-    <span class="doccomment">///          ^</span>
-    <span class="doccomment">///          |- Mutably borrows the formatter, state, context (and comments, if they aren&#39;t wrapped by a Rc)</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">comments</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">Comments</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Language</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Returns a reference to the program&#39;s comments.</span>
+    <span class="kw">fn</span> <span class="ident">comments</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Comments</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Language</span><span class="op">&gt;</span>;
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>

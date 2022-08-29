@@ -646,7 +646,7 @@
     <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">flatten_member_chain</span>(
         <span class="kw-2">&amp;mut</span> <span class="ident">chain_members</span>,
         <span class="ident">call_expression</span>.<span class="ident">clone</span>().<span class="ident">into</span>(),
-        <span class="kw-2">&amp;</span><span class="ident">f</span>.<span class="ident">context</span>().<span class="ident">comments</span>(),
+        <span class="ident">f</span>.<span class="ident">context</span>().<span class="ident">comments</span>(),
     )<span class="question-mark">?</span>;
 
     <span class="ident">chain_members</span>.<span class="ident">push</span>(<span class="ident">root</span>);
