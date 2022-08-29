@@ -20,9 +20,13 @@ fn main() -> Result<(), Termination> {
     let args = Arguments::from_env();
 
     let subcommand = args.clone().subcommand();
-    match subcommand.as_ref().map(Option::as_deref) {
+    let r = match subcommand.as_ref().map(Option::as_deref) {
         Ok(Some("__print_socket")) => print_server_socket(),
         Ok(Some("__run_server")) => run_server_session(),
         _ => run_cli_session(args),
-    }
+    };
+
+    rome_analyze::dump_profiling();
+
+    r
 }

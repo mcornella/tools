@@ -1,4 +1,4 @@
-use std::{borrow, collections::BTreeMap};
+use std::{borrow, collections::BTreeMap, time::SystemTime};
 
 use rome_rowan::{AstNode, Language, RawSyntaxKind, SyntaxKind, SyntaxNode};
 use rustc_hash::FxHashSet;
@@ -72,6 +72,8 @@ impl<L: Language + Default> RuleRegistry<L> {
         R::Query: Queryable<Language = L>,
         <R::Query as Queryable>::Output: Clone,
     {
+        crate::profiling_name::<R>();
+
         let phase = R::phase() as usize;
         let phase = &mut self.phase_rules[phase];
 
@@ -271,6 +273,9 @@ impl<L: Language + Default> RegistryRule<L> {
                 Err(_) => return,
             };
 
+            use std::time::Instant;
+            let start = Instant::now();
+
             for result in R::run(&ctx) {
                 let text_range =
                     R::text_range(&ctx, &result).unwrap_or_else(|| params.query.text_range());
@@ -291,6 +296,9 @@ impl<L: Language + Default> RegistryRule<L> {
                     text_range,
                 });
             }
+
+            let end = Instant::now();
+            crate::profiling::<R>(end.duration_since(start));
         }
 
         Self {

@@ -16,8 +16,17 @@ path = "src/main.rs"
 rome_cli = { path = "../rome_cli" }
 rome_lsp = { path = "../rome_lsp" }
 rome_service = { path = "../rome_service" }
+rome_analyze = { path = "../rome_analyze" }
+rome_js_analyze = { path = "../rome_js_analyze" }
 
-tokio = { version = "1.15.0", features = ["io-std", "io-util", "net", "time", "rt", "rt-multi-thread"] }
+tokio = { version = "1.15.0", features = [
+    "io-std",
+    "io-util",
+    "net",
+    "time",
+    "rt",
+    "rt-multi-thread",
+] }
 tower-lsp = { version = "0.17.0" }
 anyhow = "1.0.52"
 
@@ -28,7 +37,16 @@ tracing-appender = "0.2"
 
 [target.'cfg(unix)'.dependencies]
 libc = "0.2.127"
-tokio = { version = "1.15.0", features = ["io-std", "io-util", "net", "time", "process", "rt", "rt-multi-thread", "macros"] }
+tokio = { version = "1.15.0", features = [
+    "io-std",
+    "io-util",
+    "net",
+    "time",
+    "process",
+    "rt",
+    "rt-multi-thread",
+    "macros",
+] }
 
 [target.'cfg(windows)'.dependencies]
 mimalloc = "0.1.29"

@@ -1,8 +1,9 @@
 #![deny(rustdoc::broken_intra_doc_links)]
 
+use arr_macro::arr;
 use rome_console::codespan::Severity;
 use std::cmp::Ordering;
-use std::collections::{BTreeMap, BinaryHeap};
+use std::collections::{BTreeMap, BTreeSet, BinaryHeap, HashMap};
 use std::ops;
 
 mod categories;
@@ -688,3 +689,115 @@ pub enum Never {}
 /// (`Option<Never>` has a size of 0 and can be elided, while `Option<()>` has
 /// a size of 1 as it still need to store a discriminant)
 pub type ControlFlow<B = Never> = ops::ControlFlow<B>;
+
+use std::hash::*;
+use std::sync::atomic::AtomicU64;
+use std::time::*;
+
+pub struct FnvHasher(u64);
+
+impl Default for FnvHasher {
+    #[inline]
+    fn default() -> FnvHasher {
+        FnvHasher(0xcbf29ce484222325)
+    }
+}
+
+impl Hasher for FnvHasher {
+    #[inline]
+    fn finish(&self) -> u64 {
+        self.0
+    }
+
+    #[inline]
+    fn write(&mut self, bytes: &[u8]) {
+        let FnvHasher(mut hash) = *self;
+
+        for byte in bytes.iter() {
+            hash = hash ^ (*byte as u64);
+            hash = hash.wrapping_mul(0x100000001b3);
+        }
+
+        *self = FnvHasher(hash);
+    }
+}
+
+use static_init::dynamic;
+
+#[dynamic]
+static mut TYPEIDS: BTreeSet<std::any::TypeId> = BTreeSet::new();
+
+#[dynamic]
+static mut TYPENAME: HashMap<usize, BTreeSet<&'static str>> = HashMap::new();
+static mut TIMETOOK: [AtomicU64; 512] = arr![AtomicU64::new(0); 512];
+static mut CALLCOUNT: [AtomicU64; 512] = arr![AtomicU64::new(0); 512];
+
+pub fn dump_profiling() {
+    let mut allnames: Vec<&'static str> = vec![];
+
+    unsafe {
+        let names = TYPENAME.read();
+        println!("Profiling");
+        println!("-------");
+        for (k, names) in names.iter() {
+            allnames.extend(names.iter());
+            let time = TIMETOOK[*k].load(std::sync::atomic::Ordering::SeqCst);
+            let count = CALLCOUNT[*k].load(std::sync::atomic::Ordering::SeqCst);
+            println!(
+                "{:?}: {:?} ({} calls)",
+                names,
+                std::time::Duration::from_nanos(time),
+                count
+            );
+        }
+    }
+
+    // find perfect key
+    if std::env::var("ROME_PERFECT_KEY").is_ok() {
+        let ids = TYPEIDS.read();
+        'key: for key in 0..u64::MAX {
+            let mut set = BTreeSet::new();
+            for id in ids.iter() {
+                let mut hasher = FnvHasher(key);
+                id.hash(&mut hasher);
+                let id = hasher.finish() as usize % unsafe { TIMETOOK.len() };
+                if !set.insert(id) {
+                    continue 'key;
+                }
+            }
+            println!("Perfect Key Found: {}", key);
+            break;
+        }
+    }
+}
+
+fn profiling_name<T: 'static>() {
+    let mut hasher = FnvHasher::default();
+
+    let name = std::any::type_name::<T>();
+    let name = name.split("::").last().unwrap();
+
+    let id = std::any::TypeId::of::<T>();
+    id.hash(&mut hasher);
+    unsafe {
+        let mut ids = TYPEIDS.write();
+        ids.insert(id);
+
+        let id = hasher.finish() as usize % TIMETOOK.len();
+        let mut names = TYPENAME.write();
+        names.entry(id).or_default().insert(name);
+    };
+}
+
+fn profiling<T: 'static>(duration: std::time::Duration) {
+    let duration = duration.as_nanos() as u64;
+
+    let mut hasher = FnvHasher::default();
+    let id = std::any::TypeId::of::<T>();
+    id.hash(&mut hasher);
+    unsafe {
+        let id = hasher.finish() as usize % TIMETOOK.len();
+        TIMETOOK[id].fetch_add(duration, std::sync::atomic::Ordering::SeqCst);
+        CALLCOUNT[id].fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+    };
+}
