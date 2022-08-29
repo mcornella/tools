@@ -331,10 +331,18 @@
 <span id="325">325</span>
 <span id="326">326</span>
 <span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_formatter::printer::PrinterOptions</span>;
 <span class="kw">use</span> <span class="ident">rome_formatter</span>::{
     <span class="ident">CommentKind</span>, <span class="ident">CommentStyle</span>, <span class="ident">Comments</span>, <span class="ident">CstFormatContext</span>, <span class="ident">FormatContext</span>, <span class="ident">FormatOptions</span>,
-    <span class="ident">IndentStyle</span>, <span class="ident">LineWidth</span>,
+    <span class="ident">IndentStyle</span>, <span class="ident">LineWidth</span>, <span class="ident">TransformSourceMap</span>,
 };
 <span class="kw">use</span> <span class="ident">rome_js_syntax::suppression</span>::{<span class="ident">parse_suppression_comment</span>, <span class="ident">SuppressionCategory</span>};
 <span class="kw">use</span> <span class="ident">rome_js_syntax</span>::{<span class="ident">JsLanguage</span>, <span class="ident">JsSyntaxKind</span>, <span class="ident">SourceType</span>};
@@ -350,6 +358,8 @@
 
     <span class="doccomment">/// The comments of the nodes and tokens in the program.</span>
     <span class="ident">comments</span>: <span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">Comments</span><span class="op">&lt;</span><span class="ident">JsLanguage</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+
+    <span class="ident">source_map</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TransformSourceMap</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">JsFormatContext</span> {
@@ -357,7 +367,13 @@
         <span class="self">Self</span> {
             <span class="ident">options</span>,
             <span class="ident">comments</span>: <span class="ident">Rc::new</span>(<span class="ident">comments</span>),
+            ..<span class="ident">JsFormatContext::default</span>()
         }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_source_map</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">source_map</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TransformSourceMap</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">source_map</span> <span class="op">=</span> <span class="ident">source_map</span>;
+        <span class="self">self</span>
     }
 }
 
@@ -381,6 +397,10 @@
 
     <span class="kw">fn</span> <span class="ident">options</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Options</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">options</span>
+    }
+
+    <span class="kw">fn</span> <span class="ident">source_map</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">TransformSourceMap</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">source_map</span>.<span class="ident">as_ref</span>()
     }
 }
 
@@ -446,10 +466,6 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_source_type</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">source_type</span>: <span class="ident">SourceType</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">source_type</span> <span class="op">=</span> <span class="ident">source_type</span>;
         <span class="self">self</span>
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">line_width</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">LineWidth</span> {
-        <span class="self">self</span>.<span class="ident">line_width</span>
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quote_style</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">QuoteStyle</span> {
