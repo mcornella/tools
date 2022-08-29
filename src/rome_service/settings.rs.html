@@ -209,8 +209,6 @@
 <span id="203">203</span>
 <span id="204">204</span>
 <span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Configuration</span>, <span class="ident">Rules</span>};
 <span class="kw">use</span> <span class="ident">indexmap::IndexSet</span>;
 <span class="kw">use</span> <span class="ident">rome_console::codespan::Severity</span>;
@@ -255,10 +253,8 @@
             <span class="self">self</span>.<span class="ident">linter</span> <span class="op">=</span> <span class="ident">LinterSettings::from</span>(<span class="ident">linter</span>)
         }
 
-        <span class="kw">let</span> <span class="ident">globals</span> <span class="op">=</span> <span class="ident">configuration</span>.<span class="ident">javascript</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">j</span><span class="op">|</span> <span class="ident">j</span>.<span class="ident">globals</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">globals</span>) <span class="op">=</span> <span class="ident">globals</span> {
-            <span class="self">self</span>.<span class="ident">languages</span>.<span class="ident">javascript</span>.<span class="ident">globals</span> <span class="op">=</span> <span class="ident">globals</span>;
-        }
+        <span class="kw">let</span> <span class="ident">globals</span> <span class="op">=</span> <span class="ident">configuration</span>.<span class="ident">javascript</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">j</span><span class="op">|</span> <span class="ident">j</span>.<span class="ident">globals</span>);
+        <span class="self">self</span>.<span class="ident">languages</span>.<span class="ident">javascript</span>.<span class="ident">globals</span> <span class="op">=</span> <span class="ident">globals</span>;
     }
 
     <span class="doccomment">/// It retrieves the severity based on the `code` of the rule and the current configuration.</span>
@@ -381,7 +377,7 @@
         <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;crate::configuration::deserialize_globals&quot;</span>,
         <span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;crate::configuration::serialize_globals&quot;</span>
     )]</span>
-    <span class="kw">pub</span> <span class="ident">globals</span>: <span class="ident">IndexSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">globals</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexSet</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// Handle object holding a temporary lock on the workspace settings until</span>
