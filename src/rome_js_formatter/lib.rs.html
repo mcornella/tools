@@ -794,6 +794,8 @@
 <span id="788">788</span>
 <span id="789">789</span>
 <span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Rome&#39;s official JavaScript formatter.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Implement the formatter</span>
@@ -1049,6 +1051,7 @@
 <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
 <span class="kw">mod</span> <span class="ident">generated</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">builders</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">comments</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">context</span>;
 <span class="kw">mod</span> <span class="ident">parentheses</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">separated</span>;
@@ -1067,7 +1070,8 @@
 <span class="kw">use</span> <span class="ident">rome_rowan</span>::{<span class="ident">AstNode</span>, <span class="ident">SyntaxNode</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::builders</span>::{<span class="ident">format_parenthesize</span>, <span class="ident">format_suppressed_node</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::context</span>::{<span class="ident">JsCommentStyle</span>, <span class="ident">JsFormatContext</span>, <span class="ident">JsFormatOptions</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::comments::JsCommentStyle</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::context</span>::{<span class="ident">JsFormatContext</span>, <span class="ident">JsFormatOptions</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cst::FormatJsSyntaxNode</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::syntax_rewriter::transform</span>;
 <span class="kw">use</span> <span class="ident">std::iter::FusedIterator</span>;
