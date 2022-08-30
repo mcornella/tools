@@ -2337,6 +2337,32 @@
 <span id="2331">2331</span>
 <span id="2332">2332</span>
 <span id="2333">2333</span>
+<span id="2334">2334</span>
+<span id="2335">2335</span>
+<span id="2336">2336</span>
+<span id="2337">2337</span>
+<span id="2338">2338</span>
+<span id="2339">2339</span>
+<span id="2340">2340</span>
+<span id="2341">2341</span>
+<span id="2342">2342</span>
+<span id="2343">2343</span>
+<span id="2344">2344</span>
+<span id="2345">2345</span>
+<span id="2346">2346</span>
+<span id="2347">2347</span>
+<span id="2348">2348</span>
+<span id="2349">2349</span>
+<span id="2350">2350</span>
+<span id="2351">2351</span>
+<span id="2352">2352</span>
+<span id="2353">2353</span>
+<span id="2354">2354</span>
+<span id="2355">2355</span>
+<span id="2356">2356</span>
+<span id="2357">2357</span>
+<span id="2358">2358</span>
+<span id="2359">2359</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">format_element</span>, <span class="ident">write</span>, <span class="ident">Argument</span>, <span class="ident">Arguments</span>, <span class="ident">BufferSnapshot</span>, <span class="ident">FormatState</span>, <span class="ident">GroupId</span>,
@@ -3570,6 +3596,7 @@
     <span class="ident">Group</span> {
         <span class="ident">content</span>: <span class="ident">Argument::new</span>(<span class="ident">content</span>),
         <span class="ident">group_id</span>: <span class="prelude-val">None</span>,
+        <span class="ident">should_expand</span>: <span class="bool-val">false</span>,
     }
 }
 
@@ -3577,6 +3604,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Group</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Context</span><span class="op">&gt;</span> {
     <span class="ident">content</span>: <span class="ident">Argument</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Context</span><span class="op">&gt;</span>,
     <span class="ident">group_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GroupId</span><span class="op">&gt;</span>,
+    <span class="ident">should_expand</span>: <span class="ident">bool</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">Group</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Context</span><span class="op">&gt;</span> {
@@ -3584,14 +3612,37 @@
         <span class="self">self</span>.<span class="ident">group_id</span> <span class="op">=</span> <span class="ident">group_id</span>;
         <span class="self">self</span>
     }
+
+    <span class="doccomment">/// Setting the value to `true` forces the group and its enclosing group to expand regardless if it otherwise would fit on the</span>
+    <span class="doccomment">/// line or contains any hard line breaks.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The formatter writes a [FormatElement::ExpandParent], forcing any enclosing group to expand, if `should_expand` is `true`.</span>
+    <span class="doccomment">/// It also omits the enclosing [FormatElement::Group] because the group would be forced to expand anyway.</span>
+    <span class="doccomment">/// The [FormatElement:Group] only gets written if the `group_id` specified with [Group::with_group_id] isn&#39;t [None]</span>
+    <span class="doccomment">/// because other IR elements may reference the group with that group id and the printer may panic</span>
+    <span class="doccomment">/// if no group with the given id is present in the document.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">should_expand</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">should_expand</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">should_expand</span> <span class="op">=</span> <span class="ident">should_expand</span>;
+        <span class="self">self</span>
+    }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Group</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Context</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span>) -&gt; <span class="ident">FormatResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">GroupBuffer::new</span>(<span class="ident">f</span>);
-        <span class="ident">buffer</span>.<span class="ident">write_fmt</span>(<span class="ident">Arguments::from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">content</span>))<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">buffer</span>.<span class="ident">into_vec</span>();
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">group_id</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">should_expand</span> {
+            <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">expand_parent</span>()])<span class="question-mark">?</span>;
+            <span class="kw">return</span> <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="ident">Arguments::from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">content</span>));
+        }
 
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">GroupBuffer::new</span>(<span class="ident">f</span>);
+
+        <span class="ident">buffer</span>.<span class="ident">write_fmt</span>(<span class="ident">Arguments::from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">content</span>))<span class="question-mark">?</span>;
+
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">should_expand</span> {
+            <span class="macro">write!</span>(<span class="ident">buffer</span>, [<span class="ident">expand_parent</span>()])<span class="question-mark">?</span>;
+        }
+
+        <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">buffer</span>.<span class="ident">into_vec</span>();
         <span class="kw">if</span> <span class="ident">content</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">group_id</span>.<span class="ident">is_none</span>() {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
         }
@@ -3608,6 +3659,7 @@
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;GroupElements&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;group_id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">group_id</span>)
+            .<span class="ident">field</span>(<span class="string">&quot;should_expand&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">should_expand</span>)
             .<span class="ident">field</span>(<span class="string">&quot;content&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;{{content}}&quot;</span>)
             .<span class="ident">finish</span>()
     }

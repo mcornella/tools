@@ -267,6 +267,8 @@
 <span id="261">261</span>
 <span id="262">262</span>
 <span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">array</span>;
 <span class="kw">mod</span> <span class="ident">assignment_like</span>;
 <span class="kw">mod</span> <span class="ident">binary_like_expression</span>;
@@ -286,7 +288,9 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parentheses::resolve_left_most_expression</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::JsCommentStyle</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">assignment_like::JsAnyAssignmentLike</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">assignment_like</span>::{
+    <span class="ident">with_assignment_layout</span>, <span class="ident">AssignmentLikeLayout</span>, <span class="ident">JsAnyAssignmentLike</span>,
+};
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">binary_like_expression</span>::{
     <span class="ident">needs_binary_like_parentheses</span>, <span class="ident">JsAnyBinaryLikeExpression</span>, <span class="ident">JsAnyBinaryLikeLeftExpression</span>,
 };

@@ -1548,9 +1548,9 @@ function() {
     <span class="comment">// use this test check if your snippet prints as you wish, without using a snapshot</span>
     <span class="kw">fn</span> <span class="ident">quick_test</span>() {
         <span class="kw">let</span> <span class="ident">src</span> <span class="op">=</span> <span class="string">r#&quot;
-test.expect(t =&gt; {
-	t.true(a);
-}, false);
+const getIconEngagementTypeFrom = (engagementTypes: Array&lt;EngagementType&gt;) =&gt;
+	(iconEngagementType) =&gt;
+		engagementTypes.includes(iconEngagementType);
 &quot;#</span>;
         <span class="kw">let</span> <span class="ident">syntax</span> <span class="op">=</span> <span class="ident">SourceType::tsx</span>();
         <span class="kw">let</span> <span class="ident">tree</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">src</span>, <span class="number">0</span>, <span class="ident">syntax</span>);
