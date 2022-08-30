@@ -1186,17 +1186,6 @@
 <span id="1180">1180</span>
 <span id="1181">1181</span>
 <span id="1182">1182</span>
-<span id="1183">1183</span>
-<span id="1184">1184</span>
-<span id="1185">1185</span>
-<span id="1186">1186</span>
-<span id="1187">1187</span>
-<span id="1188">1188</span>
-<span id="1189">1189</span>
-<span id="1190">1190</span>
-<span id="1191">1191</span>
-<span id="1192">1192</span>
-<span id="1193">1193</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parentheses::get_expression_left_side</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils::member_chain::is_member_call_chain</span>;
@@ -2102,36 +2091,25 @@
             <span class="comment">// 4. we write the left node inside the main buffer based on the layout</span>
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">VecBuffer::new</span>(<span class="ident">f</span>.<span class="ident">state_mut</span>());
             <span class="kw">let</span> <span class="ident">is_left_short</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">write_left</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Formatter::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buffer</span>))<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">formatted_element</span> <span class="op">=</span> <span class="ident">buffer</span>.<span class="ident">into_element</span>();
+            <span class="kw">let</span> <span class="ident">formatted_left</span> <span class="op">=</span> <span class="ident">buffer</span>.<span class="ident">into_element</span>();
 
             <span class="comment">// Compare name only if we are in a position of computing it.</span>
             <span class="comment">// If not (for example, left is not an identifier), then let&#39;s fallback to false,</span>
             <span class="comment">// so we can continue the chain of checks</span>
             <span class="kw">let</span> <span class="ident">layout</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">layout</span>(<span class="ident">is_left_short</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">left</span> <span class="op">=</span> <span class="ident">format_once</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">left</span> <span class="op">=</span> <span class="ident">format_once</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">write_element</span>(<span class="ident">formatted_left</span>));
+            <span class="kw">let</span> <span class="ident">right</span> <span class="op">=</span> <span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write_right</span>(<span class="ident">f</span>)).<span class="ident">memoized</span>();
+
+            <span class="kw">let</span> <span class="ident">inner_content</span> <span class="op">=</span> <span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
                 <span class="kw">if</span> <span class="macro">matches!</span>(
                     <span class="kw-2">&amp;</span><span class="ident">layout</span>,
                     <span class="ident">AssignmentLikeLayout::BreakLeftHandSide</span> <span class="op">|</span> <span class="ident">AssignmentLikeLayout::OnlyLeft</span>
                 ) {
-                    <span class="macro">write!</span>(
-                        <span class="ident">f</span>,
-                        [<span class="kw-2">&amp;</span><span class="ident">format_once</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> { <span class="ident">f</span>.<span class="ident">write_element</span>(<span class="ident">formatted_element</span>) })]
-                    )
+                    <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">left</span>])<span class="question-mark">?</span>;
                 } <span class="kw">else</span> {
-                    <span class="macro">write!</span>(
-                        <span class="ident">f</span>,
-                        [<span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="ident">format_once</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
-                            <span class="ident">f</span>.<span class="ident">write_element</span>(<span class="ident">formatted_element</span>)
-                        }))]
-                    )
+                    <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="ident">left</span>)])<span class="question-mark">?</span>;
                 }
-            });
-
-            <span class="kw">let</span> <span class="ident">right</span> <span class="op">=</span> <span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write_right</span>(<span class="ident">f</span>));
-
-            <span class="kw">let</span> <span class="ident">inner_content</span> <span class="op">=</span> <span class="ident">format_with</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
-                <span class="macro">write!</span>(<span class="ident">f</span>, [<span class="ident">left</span>])<span class="question-mark">?</span>;
 
                 <span class="kw">if</span> <span class="ident">layout</span> <span class="op">!</span><span class="op">=</span> <span class="ident">AssignmentLikeLayout::SuppressedInitializer</span> {
                     <span class="self">self</span>.<span class="ident">write_operator</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
