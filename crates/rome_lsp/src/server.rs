@@ -212,7 +212,7 @@ impl ServerFactory {
             ready(Ok(Some(())))
         });
 
-        // supports_feature is special because it returns a bool instead of a Result
+        // supports_feature is special because it doesn't return a Result
         builder = builder.custom_method("rome/supports_feature", |server: &LSPServer, params| {
             ready(Ok(server.session.workspace.supports_feature(params)))
         });
