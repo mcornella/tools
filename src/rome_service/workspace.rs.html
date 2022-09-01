@@ -423,6 +423,9 @@
 <span id="417">417</span>
 <span id="418">418</span>
 <span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The [Workspace] is the main entry point for high-level clients (the Rome</span>
 <span class="doccomment">//! CLI and Language Server) into the various language-specific services of the</span>
 <span class="doccomment">//! Rome toolchain (parser, formatter, analyzer ...)</span>
@@ -489,6 +492,7 @@
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">panic::RefUnwindSafe</span>, <span class="ident">sync::Arc</span>};
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::client::WorkspaceTransport</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::file_handlers::Language</span>;
 
 <span class="kw">mod</span> <span class="ident">client</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">server</span>;
@@ -519,6 +523,8 @@
     <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">RomePath</span>,
     <span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">i32</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">language_hint</span>: <span class="ident">Language</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>)]</span>

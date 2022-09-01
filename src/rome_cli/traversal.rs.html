@@ -786,6 +786,9 @@
 <span id="780">780</span>
 <span id="781">781</span>
 <span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">CliSession</span>, <span class="ident">Execution</span>, <span class="ident">FormatterReportFileDetail</span>, <span class="ident">FormatterReportSummary</span>, <span class="ident">Report</span>,
     <span class="ident">ReportDiagnostic</span>, <span class="ident">ReportDiff</span>, <span class="ident">ReportErrorKind</span>, <span class="ident">ReportKind</span>, <span class="ident">Termination</span>, <span class="ident">TraversalMode</span>,
@@ -803,7 +806,9 @@
 <span class="kw">use</span> <span class="ident">rome_fs</span>::{<span class="ident">AtomicInterner</span>, <span class="ident">FileSystem</span>, <span class="ident">OpenOptions</span>, <span class="ident">PathInterner</span>, <span class="ident">RomePath</span>};
 <span class="kw">use</span> <span class="ident">rome_fs</span>::{<span class="ident">TraversalContext</span>, <span class="ident">TraversalScope</span>};
 <span class="kw">use</span> <span class="ident">rome_service</span>::{
-    <span class="ident">workspace</span>::{<span class="ident">FeatureName</span>, <span class="ident">FileGuard</span>, <span class="ident">OpenFileParams</span>, <span class="ident">RuleCategories</span>, <span class="ident">SupportsFeatureParams</span>},
+    <span class="ident">workspace</span>::{
+        <span class="ident">FeatureName</span>, <span class="ident">FileGuard</span>, <span class="ident">Language</span>, <span class="ident">OpenFileParams</span>, <span class="ident">RuleCategories</span>, <span class="ident">SupportsFeatureParams</span>,
+    },
     <span class="ident">Workspace</span>,
 };
 <span class="kw">use</span> <span class="ident">std</span>::{
@@ -1359,6 +1364,7 @@
                 <span class="ident">path</span>: <span class="ident">rome_path</span>,
                 <span class="ident">version</span>: <span class="number">0</span>,
                 <span class="ident">content</span>: <span class="ident">input</span>.<span class="ident">clone</span>(),
+                <span class="ident">language_hint</span>: <span class="ident">Language::default</span>(),
             },
         )
         .<span class="ident">with_file_id_and_code</span>(<span class="ident">file_id</span>, <span class="string">&quot;IO&quot;</span>)<span class="question-mark">?</span>;
