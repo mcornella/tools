@@ -172,6 +172,11 @@ impl JsBatchMutation for BatchMutation<JsLanguage> {
 
 #[cfg(test)]
 mod tests {
+    use rome_js_factory::make;
+    use rome_js_parser::parse;
+    use rome_js_syntax::{JsAnyExpression, JsLogicalExpression, SourceType, T};
+    use rome_rowan::{BatchMutationExt, SyntaxNodeCast};
+
     use crate::assert_remove_ok;
 
     // Remove JsVariableDeclarator
@@ -229,5 +234,44 @@ mod tests {
         ok_remove_formal_parameter_from_class_constructor_middle,
             "class A { constructor(b, a, c) {} }",
             "class A { constructor(b, c) {} }",
+    }
+
+    #[test]
+    pub fn ok_recursive_batch_mutation() {
+        let r = parse("if (a && a.b && a.b.c) {}", 0, SourceType::js_module());
+
+        let exprs: Vec<JsLogicalExpression> = r
+            .syntax()
+            .descendants()
+            .filter_map(|x| x.cast::<JsLogicalExpression>())
+            .collect();
+
+        let mut batch = r.tree().begin();
+
+        let right = exprs[0].right().ok().unwrap();
+        let right = right.as_js_static_member_expression().unwrap().clone();
+
+        batch.replace_node(
+            JsAnyExpression::JsLogicalExpression(exprs[0].clone()),
+            JsAnyExpression::JsStaticMemberExpression(right.clone()),
+        );
+
+        // batch.replace_token_slot(&right, 1, make::token(T![?.]));
+        // batch.replace_token_slot(&right.object().unwrap(), 1, make::token(T![?.]));
+
+        batch.replace_token(right.operator_token().unwrap(), make::token(T![?.]));
+
+        let obj = right.object().unwrap();
+        batch.replace_token(
+            obj.as_js_static_member_expression()
+                .unwrap()
+                .operator_token()
+                .unwrap(),
+            make::token(T![?.]),
+        );
+
+        let root = batch.commit();
+        let after = root.to_string();
+        assert_eq!("if (a?.b?.c) {}", after.as_str());
     }
 }

@@ -1,6 +1,5 @@
 ---
 source: crates/rome_cli/tests/snap_test.rs
-assertion_line: 147
 expression: content
 ---
 ## `check.js`
@@ -37,7 +36,7 @@ error[js/useWhile]: Use while loops instead of for loops.
 Suggested fix: Use a while loop
     | @@ -1 +1 @@
 0   | - for(;true;);
-  0 | + while (true);
+  0 | +  while (true);
 
 
 ```

@@ -1,6 +1,5 @@
 ---
 source: crates/rome_cli/tests/snap_test.rs
-assertion_line: 147
 expression: content
 ---
 ## `check.js`
@@ -47,13 +46,13 @@ error[js/useWhile]: Use while loops instead of for loops.
   │ ^^^^^^^^^^^
 
 Suggested fix: Use a while loop
-    | @@ -1,5 +1,5 @@
-0 0 |   
+    | @@ -1,5 +1,4 @@
+0   | - 
 1   | - for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
-  1 | + while (true);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
-2 2 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
-3 3 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
-4 4 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
+  0 | +  while (true);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
+2 1 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
+3 2 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
+4 3 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
 
 
 ```
@@ -88,7 +87,7 @@ Suggested fix: Use a while loop
     | @@ -1,5 +1,5 @@
 0 0 |   
 1   | - for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
-  1 | + for(;true;);while (true);for(;true;);for(;true;);for(;true;);for(;true;);
+  1 | + for(;true;); while (true);for(;true;);for(;true;);for(;true;);for(;true;);
 2 2 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
 3 3 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
 4 4 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
@@ -126,7 +125,7 @@ Suggested fix: Use a while loop
     | @@ -1,5 +1,5 @@
 0 0 |   
 1   | - for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
-  1 | + for(;true;);for(;true;);while (true);for(;true;);for(;true;);for(;true;);
+  1 | + for(;true;);for(;true;); while (true);for(;true;);for(;true;);for(;true;);
 2 2 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
 3 3 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
 4 4 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
@@ -164,7 +163,7 @@ Suggested fix: Use a while loop
     | @@ -1,5 +1,5 @@
 0 0 |   
 1   | - for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
-  1 | + for(;true;);for(;true;);for(;true;);while (true);for(;true;);for(;true;);
+  1 | + for(;true;);for(;true;);for(;true;); while (true);for(;true;);for(;true;);
 2 2 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
 3 3 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
 4 4 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
@@ -202,7 +201,7 @@ Suggested fix: Use a while loop
     | @@ -1,5 +1,5 @@
 0 0 |   
 1   | - for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
-  1 | + for(;true;);for(;true;);for(;true;);for(;true;);while (true);for(;true;);
+  1 | + for(;true;);for(;true;);for(;true;);for(;true;); while (true);for(;true;);
 2 2 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
 3 3 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
 4 4 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
@@ -240,7 +239,7 @@ Suggested fix: Use a while loop
     | @@ -1,5 +1,5 @@
 0 0 |   
 1   | - for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
-  1 | + for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);while (true);
+  1 | + for(;true;);for(;true;);for(;true;);for(;true;);for(;true;); while (true);
 2 2 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
 3 3 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
 4 4 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
@@ -276,14 +275,14 @@ error[js/useWhile]: Use while loops instead of for loops.
   │ ^^^^^^^^^^^
 
 Suggested fix: Use a while loop
-    | @@ -1,6 +1,6 @@
+    | @@ -1,6 +1,5 @@
 0 0 |   
-1 1 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
+1   | - for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
 2   | - for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
-  2 | + while (true);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
-3 3 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
-4 4 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
-5 5 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
+  1 | + for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;); while (true);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
+3 2 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
+4 3 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
+5 4 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
 
 
 ```
@@ -320,7 +319,7 @@ Suggested fix: Use a while loop
 0 0 |   
 1 1 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
 2   | - for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
-  2 | + for(;true;);while (true);for(;true;);for(;true;);for(;true;);for(;true;);
+  2 | + for(;true;); while (true);for(;true;);for(;true;);for(;true;);for(;true;);
 3 3 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
 4 4 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
 5 5 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
@@ -360,7 +359,7 @@ Suggested fix: Use a while loop
 0 0 |   
 1 1 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
 2   | - for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
-  2 | + for(;true;);for(;true;);while (true);for(;true;);for(;true;);for(;true;);
+  2 | + for(;true;);for(;true;); while (true);for(;true;);for(;true;);for(;true;);
 3 3 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
 4 4 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
 5 5 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
@@ -400,7 +399,7 @@ Suggested fix: Use a while loop
 0 0 |   
 1 1 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
 2   | - for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
-  2 | + for(;true;);for(;true;);for(;true;);while (true);for(;true;);for(;true;);
+  2 | + for(;true;);for(;true;);for(;true;); while (true);for(;true;);for(;true;);
 3 3 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
 4 4 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);
 5 5 |   for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);for(;true;);

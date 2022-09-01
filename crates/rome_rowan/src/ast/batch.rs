@@ -1,10 +1,12 @@
 use rome_text_edit::Indel;
 use rome_text_size::TextRange;
 
-use crate::{AstNode, Language, SyntaxElement, SyntaxKind, SyntaxNode, SyntaxSlot, SyntaxToken};
+use crate::{
+    AstNode, Language, NodeOrToken, SyntaxElement, SyntaxKind, SyntaxNode, SyntaxSlot, SyntaxToken,
+};
 use std::{
     cmp,
-    collections::BinaryHeap,
+    collections::{BinaryHeap, HashMap},
     iter::{empty, once},
 };
 
@@ -33,12 +35,14 @@ where
 ///
 /// This is necesasry so we can aggregate all changes to the same node using "peek".
 #[derive(Debug, Clone)]
-struct CommitChange<L: Language> {
-    parent_depth: usize,
-    parent: Option<SyntaxNode<L>>,
-    parent_range: Option<(u32, u32)>,
-    new_node_slot: usize,
-    new_node: Option<SyntaxElement<L>>,
+enum CommitChange<L: Language> {
+    Replace {
+        parent_depth: usize,
+        parent: Option<SyntaxNode<L>>,
+        parent_range: Option<(u32, u32)>,
+        new_node_slot: usize,
+        new_node: Option<SyntaxElement<L>>,
+    },
 }
 
 impl<L: Language> CommitChange<L> {
@@ -47,11 +51,18 @@ impl<L: Language> CommitChange<L> {
     /// a tuple of numeric values representing the depth, parent start and slot
     /// of the corresponding change
     fn key(&self) -> (usize, cmp::Reverse<u32>, cmp::Reverse<usize>) {
-        (
-            self.parent_depth,
-            cmp::Reverse(self.parent_range.map(|(start, _)| start).unwrap_or(0)),
-            cmp::Reverse(self.new_node_slot),
-        )
+        match self {
+            CommitChange::Replace {
+                parent_depth,
+                parent_range,
+                new_node_slot,
+                ..
+            } => (
+                *parent_depth,
+                cmp::Reverse(parent_range.map(|(start, _)| start).unwrap_or(0)),
+                cmp::Reverse(*new_node_slot),
+            ),
+        }
     }
 }
 
@@ -122,6 +133,30 @@ where
         self.replace_element(prev_token.into(), next_token.into())
     }
 
+    pub fn replace_token_slot(
+        &mut self,
+        parent: &impl AstNode<Language = L>,
+        slot: usize,
+        next_token: SyntaxToken<L>,
+    ) {
+        let parent = parent.syntax();
+
+        let new_node_slot = slot;
+        let parent_range: Option<(u32, u32)> = {
+            let range = parent.text_range();
+            Some((range.start().into(), range.end().into()))
+        };
+        let parent_depth = parent.ancestors().count();
+
+        self.changes.push(CommitChange::Replace {
+            parent_depth,
+            parent: Some(parent.clone()),
+            parent_range,
+            new_node_slot,
+            new_node: Some(SyntaxElement::Token(next_token)),
+        });
+    }
+
     /// Push a change to replace the "prev_element" with "next_element".
     /// Trivia from "prev_element" is automatically copied to "next_element".
     ///
@@ -131,59 +166,59 @@ where
         prev_element: SyntaxElement<L>,
         next_element: SyntaxElement<L>,
     ) {
-        let (prev_leading_trivia, prev_trailing_trivia) = match &prev_element {
-            SyntaxElement::Node(node) => (
-                node.first_token().map(|token| token.leading_trivia()),
-                node.last_token().map(|token| token.trailing_trivia()),
-            ),
-            SyntaxElement::Token(token) => {
-                (Some(token.leading_trivia()), Some(token.trailing_trivia()))
-            }
-        };
+        // let (prev_leading_trivia, prev_trailing_trivia) = match &prev_element {
+        //     SyntaxElement::Node(node) => (
+        //         node.first_token().map(|token| token.leading_trivia()),
+        //         node.last_token().map(|token| token.trailing_trivia()),
+        //     ),
+        //     SyntaxElement::Token(token) => {
+        //         (Some(token.leading_trivia()), Some(token.trailing_trivia()))
+        //     }
+        // };
 
-        let next_element = match next_element {
-            SyntaxElement::Node(mut node) => {
-                if let Some(token) = node.first_token() {
-                    let new_token = match prev_leading_trivia {
-                        Some(prev_leading_trivia) => {
-                            token.with_leading_trivia_pieces(prev_leading_trivia.pieces())
-                        }
-                        None => token.with_leading_trivia_pieces(empty()),
-                    };
+        // let next_element = match next_element {
+        //     SyntaxElement::Node(mut node) => {
+        //         if let Some(token) = node.first_token() {
+        //             let new_token = match prev_leading_trivia {
+        //                 Some(prev_leading_trivia) => {
+        //                     token.with_leading_trivia_pieces(prev_leading_trivia.pieces())
+        //                 }
+        //                 None => token.with_leading_trivia_pieces(empty()),
+        //             };
 
-                    node = node.replace_child(token.into(), new_token.into()).unwrap();
-                }
+        //             node = node.replace_child(token.into(), new_token.into()).unwrap();
+        //         }
 
-                if let Some(token) = node.last_token() {
-                    let new_token = match prev_trailing_trivia {
-                        Some(prev_trailing_trivia) => {
-                            token.with_trailing_trivia_pieces(prev_trailing_trivia.pieces())
-                        }
-                        None => token.with_trailing_trivia_pieces(empty()),
-                    };
+        //         if let Some(token) = node.last_token() {
+        //             let new_token = match prev_trailing_trivia {
+        //                 Some(prev_trailing_trivia) => {
+        //                     token.with_trailing_trivia_pieces(prev_trailing_trivia.pieces())
+        //                 }
+        //                 None => token.with_trailing_trivia_pieces(empty()),
+        //             };
 
-                    node = node.replace_child(token.into(), new_token.into()).unwrap();
-                }
+        //             node = node.replace_child(token.into(), new_token.into()).unwrap();
+        //         }
 
-                SyntaxElement::Node(node)
-            }
-            SyntaxElement::Token(token) => {
-                let new_token = match prev_leading_trivia {
-                    Some(prev_leading_trivia) => {
-                        token.with_leading_trivia_pieces(prev_leading_trivia.pieces())
-                    }
-                    None => token.with_leading_trivia_pieces(empty()),
-                };
+        //         SyntaxElement::Node(node)
+        //     }
+        //     SyntaxElement::Token(token) => {
+        //         let new_token = match prev_leading_trivia {
+        //             Some(prev_leading_trivia) => {
+        //                 token.with_leading_trivia_pieces(prev_leading_trivia.pieces())
+        //             }
+        //             None => token.with_leading_trivia_pieces(empty()),
+        //         };
 
-                let new_token = match prev_trailing_trivia {
-                    Some(prev_trailing_trivia) => {
-                        new_token.with_trailing_trivia_pieces(prev_trailing_trivia.pieces())
-                    }
-                    None => new_token.with_trailing_trivia_pieces(empty()),
-                };
-                SyntaxElement::Token(new_token)
-            }
-        };
+        //         let new_token = match prev_trailing_trivia {
+        //             Some(prev_trailing_trivia) => {
+        //                 new_token.with_trailing_trivia_pieces(prev_trailing_trivia.pieces())
+        //             }
+        //             None => new_token.with_trailing_trivia_pieces(empty()),
+        //         };
+        //         SyntaxElement::Token(new_token)
+        //     }
+        // };
 
         self.push_change(prev_element, Some(next_element))
     }
@@ -248,7 +283,7 @@ where
         });
         let parent_depth = parent.as_ref().map(|p| p.ancestors().count()).unwrap_or(0);
 
-        self.changes.push(CommitChange {
+        self.changes.push(CommitChange::Replace {
             parent_depth,
             parent,
             parent_range,
@@ -261,20 +296,27 @@ where
     /// a list of individual text edits to be performed on the source code, or
     /// [None] if the mutation is empty
     pub fn as_text_edits(&self) -> Option<(TextRange, Vec<Indel>)> {
-        let iter = self.changes.iter().filter_map(|change| {
-            let parent = change.parent.as_ref().unwrap_or(&self.root);
-            let delete = match parent.slots().nth(change.new_node_slot) {
-                Some(SyntaxSlot::Node(node)) => node.text_range(),
-                Some(SyntaxSlot::Token(token)) => token.text_range(),
-                _ => return None,
-            };
+        let iter = self.changes.iter().filter_map(|change| match change {
+            CommitChange::Replace {
+                parent,
+                new_node_slot,
+                new_node,
+                ..
+            } => {
+                let parent = parent.as_ref().unwrap_or(&self.root);
+                let delete = match parent.slots().nth(*new_node_slot) {
+                    Some(SyntaxSlot::Node(node)) => node.text_range(),
+                    Some(SyntaxSlot::Token(token)) => token.text_range(),
+                    _ => return None,
+                };
 
-            let insert = match &change.new_node {
-                Some(elem) => elem.to_string(),
-                None => String::new(),
-            };
+                let insert = match &new_node {
+                    Some(elem) => elem.to_string(),
+                    None => String::new(),
+                };
 
-            Some(Indel { delete, insert })
+                Some(Indel { delete, insert })
+            }
         });
 
         let mut range = None;
@@ -310,73 +352,163 @@ where
     ///
     pub fn commit(self) -> SyntaxNode<L> {
         let BatchMutation { root, mut changes } = self;
-        // Fill the heap with the requested changes
 
-        while let Some(item) = changes.pop() {
+        let mut stash: HashMap<(usize, TextRange), Option<SyntaxElement<L>>> = HashMap::new();
+
+        while let Some(change) = changes.pop() {
+            println!("-----------");
+
             // If parent is None, we reached the root
-            if let Some(current_parent) = item.parent {
-                // This must be done before the detachment below
-                // because we need nodes that are still valid in the old tree
+            match change {
+                CommitChange::Replace {
+                    parent_depth,
+                    parent,
+                    new_node_slot,
+                    new_node,
+                    ..
+                } => {
+                    if let Some(current_parent) = parent {
+                        // This must be done before the detachment below
+                        // because we need nodes that are still valid in the old tree
 
-                let grandparent = current_parent.parent();
-                let grandparent_range = grandparent.as_ref().map(|g| {
-                    let range = g.text_range();
-                    (range.start().into(), range.end().into())
-                });
-                let currentparent_slot = current_parent.index();
+                        let grandparent = current_parent.parent();
+                        let grandparent_range = grandparent.as_ref().map(|g| {
+                            let range = g.text_range();
+                            (range.start().into(), range.end().into())
+                        });
+                        let currentparent_slot = current_parent.index();
 
-                // Aggregate all modifications to the current parent
-                // This works because of the Ord we defined in the [CommitChange] struct
+                        // Aggregate all modifications to the current parent
+                        // This works because of the Ord we defined in the [CommitChange] struct
 
-                let mut modifications = vec![(item.new_node_slot, item.new_node)];
-                loop {
-                    if let Some(next_change_parent) = changes.peek().and_then(|i| i.parent.as_ref())
-                    {
-                        if *next_change_parent == current_parent {
-                            // SAFETY: We can .pop().unwrap() because we .peek() above
-                            let next_change = changes.pop().expect("changes.pop");
-                            modifications.push((next_change.new_node_slot, next_change.new_node));
-                            continue;
+                        let mut modifications = vec![(new_node_slot, new_node)];
+                        loop {
+                            if let Some(next_change_parent) = changes.peek().and_then(|i| match i {
+                                CommitChange::Replace { parent, .. } => parent.as_ref(),
+                            }) {
+                                if *next_change_parent == current_parent {
+                                    // SAFETY: We can .pop().unwrap() because we .peek() above
+                                    let next_change = changes.pop().expect("changes.pop");
+                                    match next_change {
+                                        CommitChange::Replace {
+                                            new_node_slot,
+                                            new_node,
+                                            ..
+                                        } => modifications.push((new_node_slot, new_node)),
+                                    }
+                                    continue;
+                                }
+                            }
+                            break;
                         }
-                    }
-                    break;
-                }
 
-                // Now we detach the current parent, make all the modifications
-                // and push a pending change to its parent.
+                        // Now we detach the current parent, make all the modifications
+                        // and push a pending change to its parent.
 
-                let mut current_parent = current_parent.detach();
-                let is_list = current_parent.kind().is_list();
-                let mut removed_slots = 0;
+                        println!("Before: {:?}", current_parent.to_string());
+                        for (index, new_node) in modifications.iter() {
+                            let will_be_changed =
+                                current_parent.slots().skip(*index).next().unwrap();
+                            match will_be_changed {
+                                SyntaxSlot::Node(node) => {
+                                    println!(
+                                        "{} -> {:?}",
+                                        node.to_string(),
+                                        new_node.as_ref().map(|x| x.to_string()),
+                                    )
+                                }
+                                SyntaxSlot::Token(token) => {
+                                    println!(
+                                        "{} -> {:?}",
+                                        token.to_string(),
+                                        new_node.as_ref().map(|x| x.to_string()),
+                                    )
+                                }
+                                SyntaxSlot::Empty => {}
+                            }
+                        }
 
-                for (index, replace_with) in modifications {
-                    let index = index.checked_sub( removed_slots).unwrap_or_else(|| panic!("cannot replace element in slot {index} with {removed_slots} removed slots"));
+                        let mut insert_into_stash = None;
+                        for change in changes.iter() {
+                            match change {
+                                CommitChange::Replace { new_node, .. } => match new_node.as_ref() {
+                                    Some(NodeOrToken::Node(node)) => {
+                                        if node == &current_parent {
+                                            let node_depth = node.ancestors().count();
+                                            let node_range = node.text_range();
+                                            insert_into_stash = Some((node_depth, node_range));
+                                        }
+                                    }
+                                    _ => {}
+                                },
+                            }
+                        }
 
-                    current_parent = if is_list && replace_with.is_none() {
-                        removed_slots += 1;
-                        current_parent.clone().splice_slots(index..=index, empty())
+                        let mut current_parent = current_parent.detach();
+                        let is_list = current_parent.kind().is_list();
+                        let mut removed_slots = 0;
+
+                        for (index, replace_with) in modifications {
+                            let index = index.checked_sub(removed_slots).unwrap_or_else(|| panic!("cannot replace element in slot {index} with {removed_slots} removed slots"));
+
+                            current_parent = match replace_with {
+                                Some(replace_with) => {
+                                    let node_depth = replace_with.ancestors().count();
+                                    let node_range = replace_with.text_range();
+                                    let key = (node_depth, node_range);
+
+                                    let replace_with = if stash.contains_key(&key) {
+                                        let n = stash[&key].clone();
+                                        println!(
+                                            "There is a newer version of this node in the stash. Using it: {:?}",
+                                            n.as_ref().map(|x| x.to_string())
+                                        );
+                                        n
+                                    } else {
+                                        Some(replace_with)
+                                    };
+
+                                    current_parent
+                                        .clone()
+                                        .splice_slots(index..=index, once(replace_with))
+                                }
+                                None if is_list => {
+                                    removed_slots += 1;
+                                    current_parent.clone().splice_slots(index..=index, empty())
+                                }
+                                None => current_parent
+                                    .clone()
+                                    .splice_slots(index..=index, once(None)),
+                            };
+                        }
+
+                        println!("After: {:?}", current_parent.to_string());
+
+                        if let Some(key) = insert_into_stash {
+                            println!(
+                                "Another mutation uses this node. Stashing to use this new version later"
+                            );
+                            stash.insert(key, Some(SyntaxElement::Node(current_parent)));
+                        } else {
+                            changes.push(CommitChange::Replace {
+                                parent_depth: parent_depth - 1,
+                                parent: grandparent,
+                                parent_range: grandparent_range,
+                                new_node_slot: currentparent_slot,
+                                new_node: Some(SyntaxElement::Node(current_parent)),
+                            });
+                        }
                     } else {
-                        current_parent
-                            .clone()
-                            .splice_slots(index..=index, once(replace_with))
-                    };
+                        let root = new_node
+                            .expect("new_node")
+                            .into_node()
+                            .expect("expected root to be a node and not a token");
+
+                        println!("Final: {:?}", root.to_string());
+
+                        return root;
+                    }
                 }
-
-                changes.push(CommitChange {
-                    parent_depth: item.parent_depth - 1,
-                    parent: grandparent,
-                    parent_range: grandparent_range,
-                    new_node_slot: currentparent_slot,
-                    new_node: Some(SyntaxElement::Node(current_parent)),
-                });
-            } else {
-                let root = item
-                    .new_node
-                    .expect("new_node")
-                    .into_node()
-                    .expect("expected root to be a node and not a token");
-
-                return root;
             }
         }
 
