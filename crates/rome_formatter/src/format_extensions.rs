@@ -34,7 +34,7 @@ pub trait FormatOptional<Context> {
     ///     none_token.with_or_empty(|token, f| write!(f, [token]))
     /// ]).unwrap();
     ///
-    /// assert!(none_formatted.into_format_element().is_empty());
+    /// assert!(none_formatted.into_document().is_empty());
     ///
     /// let some_token = Some(MyFormat);
     /// assert_eq!(
@@ -211,7 +211,7 @@ where
     /// assert_eq!("Counter:\n\tCount: 0\nCount: 0\n", formatted.print().as_code())
     ///
     /// ```
-    pub fn inspect(&mut self, f: &mut Formatter<Context>) -> FormatResult<&FormatElement> {
+    pub fn inspect(&mut self, f: &mut Formatter<Context>) -> FormatResult<&[FormatElement]> {
         let result = self
             .memory
             .get_mut()
@@ -219,7 +219,7 @@ where
 
         match result.as_ref() {
             Ok(FormatElement::Interned(interned)) => Ok(interned.deref()),
-            Ok(other) => Ok(other),
+            Ok(other) => Ok(std::slice::from_ref(other)),
             Err(error) => Err(*error),
         }
     }

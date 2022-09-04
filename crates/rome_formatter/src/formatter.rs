@@ -178,17 +178,18 @@ impl<'buf, Context> Formatter<'buf, Context> {
     /// Formats `content` into an interned element without writing it to the formatter's buffer.
     pub fn intern(&mut self, content: &dyn Format<Context>) -> FormatResult<FormatElement> {
         let mut buffer = VecBuffer::new(self.state_mut());
-
         crate::write!(&mut buffer, [content])?;
+        let elements = buffer.into_vec();
 
-        let interned = match buffer.into_element() {
-            // No point in interning an empty list as that would only result in an unnecessary allocation.
-            FormatElement::List(list) if list.is_empty() => FormatElement::List(list),
-            interned @ FormatElement::Interned(_) => interned,
-            element => FormatElement::Interned(Interned::new(element)),
-        };
+        Ok(self.intern_vec(elements))
+    }
 
-        Ok(interned)
+    pub fn intern_vec(&mut self, mut elements: Vec<FormatElement>) -> FormatElement {
+        match elements.len() {
+            // Doesn't get cheaper than calling clone, use the element directly
+            1 => elements.pop().unwrap(),
+            _ => FormatElement::Interned(Interned::new(elements)),
+        }
     }
 }
 
@@ -219,6 +220,10 @@ impl<Context> Buffer for Formatter<'_, Context> {
     #[inline(always)]
     fn write_element(&mut self, element: FormatElement) -> FormatResult<()> {
         self.buffer.write_element(element)
+    }
+
+    fn reserve(&mut self, additional: usize) {
+        self.buffer.reserve(additional)
     }
 
     #[inline(always)]

@@ -53,12 +53,12 @@ macro_rules! format_args {
 ///     write!(&mut buffer, [text("World")])?;
 ///
 ///     assert_eq!(
-///         buffer.into_element(),
-///         FormatElement::from_iter([
+///         buffer.into_vec(),
+///         vec![
 ///             FormatElement::Text(Text::Static { text: "Hello" }),
 ///             FormatElement::Space,
 ///             FormatElement::Text(Text::Static { text: "World" }),
-///         ])
+///         ]
 ///     );
 ///
 ///     Ok(())
@@ -86,7 +86,7 @@ macro_rules! write {
 /// dbg_write!(buffer, [text("Hello")]).unwrap();
 /// // ^-- prints: [src/main.rs:7][0] = StaticToken("Hello")
 ///
-/// assert_eq!(buffer.into_element(), FormatElement::Text(Text::Static { text: "Hello" }));
+/// assert_eq!(buffer.into_vec(), vec![FormatElement::Text(Text::Static { text: "Hello" })]);
 /// ```
 ///
 /// Note that the macro is intended as debugging tool and therefore you should avoid having
@@ -124,8 +124,8 @@ macro_rules! dbg_write {
 /// let formatted = format!(SimpleFormatContext::default(), [text("("), text("a"), text(")")]).unwrap();
 ///
 /// assert_eq!(
-///     formatted.into_format_element(),
-///     FormatElement::from_iter([
+///     formatted.into_document(),
+///     Document::from(vec![
 ///         FormatElement::Text(Text::Static { text: "(" }),
 ///         FormatElement::Text(Text::Static { text: "a" }),
 ///         FormatElement::Text(Text::Static { text: ")" }),
@@ -202,12 +202,12 @@ macro_rules! format {
 ///     ]
 /// ).unwrap();
 ///
-/// let elements = formatted.into_format_element();
+/// let document = formatted.into_document();
 ///
 /// // Takes the first variant if everything fits on a single line
 /// assert_eq!(
 ///     "aVeryLongIdentifier([1, 2, 3])",
-///     Formatted::new(elements.clone(), SimpleFormatContext::default())
+///     Formatted::new(document.clone(), SimpleFormatContext::default())
 ///         .print()
 ///         .as_code()
 /// );
@@ -216,7 +216,7 @@ macro_rules! format {
 /// // has some additional line breaks to make sure inner groups don't break
 /// assert_eq!(
 ///     "aVeryLongIdentifier([\n\t1, 2, 3\n])",
-///     Formatted::new(elements.clone(), SimpleFormatContext::new(SimpleFormatOptions { line_width: 21.try_into().unwrap(), ..SimpleFormatOptions::default() }))
+///     Formatted::new(document.clone(), SimpleFormatContext::new(SimpleFormatOptions { line_width: 21.try_into().unwrap(), ..SimpleFormatOptions::default() }))
 ///         .print()
 ///         .as_code()
 /// );
@@ -224,7 +224,7 @@ macro_rules! format {
 /// // Prints the last option as last resort
 /// assert_eq!(
 ///     "aVeryLongIdentifier(\n\t[\n\t\t1,\n\t\t2,\n\t\t3\n\t]\n)",
-///     Formatted::new(elements.clone(), SimpleFormatContext::new(SimpleFormatOptions { line_width: 20.try_into().unwrap(), ..SimpleFormatOptions::default() }))
+///     Formatted::new(document.clone(), SimpleFormatContext::new(SimpleFormatOptions { line_width: 20.try_into().unwrap(), ..SimpleFormatOptions::default() }))
 ///         .print()
 ///         .as_code()
 /// );
@@ -281,8 +281,8 @@ mod tests {
         write![&mut buffer, [TestFormat]].unwrap();
 
         assert_eq!(
-            buffer.into_element(),
-            FormatElement::Text(Text::Static { text: "test" })
+            buffer.into_vec(),
+            vec![FormatElement::Text(Text::Static { text: "test" })]
         );
     }
 
@@ -298,14 +298,14 @@ mod tests {
         .unwrap();
 
         assert_eq!(
-            buffer.into_element(),
-            FormatElement::List(List::new(vec![
+            buffer.into_vec(),
+            vec![
                 FormatElement::Text(Text::Static { text: "a" }),
                 FormatElement::Space,
                 FormatElement::Text(Text::Static { text: "simple" }),
                 FormatElement::Space,
                 FormatElement::Text(Text::Static { text: "test" })
-            ]))
+            ]
         );
     }
 
@@ -396,7 +396,7 @@ mod tests {
         .unwrap();
 
         let best_fitting_code = Formatted::new(
-            formatted_best_fitting.into_format_element(),
+            formatted_best_fitting.into_document(),
             SimpleFormatContext::new(SimpleFormatOptions {
                 line_width: 30.try_into().unwrap(),
                 ..SimpleFormatOptions::default()
@@ -407,7 +407,7 @@ mod tests {
         .to_string();
 
         let normal_list_code = Formatted::new(
-            formatted_normal_list.into_format_element(),
+            formatted_normal_list.into_document(),
             SimpleFormatContext::new(SimpleFormatOptions {
                 line_width: 30.try_into().unwrap(),
                 ..SimpleFormatOptions::default()

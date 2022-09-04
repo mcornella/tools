@@ -1,5 +1,7 @@
 use crate::prelude::*;
 use crate::AsFormat;
+use rome_formatter::format_element::signal::VerbatimKind;
+use rome_formatter::prelude::signal::Signal;
 use rome_formatter::token::{FormatInserted, FormatInsertedCloseParen, FormatInsertedOpenParen};
 use rome_formatter::{
     format_args, write, Argument, Arguments, CstFormatContext, FormatContext, GroupId,
@@ -213,86 +215,71 @@ impl Format<JsFormatContext> for FormatVerbatimNode<'_> {
             |source_map| source_map.trimmed_source_range(self.node),
         );
 
-        let mut buffer = VecBuffer::new(f.state_mut());
+        f.write_element(FormatElement::Signal(Signal::StartVerbatim(self.kind)))?;
 
-        write!(
-            buffer,
-            [format_with(|f: &mut JsFormatter| {
-                fn source_range(f: &JsFormatter, range: TextRange) -> TextRange {
-                    f.context()
-                        .source_map()
-                        .map_or_else(|| range, |source_map| source_map.source_range(range))
-                }
+        fn source_range(f: &JsFormatter, range: TextRange) -> TextRange {
+            f.context()
+                .source_map()
+                .map_or_else(|| range, |source_map| source_map.source_range(range))
+        }
 
-                for leading_trivia in self
-                    .node
-                    .first_leading_trivia()
-                    .into_iter()
-                    .flat_map(|trivia| trivia.pieces())
-                    .skip_while(skip_whitespace)
-                {
-                    let trivia_source_range = source_range(f, leading_trivia.text_range());
+        for leading_trivia in self
+            .node
+            .first_leading_trivia()
+            .into_iter()
+            .flat_map(|trivia| trivia.pieces())
+            .skip_while(skip_whitespace)
+        {
+            let trivia_source_range = source_range(f, leading_trivia.text_range());
 
-                    if trivia_source_range.start() >= trimmed_source_range.start() {
-                        break;
-                    }
+            if trivia_source_range.start() >= trimmed_source_range.start() {
+                break;
+            }
 
-                    write_trivia_token(f, leading_trivia)?;
-                }
+            write_trivia_token(f, leading_trivia)?;
+        }
 
-                let original_source = f
-                    .context()
-                    .source_map()
-                    .map_or_else(
-                        || self.node.text_trimmed(),
-                        |source_map| source_map.text().slice(trimmed_source_range),
-                    )
-                    .to_string();
+        let original_source = f
+            .context()
+            .source_map()
+            .map_or_else(
+                || self.node.text_trimmed(),
+                |source_map| source_map.text().slice(trimmed_source_range),
+            )
+            .to_string();
 
-                dynamic_text(
-                    &normalize_newlines(&original_source, LINE_TERMINATORS),
-                    self.node.text_trimmed_range().start(),
-                )
-                .fmt(f)?;
+        dynamic_text(
+            &normalize_newlines(&original_source, LINE_TERMINATORS),
+            self.node.text_trimmed_range().start(),
+        )
+        .fmt(f)?;
 
-                let mut trailing_trivia = self
-                    .node
-                    .last_trailing_trivia()
-                    .into_iter()
-                    .flat_map(|trivia| trivia.pieces());
+        let mut trailing_trivia = self
+            .node
+            .last_trailing_trivia()
+            .into_iter()
+            .flat_map(|trivia| trivia.pieces());
 
-                let mut trailing_back = trailing_trivia.by_ref().rev().peekable();
+        let mut trailing_back = trailing_trivia.by_ref().rev().peekable();
 
-                while let Some(trailing) = trailing_back.peek() {
-                    let is_whitespace = skip_whitespace(trailing);
+        while let Some(trailing) = trailing_back.peek() {
+            let is_whitespace = skip_whitespace(trailing);
 
-                    let trailing_source_range = source_range(f, trailing.text_range());
-                    let is_in_trimmed_range =
-                        trailing_source_range.start() < trimmed_source_range.end();
+            let trailing_source_range = source_range(f, trailing.text_range());
+            let is_in_trimmed_range = trailing_source_range.start() < trimmed_source_range.end();
 
-                    if is_whitespace || is_in_trimmed_range {
-                        trailing_back.next();
-                    } else {
-                        break;
-                    }
-                }
+            if is_whitespace || is_in_trimmed_range {
+                trailing_back.next();
+            } else {
+                break;
+            }
+        }
 
-                for trailing_trivia in trailing_trivia {
-                    write_trivia_token(f, trailing_trivia)?;
-                }
+        for trailing_trivia in trailing_trivia {
+            write_trivia_token(f, trailing_trivia)?;
+        }
 
-                Ok(())
-            })]
-        )?;
-
-        let content = buffer.into_vec();
-
-        let verbatim = Verbatim {
-            content: content.into_boxed_slice(),
-            kind: self.kind,
-        };
-
-        f.write_element(FormatElement::Verbatim(verbatim))
+        f.write_element(FormatElement::Signal(Signal::EndVerbatim))
     }
 }
 
@@ -447,11 +434,7 @@ impl Format<JsFormatContext> for FormatDelimited<'_, '_> {
                     let mut is_empty = true;
 
                     let format_content = format_once(|f| {
-                        let mut buffer = f.inspect(|element| {
-                            if !element.is_empty() {
-                                is_empty = false
-                            }
-                        });
+                        let mut buffer = f.inspect(|_| is_empty = false);
 
                         write!(
                             buffer,

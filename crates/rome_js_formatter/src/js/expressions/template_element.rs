@@ -1,6 +1,8 @@
 use crate::prelude::*;
+use rome_formatter::format_element::document::Document;
+use rome_formatter::prelude::signal::Signal;
 use rome_formatter::printer::{PrintWidth, Printer};
-use rome_formatter::{format_args, write, FormatOptions, FormatRuleWithOptions, VecBuffer};
+use rome_formatter::{format_args, write, Buffer, FormatOptions, FormatRuleWithOptions, VecBuffer};
 
 use crate::context::TabWidth;
 use crate::js::lists::template_element_list::{TemplateElementIndention, TemplateElementLayout};
@@ -87,7 +89,7 @@ impl Format<JsFormatContext> for FormatTemplateElement {
                 // the print width.
                 let mut buffer = VecBuffer::new(f.state_mut());
                 write!(buffer, [format_expression])?;
-                let root = buffer.into_element();
+                let root = Document::from(buffer.into_vec());
 
                 let print_options = f
                     .options()
@@ -212,21 +214,17 @@ where
 
     // Adds as many nested `indent` elements until it reaches the desired indention level.
     let format_indented = format_with(|f| {
-        if level == 0 {
-            write!(f, [content])
-        } else {
-            let mut buffer = VecBuffer::new(f.state_mut());
-
-            write!(buffer, [content])?;
-
-            let mut indented = buffer.into_element();
-
-            for _ in 0..level {
-                indented = FormatElement::Indent(vec![indented].into_boxed_slice());
-            }
-
-            f.write_element(indented)
+        for _ in 0..level {
+            f.write_element(FormatElement::Signal(Signal::StartIndent))?;
         }
+
+        write!(f, [content])?;
+
+        for _ in 0..level {
+            f.write_element(FormatElement::Signal(Signal::EndIndent))?;
+        }
+
+        Ok(())
     });
 
     // Adds any necessary `align` for spaces not covered by indent level.

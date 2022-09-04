@@ -50,8 +50,8 @@ pub fn check_reformat(params: CheckReformatParams) {
 
     if text != printed.as_code() {
         let input_format_element = format_node(options, root).unwrap();
-        let pretty_input_ir = format!("{}", formatted.into_format_element());
-        let pretty_reformat_ir = format!("{}", input_format_element.into_format_element());
+        let pretty_input_ir = format!("{}", formatted.into_document());
+        let pretty_reformat_ir = format!("{}", input_format_element.into_document());
 
         // Print a diff of the Formatter IR emitted for the input and the output
         let diff = similar_asserts::SimpleDiff::from_str(

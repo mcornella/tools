@@ -1,5 +1,6 @@
 use crate::prelude::*;
-use rome_formatter::{write, Buffer, VecBuffer};
+use rome_formatter::prelude::signal::Signal;
+use rome_formatter::{write, Buffer};
 use rome_js_syntax::{JsSyntaxKind, TsAnyTypeMember, TsTypeMemberList};
 
 use rome_rowan::AstNodeList;
@@ -30,25 +31,24 @@ struct TsTypeMemberItem {
 
 impl Format<JsFormatContext> for TsTypeMemberItem {
     fn fmt(&self, f: &mut JsFormatter) -> FormatResult<()> {
-        let mut buffer = VecBuffer::new(f.state_mut());
+        f.write_element(FormatElement::Signal(Signal::StartGroup(None)))?;
 
-        write!(buffer, [self.member.format()])?;
+        let mut last_is_verbatim = false;
 
-        let formatted_element = buffer.into_element();
+        {
+            let mut buffer = f.inspect(|element| match element {
+                FormatElement::Signal(Signal::EndVerbatim) => {
+                    last_is_verbatim = true;
+                }
+                _ => last_is_verbatim = false,
+            });
 
-        let is_verbatim = matches!(
-            formatted_element.last_element(),
-            Some(FormatElement::Verbatim(_))
-        );
+            write!(buffer, [self.member.format()])?;
+        }
 
-        write!(
-            f,
-            [group(&format_once(|f| {
-                f.write_element(formatted_element)
-            }))]
-        )?;
+        f.write_element(FormatElement::Signal(Signal::EndGroup))?;
 
-        if !is_verbatim {
+        if !last_is_verbatim {
             // Children don't format the separator on purpose, so it's up to the parent - this node,
             // to decide to print their separator
             if self.last {

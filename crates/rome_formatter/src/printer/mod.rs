@@ -1,15 +1,26 @@
+mod call_stack;
+mod line_suffixes;
 mod printer_options;
+mod queue;
+mod stack;
 
 pub use printer_options::*;
 
-use crate::format_element::{
-    Align, ConditionalGroupContent, DedentMode, Group, IndentIfGroupBreaks, LineMode, PrintMode,
-    VerbatimKind,
-};
+use crate::format_element::{FormatElements, LineMode, PrintMode};
 use crate::{FormatElement, GroupId, IndentStyle, Printed, SourceMarker, TextRange};
 
+use crate::format_element::document::Document;
+use crate::format_element::signal::Condition;
+use crate::prelude::signal::{DedentMode, Signal, SignalKind, VerbatimKind};
+use crate::printer::call_stack::{
+    CallStack, FitsCallStack, PrintCallStack, PrintElementArgs, StackFrame,
+};
+use crate::printer::line_suffixes::LineSuffixes;
+use crate::printer::queue::{
+    BestFittingVariantFilter, FillSeparatorItemPair, FitsFilter, FitsFilterSignal, FitsQueue,
+    OneEntryQueueFilter, PrintQueue, Queue, TakeAllFitsFilter,
+};
 use rome_rowan::{TextLen, TextSize};
-use std::iter::{once, Rev};
 use std::num::NonZeroU8;
 
 /// Prints the format elements into a string
@@ -28,30 +39,29 @@ impl<'a> Printer<'a> {
     }
 
     /// Prints the passed in element as well as all its content
-    pub fn print(self, element: &'a FormatElement) -> Printed {
-        self.print_with_indent(element, 0)
+    pub fn print(self, document: &'a Document) -> Printed {
+        self.print_with_indent(document, 0)
     }
 
     /// Prints the passed in element as well as all its content,
     /// starting at the specified indentation level
-    pub fn print_with_indent(mut self, element: &'a FormatElement, indent: u16) -> Printed {
+    pub fn print_with_indent(mut self, document: &'a Document, indent: u16) -> Printed {
         tracing::debug_span!("Printer::print").in_scope(move || {
-            let mut queue = ElementCallQueue::default();
+            #[cfg(debug_assertions)]
+            document.as_ref().validate();
 
-            queue.enqueue(PrintElementCall::new(
-                element,
-                PrintElementArgs::new(Indention::Level(indent)),
-            ));
+            let mut stack = PrintCallStack::new(PrintElementArgs::new(Indention::Level(indent)));
+            let mut queue: PrintQueue<'a> = PrintQueue::new(document.as_ref());
 
-            while let Some(print_element_call) = queue.dequeue() {
-                self.print_element(
-                    &mut queue,
-                    print_element_call.element,
-                    print_element_call.args,
-                );
+            while let Some(element) = queue.pop() {
+                self.print_element(&mut stack, &mut queue, element);
 
-                if queue.is_empty() && !self.state.line_suffixes.is_empty() {
-                    queue.extend(self.state.line_suffixes.drain(..));
+                if queue.is_empty() {
+                    if let Some((_, suffixes)) = self.state.line_suffixes.take_pending() {
+                        for suffix in suffixes.rev() {
+                            queue.extend_back(std::slice::from_ref(suffix));
+                        }
+                    }
                 }
             }
 
@@ -67,16 +77,19 @@ impl<'a> Printer<'a> {
     /// Prints a single element and push the following elements to queue
     fn print_element(
         &mut self,
-        queue: &mut ElementCallQueue<'a>,
+        stack: &mut PrintCallStack,
+        queue: &mut PrintQueue<'a>,
         element: &'a FormatElement,
-        args: PrintElementArgs,
     ) {
+        let args = stack.top();
+
         match element {
             FormatElement::Space => {
                 if self.state.line_width > 0 {
                     self.state.pending_space = true;
                 }
             }
+
             FormatElement::Text(token) => {
                 if !self.state.pending_indent.is_empty() {
                     let (indent_char, repeat_count) = match self.options.indent_style() {
@@ -136,102 +149,14 @@ impl<'a> Printer<'a> {
                 });
             }
 
-            FormatElement::Group(Group { content, id }) => {
-                let group_mode = match args.mode {
-                    PrintMode::Flat if self.state.measured_group_fits => {
-                        // A parent group has already verified that this group fits on a single line
-                        // Thus, just continue in flat mode
-                        queue.extend_with_args(content.iter(), args);
-                        PrintMode::Flat
-                    }
-                    // The printer is either in expanded mode or it's necessary to re-measure if the group fits
-                    // because the printer printed a line break
-                    _ => {
-                        // Measure to see if the group fits up on a single line. If that's the case,
-                        // print the group in "flat" mode, otherwise continue in expanded mode
-
-                        let flat_args = args.with_print_mode(PrintMode::Flat);
-                        if fits_on_line(content.iter(), flat_args, queue, self) {
-                            queue.extend_with_args(content.iter(), flat_args);
-                            self.state.measured_group_fits = true;
-                            PrintMode::Flat
-                        } else {
-                            queue.extend_with_args(
-                                content.iter(),
-                                args.with_print_mode(PrintMode::Expanded),
-                            );
-                            PrintMode::Expanded
-                        }
-                    }
-                };
-
-                if let Some(id) = id {
-                    self.state.group_modes.insert_print_mode(*id, group_mode);
-                }
-            }
-
-            FormatElement::Fill(content) => {
-                self.print_fill(queue, content, args);
-            }
-
-            FormatElement::List(list) => {
-                queue.extend_with_args(list.iter(), args);
-            }
-
-            FormatElement::Indent(content) => {
-                queue.extend_with_args(
-                    content.iter(),
-                    args.increment_indent_level(self.options.indent_style()),
-                );
-            }
-
-            FormatElement::Dedent { content, mode } => {
-                let args = match mode {
-                    DedentMode::Level => args.decrement_indent(),
-                    DedentMode::Root => args.reset_indent(),
-                };
-                queue.extend_with_args(content.iter(), args);
-            }
-
-            FormatElement::Align(Align { content, count }) => {
-                queue.extend_with_args(content.iter(), args.set_indent_align(*count))
-            }
-
-            FormatElement::ConditionalGroupContent(ConditionalGroupContent {
-                mode,
-                content,
-                group_id,
-            }) => {
-                let group_mode = match group_id {
-                    None => args.mode,
-                    Some(id) => self.state.group_modes.unwrap_print_mode(*id, element),
-                };
-
-                if &group_mode == mode {
-                    queue.extend_with_args(content.iter(), args);
-                }
-            }
-
-            FormatElement::IndentIfGroupBreaks(IndentIfGroupBreaks { content, group_id }) => {
-                let group_mode = self.state.group_modes.unwrap_print_mode(*group_id, element);
-
-                match group_mode {
-                    PrintMode::Flat => queue.extend_with_args(content.iter(), args),
-                    PrintMode::Expanded => queue.extend_with_args(
-                        content.iter(),
-                        args.increment_indent_level(self.options.indent_style),
-                    ),
-                }
-            }
-
             FormatElement::Line(line_mode) => {
-                if args.mode.is_flat()
+                if args.mode().is_flat()
                     && matches!(line_mode, LineMode::Soft | LineMode::SoftOrSpace)
                 {
                     if line_mode == &LineMode::SoftOrSpace && self.state.line_width > 0 {
                         self.state.pending_space = true;
                     }
-                } else if !self.state.line_suffixes.is_empty() {
+                } else if self.state.line_suffixes.has_pending() {
                     self.queue_line_suffixes(element, args, queue);
                 } else {
                     // Only print a newline if the current line isn't already empty
@@ -246,7 +171,7 @@ impl<'a> Printer<'a> {
                     }
 
                     self.state.pending_space = false;
-                    self.state.pending_indent = args.indent;
+                    self.state.pending_indent = args.indention();
 
                     // Fit's only tests if groups up to the first line break fit.
                     // The next group must re-measure if it still fits.
@@ -254,85 +179,174 @@ impl<'a> Printer<'a> {
                 }
             }
 
-            FormatElement::LineSuffix(suffix) => {
-                self.state
-                    .line_suffixes
-                    .extend(suffix.iter().map(|e| PrintElementCall::new(e, args)));
+            FormatElement::ExpandParent => {
+                // No-op, only has an effect on `fits`
+                debug_assert!(
+                    !args.mode().is_flat(),
+                    "Fits should always return false for `ExpandParent`"
+                );
             }
+
             FormatElement::LineSuffixBoundary => {
                 const HARD_BREAK: &FormatElement = &FormatElement::Line(LineMode::Hard);
                 self.queue_line_suffixes(HARD_BREAK, args, queue);
             }
 
-            FormatElement::Comment(content) => {
-                queue.extend_with_args(content.iter(), args);
+            FormatElement::Interned(content) => {
+                queue.extend_back(content);
             }
 
-            FormatElement::Verbatim(verbatim) => {
-                if let VerbatimKind::Verbatim { length } = &verbatim.kind {
+            FormatElement::Signal(Signal::StartGroup(id)) => {
+                let group_mode = match args.mode() {
+                    PrintMode::Flat if self.state.measured_group_fits => {
+                        // A parent group has already verified that this group fits on a single line
+                        // Thus, just continue in flat mode
+                        stack.push(SignalKind::Group, args);
+                        PrintMode::Flat
+                    }
+                    // The printer is either in expanded mode or it's necessary to re-measure if the group fits
+                    // because the printer printed a line break
+                    _ => {
+                        // Measure to see if the group fits up on a single line. If that's the case,
+                        // print the group in "flat" mode, otherwise continue in expanded mode
+                        stack.push(SignalKind::Group, args.with_print_mode(PrintMode::Flat));
+                        let fits = fits_on_line(TakeAllFitsFilter, queue, stack, self);
+                        stack.pop(SignalKind::Group);
+
+                        let mode = if fits {
+                            self.state.measured_group_fits = true;
+                            PrintMode::Flat
+                        } else {
+                            PrintMode::Expanded
+                        };
+
+                        stack.push(SignalKind::Group, args.with_print_mode(mode));
+
+                        mode
+                    }
+                };
+
+                if let Some(id) = id {
+                    self.state.group_modes.insert_print_mode(*id, group_mode);
+                }
+            }
+            FormatElement::Signal(Signal::EndGroup) => {
+                stack.pop(SignalKind::Group);
+            }
+
+            FormatElement::Signal(Signal::StartFill) => {
+                stack.push(SignalKind::Fill, args);
+                self.print_fill(queue, stack);
+            }
+            FormatElement::Signal(Signal::EndFill) => {
+                stack.pop(SignalKind::Fill);
+            }
+
+            FormatElement::Signal(Signal::StartIndent) => {
+                stack.push(
+                    SignalKind::Indent,
+                    args.increment_indent_level(self.options.indent_style()),
+                );
+            }
+            FormatElement::Signal(Signal::EndIndent) => {
+                stack.pop(SignalKind::Indent);
+            }
+
+            FormatElement::Signal(Signal::StartDedent(mode)) => {
+                let args = match mode {
+                    DedentMode::Level => args.decrement_indent(),
+                    DedentMode::Root => args.reset_indent(),
+                };
+                stack.push(SignalKind::Dedent, args);
+            }
+            FormatElement::Signal(Signal::EndDedent) => {
+                stack.pop(SignalKind::Dedent);
+            }
+
+            FormatElement::Signal(Signal::StartAlign(align)) => {
+                stack.push(SignalKind::Align, args.set_indent_align(align.count()));
+            }
+            FormatElement::Signal(Signal::EndAlign) => {
+                stack.pop(SignalKind::Align);
+            }
+
+            FormatElement::Signal(Signal::StartConditionalContent(Condition {
+                mode,
+                group_id,
+            })) => {
+                let group_mode = match group_id {
+                    None => args.mode(),
+                    Some(id) => self.state.group_modes.unwrap_print_mode(*id, element),
+                };
+
+                if group_mode != *mode {
+                    queue.skip_content(SignalKind::ConditionalContent);
+                } else {
+                    stack.push(SignalKind::ConditionalContent, args);
+                }
+            }
+            FormatElement::Signal(Signal::EndConditionalContent) => {
+                stack.pop(SignalKind::ConditionalContent);
+            }
+
+            FormatElement::Signal(Signal::StartIndentIfGroupBreaks(group_id)) => {
+                let group_mode = self.state.group_modes.unwrap_print_mode(*group_id, element);
+
+                let args = match group_mode {
+                    PrintMode::Flat => args,
+                    PrintMode::Expanded => args.increment_indent_level(self.options.indent_style),
+                };
+
+                stack.push(SignalKind::IndentIfGroupBreaks, args);
+            }
+            FormatElement::Signal(Signal::EndIndentIfGroupBreaks) => {
+                stack.pop(SignalKind::IndentIfGroupBreaks);
+            }
+
+            FormatElement::Signal(Signal::StartLineSuffix) => {
+                self.state
+                    .line_suffixes
+                    .extend(args.indention(), queue.iter_content(SignalKind::LineSuffix));
+            }
+            FormatElement::Signal(Signal::EndLineSuffix) => {
+                unreachable!("StartLineSuffix consumes the EndLineSuffix");
+            }
+
+            FormatElement::Signal(Signal::StartVerbatim(kind)) => {
+                if let VerbatimKind::Verbatim { length } = kind {
                     self.state.verbatim_markers.push(TextRange::at(
                         TextSize::from(self.state.buffer.len() as u32),
                         *length,
                     ));
                 }
 
-                queue.extend_with_args(verbatim.content.iter(), args);
+                stack.push(SignalKind::Verbatim, args);
             }
-            FormatElement::ExpandParent => {
-                // No-op, only has an effect on `fits`
-                debug_assert!(
-                    !args.mode.is_flat(),
-                    "Fits should always return false for `ExpandParent`"
-                );
+            FormatElement::Signal(Signal::EndVerbatim) => {
+                stack.pop(SignalKind::Verbatim);
             }
-            FormatElement::BestFitting(best_fitting) => {
-                match args.mode {
-                    PrintMode::Flat if self.state.measured_group_fits => {
-                        queue.enqueue(PrintElementCall::new(best_fitting.most_flat(), args))
-                    }
-                    _ => {
-                        let last_index = best_fitting.variants().len() - 1;
-                        for (index, variant) in best_fitting.variants().iter().enumerate() {
-                            if index == last_index {
-                                // No variant fits, take the last (most expanded) as fallback
-                                queue.enqueue(PrintElementCall::new(
-                                    variant,
-                                    args.with_print_mode(PrintMode::Expanded),
-                                ));
-                                break;
-                            } else {
-                                // Test if this variant fits and if so, use it. Otherwise try the next
-                                // variant.
 
-                                // Try to fit only the first variant on a single line
-                                let mode = if index == 0 {
-                                    PrintMode::Flat
-                                } else {
-                                    PrintMode::Expanded
-                                };
-
-                                if fits_on_line([variant], args.with_print_mode(mode), queue, self)
-                                {
-                                    self.state.measured_group_fits = true;
-                                    queue.enqueue(PrintElementCall::new(
-                                        variant,
-                                        args.with_print_mode(mode),
-                                    ));
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                }
+            FormatElement::Signal(Signal::StartBestFitting) => {
+                self.print_best_fitting(queue, stack);
             }
-            FormatElement::Interned(content) => queue.enqueue(PrintElementCall::new(content, args)),
-            FormatElement::Label(label) => queue.extend(
-                label
-                    .content
-                    .iter()
-                    .map(|element| PrintElementCall::new(element, args)),
-            ),
-        }
+            FormatElement::Signal(Signal::EndBestFitting) => {
+                // Best fitting doesn't print a stack frame, nothing todo
+            }
+
+            FormatElement::Signal(
+                signal @ (Signal::StartLabelled(_)
+                | Signal::StartComment
+                | Signal::StartEntry
+                | Signal::StartMostExpandedEntry),
+            ) => {
+                stack.push(signal.kind(), args);
+            }
+            FormatElement::Signal(
+                signal @ (Signal::EndLabelled | Signal::EndComment | Signal::EndEntry),
+            ) => {
+                stack.pop(signal.kind());
+            }
+        };
     }
 
     fn push_marker(&mut self, marker: SourceMarker) {
@@ -349,34 +363,82 @@ impl<'a> Printer<'a> {
         &mut self,
         line_break: &'a FormatElement,
         args: PrintElementArgs,
-        queue: &mut ElementCallQueue<'a>,
+        queue: &mut PrintQueue<'a>,
     ) {
-        if self.state.line_suffixes.is_empty() {
-            return;
+        if let Some((indention, elements)) = self.state.line_suffixes.take_pending() {
+            // Print this line break element again once all the line suffixes have been flushed
+            queue.extend_back(std::slice::from_ref(line_break));
+
+            for element in elements.rev() {
+                queue.extend_back(std::slice::from_ref(element));
+            }
+
+            // If the indentation level has changed since these line suffixes were queued,
+            // insert a line break before to push the comments into the new indent block
+            if indention.level() < args.indention().level() {
+                queue.extend_back(std::slice::from_ref(line_break));
+            }
         }
+    }
 
-        // If the indentation level has changed since these line suffixes were queued,
-        // insert a line break before to push the comments into the new indent block
-        // SAFETY: Indexing into line_suffixes is guarded by the above call to is_empty
-        let has_line_break = self.state.line_suffixes[0].args.indent.level() < args.indent.level();
+    fn print_best_fitting(&mut self, queue: &mut PrintQueue<'a>, stack: &mut PrintCallStack) {
+        let args = stack.top();
 
-        // Print this line break element again once all the line suffixes have been flushed
-        let call_self = PrintElementCall::new(line_break, args);
+        match args.mode() {
+            PrintMode::Flat if self.state.measured_group_fits => {
+                // Print the most flat version
+                self.print_entry(queue, stack, args);
 
-        let line_break = if has_line_break {
-            // Duplicate this line break element before the line
-            // suffixes if a line break is required
-            Some(call_self.clone())
-        } else {
-            None
-        };
+                // Skip all other entries.
+                queue.skip_content(SignalKind::BestFitting);
+            }
+            _ => {
+                let mut first = true;
+                while let Some(FormatElement::Signal(Signal::StartEntry)) = queue.top() {
+                    // Test if this variant fits and if so, use it. Otherwise try the next
+                    // variant.
 
-        queue.extend(
-            line_break
-                .into_iter()
-                .chain(self.state.line_suffixes.drain(..))
-                .chain(once(call_self)),
-        );
+                    // Try to fit only the first variant on a single line
+                    let mode = if first {
+                        first = false;
+                        PrintMode::Flat
+                    } else {
+                        PrintMode::Expanded
+                    };
+
+                    stack.push(SignalKind::BestFitting, args.with_print_mode(mode));
+                    let variant_fits =
+                        fits_on_line(BestFittingVariantFilter::default(), queue, stack, self);
+                    stack.pop(SignalKind::BestFitting);
+
+                    if variant_fits {
+                        self.state.measured_group_fits = true;
+                        self.print_entry(queue, stack, args.with_print_mode(mode));
+                        // Skip other variants
+                        queue.skip_content(SignalKind::BestFitting);
+                        return;
+                    } else {
+                        // Pop the head of the entry
+                        queue.pop_queue_interned();
+                        // Skip over the variants content
+                        queue.skip_content(SignalKind::Entry);
+                    }
+                }
+
+                // No variant fits, print the last variant in expanded mode
+                assert_eq!(
+                    queue.top(),
+                    Some(&FormatElement::Signal(Signal::StartMostExpandedEntry))
+                );
+
+                self.print_entry(queue, stack, args.with_print_mode(PrintMode::Expanded));
+
+                assert_eq!(
+                    queue.pop_queue_interned(),
+                    Some(&FormatElement::Signal(Signal::EndBestFitting))
+                );
+            }
+        }
     }
 
     /// Tries to fit as much content as possible on a single line.
@@ -386,34 +448,22 @@ impl<'a> Printer<'a> {
     /// * The first and second content fit on a single line. It prints the content and separator in flat mode.
     /// * The first content fits on a single line, but the second doesn't. It prints the content in flat and the separator in expanded mode.
     /// * Neither the first nor the second content fit on the line. It brings the first content and the separator in expanded mode.
-    fn print_fill(
-        &mut self,
-        queue: &mut ElementCallQueue<'a>,
-        content: &'a [FormatElement],
-        args: PrintElementArgs,
-    ) {
-        let empty_rest = ElementCallQueue::default();
+    fn print_fill(&mut self, queue: &mut PrintQueue<'a>, stack: &mut PrintCallStack) {
+        let args = stack.top();
 
-        let mut items = content.iter();
+        if matches!(queue.top(), Some(FormatElement::Signal(Signal::EndFill))) {
+            // Empty fill
+            return;
+        }
 
-        let current_content = match items.next() {
-            None => {
-                // Empty list
-                return;
-            }
-            Some(item) => item,
-        };
+        // Print the first item
+        stack.push(SignalKind::Fill, args.with_print_mode(PrintMode::Flat));
+        let mut current_fits = fits_on_line(OneEntryQueueFilter::default(), queue, stack, self);
+        stack.pop(SignalKind::Fill);
 
-        let mut current_fits = fits_on_line(
-            [current_content],
-            args.with_print_mode(PrintMode::Flat),
-            &empty_rest,
-            self,
-        );
-
-        self.print_all(
+        self.print_entry(
             queue,
-            &[current_content],
+            stack,
             args.with_print_mode(if current_fits {
                 PrintMode::Flat
             } else {
@@ -421,84 +471,57 @@ impl<'a> Printer<'a> {
             }),
         );
 
-        // Process remaining items
-        loop {
-            match (items.next(), items.next()) {
-                (Some(separator), Some(next_item)) => {
-                    // A line break in expanded mode is always necessary if the current item didn't fit.
-                    // otherwise see if both contents fit on the line.
-                    let current_and_next_fit = current_fits
-                        && fits_on_line(
-                            [separator, next_item],
-                            args.with_print_mode(PrintMode::Flat),
-                            &empty_rest,
-                            self,
-                        );
+        // Process remaining items, it's a sequence of separator, item, separator, item...
+        while !matches!(queue.top(), Some(FormatElement::Signal(Signal::EndFill))) {
+            // A line break in expanded mode is always necessary if the current item didn't fit.
+            // otherwise see if both contents fit on the line.
+            let all_fits = if current_fits {
+                stack.push(SignalKind::Fill, args.with_print_mode(PrintMode::Flat));
+                let next_fits = fits_on_line(FillSeparatorItemPair::default(), queue, stack, self);
+                stack.pop(SignalKind::Fill);
+                next_fits
+            } else {
+                false
+            };
 
-                    if current_and_next_fit {
-                        // Print Space and next item on the same line
-                        self.print_all(
-                            queue,
-                            &[separator, next_item],
-                            args.with_print_mode(PrintMode::Flat),
-                        );
-                    } else {
-                        // Print the separator and then check again if the next item fits on the line now
-                        self.print_all(
-                            queue,
-                            &[separator],
-                            args.with_print_mode(PrintMode::Expanded),
-                        );
+            let separator_mode = if all_fits {
+                PrintMode::Flat
+            } else {
+                PrintMode::Expanded
+            };
 
-                        let next_fits = fits_on_line(
-                            [next_item],
-                            args.with_print_mode(PrintMode::Flat),
-                            &empty_rest,
-                            self,
-                        );
+            // Separator
+            self.print_entry(queue, stack, args.with_print_mode(separator_mode));
 
-                        if next_fits {
-                            self.print_all(
-                                queue,
-                                &[next_item],
-                                args.with_print_mode(PrintMode::Flat),
-                            );
-                        } else {
-                            self.print_all(
-                                queue,
-                                &[next_item],
-                                args.with_print_mode(PrintMode::Expanded),
-                            );
-                        }
+            // If this was a trailing separator, break
+            if matches!(
+                queue.top_with_interned(),
+                None | Some(FormatElement::Signal(Signal::EndFill))
+            ) {
+                break;
+            }
 
-                        current_fits = next_fits;
-                    }
-                }
-                // Trailing separator
-                (Some(separator), _) => {
-                    let print_mode = if current_fits
-                        && fits_on_line(
-                            [separator],
-                            args.with_print_mode(PrintMode::Flat),
-                            &empty_rest,
-                            self,
-                        ) {
+            if all_fits {
+                // Item
+                self.print_entry(queue, stack, args.with_print_mode(PrintMode::Flat));
+            } else {
+                // Test if item fits now
+
+                stack.push(SignalKind::Fill, args.with_print_mode(PrintMode::Flat));
+                let next_fits = fits_on_line(OneEntryQueueFilter::default(), queue, stack, self);
+                stack.pop(SignalKind::Fill);
+
+                self.print_entry(
+                    queue,
+                    stack,
+                    args.with_print_mode(if next_fits {
                         PrintMode::Flat
                     } else {
                         PrintMode::Expanded
-                    };
+                    }),
+                );
 
-                    self.print_all(queue, &[separator], args.with_print_mode(print_mode));
-                }
-                (None, None) => {
-                    break;
-                }
-                (None, Some(_)) => {
-                    // Unreachable for iterators implementing [FusedIterator] which slice.iter implements.
-                    // Reaching this means that the first `iter.next()` returned `None` but calling `iter.next()`
-                    // again returns `Some`
-                    unreachable!()
-                }
+                current_fits = next_fits;
             }
         }
     }
@@ -507,25 +530,47 @@ impl<'a> Printer<'a> {
     ///
     /// Unlike [print_element], this function ensures the entire element has
     /// been printed when it returns and the queue is back to its original state
-    fn print_all(
+    fn print_entry(
         &mut self,
-        queue: &mut ElementCallQueue<'a>,
-        elements: &[&'a FormatElement],
+        queue: &mut PrintQueue<'a>,
+        stack: &mut PrintCallStack,
         args: PrintElementArgs,
     ) {
-        let min_queue_length = queue.0.len();
+        let start_entry = queue.pop_queue_interned();
 
-        queue.extend(elements.iter().map(|e| PrintElementCall::new(e, args)));
+        assert!(
+            matches!(start_entry,
+            Some(&FormatElement::Signal(
+                Signal::StartEntry | Signal::StartMostExpandedEntry
+            ))),
+            "Expected a StartEntry or StartMostExpandedEntry Signal but queue is at {start_entry:?}"
+        );
 
-        while let Some(call) = queue.dequeue() {
-            self.print_element(queue, call.element, call.args);
+        stack.push(SignalKind::Entry, args);
 
-            if queue.0.len() == min_queue_length {
-                return;
+        let mut depth = 1;
+
+        while let Some(element) = queue.pop() {
+            self.print_element(stack, queue, element);
+
+            match element {
+                FormatElement::Signal(Signal::StartEntry | Signal::StartMostExpandedEntry) => {
+                    depth += 1;
+                }
+                FormatElement::Signal(Signal::EndEntry) => {
+                    depth -= 1;
+                    if depth == 0 {
+                        return;
+                    }
+                }
+                _ => continue,
             }
-
-            debug_assert!(queue.0.len() > min_queue_length);
         }
+
+        panic!(
+            "Missing EndEntry Signal, current top is: {:?}",
+            queue.top_with_interned()
+        );
     }
 
     fn print_str(&mut self, content: &str) {
@@ -574,12 +619,13 @@ struct PrinterState<'a> {
     generated_column: usize,
     line_width: usize,
     has_empty_line: bool,
-    line_suffixes: Vec<PrintElementCall<'a>>,
+    line_suffixes: LineSuffixes<'a>,
     verbatim_markers: Vec<TextRange>,
     group_modes: GroupModes,
     // Re-used queue to measure if a group fits. Optimisation to avoid re-allocating a new
     // vec everytime a group gets measured
-    measure_queue: Vec<PrintElementCall<'a>>,
+    fits_stack: Vec<StackFrame>,
+    fits_queue: Vec<&'a [FormatElement]>,
 }
 
 /// Tracks the mode in which groups with ids are printed. Stores the groups at `group.id()` index.
@@ -606,61 +652,6 @@ impl GroupModes {
         self.get_print_mode(group_id).unwrap_or_else(||
             panic!("Expected group with id {group_id:?} to exist but it wasn't present in the document. Ensure that a group with such a document appears in the document before the element {next_element:?}.")
         )
-    }
-}
-
-/// Stores arguments passed to `print_element` call, holding the state specific to printing an element.
-/// E.g. the `indent` depends on the token the Printer's currently processing. That's why
-/// it must be stored outside of the [PrinterState] that stores the state common to all elements.
-///
-/// The state is passed by value, which is why it's important that it isn't storing any heavy
-/// data structures. Such structures should be stored on the [PrinterState] instead.
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
-struct PrintElementArgs {
-    indent: Indention,
-    mode: PrintMode,
-}
-
-impl PrintElementArgs {
-    pub fn new(indent: Indention) -> Self {
-        Self {
-            indent,
-            ..Self::default()
-        }
-    }
-
-    pub fn increment_indent_level(mut self, indent_style: IndentStyle) -> Self {
-        self.indent = self.indent.increment_level(indent_style);
-        self
-    }
-
-    pub fn decrement_indent(mut self) -> Self {
-        self.indent = self.indent.decrement();
-        self
-    }
-
-    pub fn reset_indent(mut self) -> Self {
-        self.indent = Indention::default();
-        self
-    }
-
-    pub fn set_indent_align(mut self, count: NonZeroU8) -> Self {
-        self.indent = self.indent.set_align(count);
-        self
-    }
-
-    pub fn with_print_mode(mut self, mode: PrintMode) -> Self {
-        self.mode = mode;
-        self
-    }
-}
-
-impl Default for PrintElementArgs {
-    fn default() -> Self {
-        Self {
-            indent: Indention::Level(0),
-            mode: PrintMode::Expanded,
-        }
     }
 }
 
@@ -757,149 +748,101 @@ impl Default for Indention {
     }
 }
 
-/// The Printer uses a stack that emulates recursion. E.g. recursively processing the elements:
-/// `indent(&concat(string, string))` would result in the following call stack:
-///
-/// ```plain
-/// print_element(indent, indent = 0);
-///   print_element(concat, indent = 1);
-///     print_element(string, indent = 1);
-///     print_element(string, indent = 1);
-/// ```
-/// The `PrintElementCall` stores the data for a single `print_element` call consisting of the element
-/// and the `args` that's passed to `print_element`.
-#[derive(Debug, Eq, PartialEq, Clone)]
-struct PrintElementCall<'element> {
-    element: &'element FormatElement,
-    args: PrintElementArgs,
-}
+/// Tests if it's possible to print the content of the queue up to the first hard line break
+/// or the end of the document on a single line without exceeding the line width.
+#[must_use = "Only determines if content fits on a single line but doesn't print it"]
+fn fits_on_line<'a, 'print, F>(
+    filter: F,
+    print_queue: &'print mut PrintQueue<'a>,
+    stack: &'print mut PrintCallStack,
+    printer: &mut Printer<'a>,
+) -> bool
+where
+    F: FitsFilter,
+{
+    let saved_stack = std::mem::take(&mut printer.state.fits_stack);
+    let saved_queue = std::mem::take(&mut printer.state.fits_queue);
+    debug_assert!(saved_stack.is_empty());
+    debug_assert!(saved_queue.is_empty());
 
-impl<'element> PrintElementCall<'element> {
-    pub fn new(element: &'element FormatElement, args: PrintElementArgs) -> Self {
-        Self { element, args }
-    }
-}
+    let mut fits_queue = FitsQueue::new(print_queue, saved_queue);
+    let mut fits_stack = FitsCallStack::new(stack, saved_stack);
 
-/// Small helper that manages the order in which the elements should be visited.
-#[derive(Debug, Default)]
-struct ElementCallQueue<'a>(Vec<PrintElementCall<'a>>);
+    let mut fits_state = FitsState {
+        pending_indent: printer.state.pending_indent,
+        pending_space: printer.state.pending_space,
+        line_width: printer.state.line_width,
+        has_line_suffix: printer.state.line_suffixes.has_pending(),
+        group_modes: &mut printer.state.group_modes,
+    };
 
-impl<'a> ElementCallQueue<'a> {
-    pub fn new(elements: Vec<PrintElementCall<'a>>) -> Self {
-        Self(elements)
-    }
+    let result = all_fit(
+        filter,
+        &mut fits_state,
+        &mut fits_queue,
+        &mut fits_stack,
+        &printer.options,
+    );
 
-    fn extend<T>(&mut self, calls: T)
-    where
-        T: IntoIterator<Item = PrintElementCall<'a>>,
-        T::IntoIter: DoubleEndedIterator,
-    {
-        // Reverse the calls because elements are removed from the back of the vec
-        // in reversed insertion order
-        self.0.extend(calls.into_iter().rev());
-    }
+    printer.state.fits_stack = fits_stack.finish();
+    printer.state.fits_queue = fits_queue.finish();
 
-    fn extend_with_args<I>(&mut self, elements: I, args: PrintElementArgs)
-    where
-        I: IntoIterator<Item = &'a FormatElement>,
-        I::IntoIter: DoubleEndedIterator,
-    {
-        self.extend(
-            elements
-                .into_iter()
-                .map(|element| PrintElementCall::new(element, args)),
-        )
-    }
-
-    pub fn enqueue(&mut self, call: PrintElementCall<'a>) {
-        self.0.push(call);
-    }
-
-    pub fn dequeue(&mut self) -> Option<PrintElementCall<'a>> {
-        self.0.pop()
-    }
-
-    fn is_empty(&self) -> bool {
-        self.0.is_empty()
-    }
-
-    fn into_vec(self) -> Vec<PrintElementCall<'a>> {
-        self.0
+    match result {
+        Fits::Maybe | Fits::Yes => true,
+        Fits::No => false,
     }
 }
 
 /// Tests if it's possible to print the content of the queue up to the first hard line break
 /// or the end of the document on a single line without exceeding the line width.
 #[must_use = "Only determines if content fits on a single line but doesn't print it"]
-fn fits_on_line<'a, I>(
-    elements: I,
-    args: PrintElementArgs,
-    queue: &ElementCallQueue<'a>,
-    printer: &mut Printer<'a>,
-) -> bool
+fn all_fit<'a, 'print, F>(
+    mut filter: F,
+    fits_state: &mut FitsState,
+    queue: &mut FitsQueue<'a, 'print>,
+    stack: &mut FitsCallStack<'print>,
+    options: &PrinterOptions,
+) -> Fits
 where
-    I: IntoIterator<Item = &'a FormatElement>,
-    I::IntoIter: DoubleEndedIterator,
+    F: FitsFilter,
 {
-    let shared_buffer = std::mem::take(&mut printer.state.measure_queue);
-    debug_assert!(shared_buffer.is_empty());
+    while let Some(element) = queue.pop() {
+        let signal = filter.filter(element);
 
-    let mut measure_queue = MeasureQueue::new()
-        .with_rest(queue)
-        .with_queue(ElementCallQueue::new(shared_buffer));
+        match signal {
+            FitsFilterSignal::Skip => continue,
+            FitsFilterSignal::Visit | FitsFilterSignal::End => {
+                match fits_element_on_line(element, fits_state, queue, stack, options) {
+                    Fits::Yes => {
+                        return Fits::Yes;
+                    }
+                    Fits::No => {
+                        return Fits::No;
+                    }
+                    Fits::Maybe => {
+                        if signal.is_end() {
+                            return Fits::Maybe;
+                        }
 
-    measure_queue.extend(elements.into_iter(), args);
-
-    let mut measure_state = MeasureState {
-        pending_indent: printer.state.pending_indent,
-        pending_space: printer.state.pending_space,
-        line_width: printer.state.line_width,
-        has_line_suffix: !printer.state.line_suffixes.is_empty(),
-        group_modes: &mut printer.state.group_modes,
-    };
-
-    let result = loop {
-        match measure_queue.dequeue() {
-            None => {
-                break true;
+                        continue;
+                    }
+                }
             }
-
-            Some((element, args)) => match fits_element_on_line(
-                element,
-                args,
-                &mut measure_state,
-                &mut measure_queue,
-                &printer.options,
-            ) {
-                Fits::Yes => {
-                    break true;
-                }
-                Fits::No => {
-                    break false;
-                }
-                Fits::Maybe => {
-                    continue;
-                }
-            },
         }
-    };
+    }
 
-    let mut shared_buffer = measure_queue.into_vec();
-    // Clear out remaining items
-    shared_buffer.clear();
-    printer.state.measure_queue = shared_buffer;
-
-    result
+    Fits::Maybe
 }
 
 /// Tests if the passed element fits on the current line or not.
 fn fits_element_on_line<'a, 'rest>(
     element: &'a FormatElement,
-    args: PrintElementArgs,
-    state: &mut MeasureState,
-    queue: &mut MeasureQueue<'a, 'rest>,
+    state: &mut FitsState,
+    queue: &mut FitsQueue<'a, 'rest>,
+    stack: &mut FitsCallStack<'rest>,
     options: &PrinterOptions,
 ) -> Fits {
+    let args = stack.top();
     match element {
         FormatElement::Space => {
             if state.line_width > 0 {
@@ -908,7 +851,7 @@ fn fits_element_on_line<'a, 'rest>(
         }
 
         FormatElement::Line(line_mode) => {
-            if args.mode.is_flat() {
+            if args.mode().is_flat() {
                 match line_mode {
                     LineMode::SoftOrSpace => {
                         state.pending_space = true;
@@ -927,67 +870,6 @@ fn fits_element_on_line<'a, 'rest>(
             }
         }
 
-        FormatElement::Indent(content) => queue.extend(
-            content.iter(),
-            args.increment_indent_level(options.indent_style()),
-        ),
-
-        FormatElement::Dedent { content, mode } => {
-            let args = match mode {
-                DedentMode::Level => args.decrement_indent(),
-                DedentMode::Root => args.reset_indent(),
-            };
-            queue.extend(content.iter(), args)
-        }
-
-        FormatElement::Align(Align { content, count }) => {
-            queue.extend(content.iter(), args.set_indent_align(*count))
-        }
-
-        FormatElement::Group(group) => {
-            queue.extend(group.content.iter(), args);
-
-            if let Some(id) = group.id {
-                state.group_modes.insert_print_mode(id, args.mode);
-            }
-        }
-
-        FormatElement::ConditionalGroupContent(conditional) => {
-            let group_mode = match conditional.group_id {
-                None => args.mode,
-                Some(group_id) => state
-                    .group_modes
-                    .get_print_mode(group_id)
-                    .unwrap_or(args.mode),
-            };
-
-            if group_mode == conditional.mode {
-                queue.extend(conditional.content.iter(), args);
-            }
-        }
-
-        FormatElement::IndentIfGroupBreaks(indent) => {
-            let group_mode = state
-                .group_modes
-                .get_print_mode(indent.group_id)
-                .unwrap_or(args.mode);
-
-            match group_mode {
-                PrintMode::Flat => queue.extend(indent.content.iter(), args),
-                PrintMode::Expanded => queue.extend(
-                    indent.content.iter(),
-                    args.increment_indent_level(options.indent_style()),
-                ),
-            }
-        }
-
-        FormatElement::List(list) => queue.extend(list.iter(), args),
-
-        FormatElement::Fill(content) => queue
-            .queue
-            .0
-            .extend(content.iter().rev().map(|t| PrintElementCall::new(t, args))),
-
         FormatElement::Text(token) => {
             let indent = std::mem::take(&mut state.pending_indent);
             state.line_width +=
@@ -1001,7 +883,7 @@ fn fits_element_on_line<'a, 'rest>(
                 let char_width = match c {
                     '\t' => options.tab_width,
                     '\n' => {
-                        return match args.mode {
+                        return match args.mode() {
                             PrintMode::Flat => Fits::No,
                             PrintMode::Expanded => Fits::Yes,
                         }
@@ -1018,34 +900,154 @@ fn fits_element_on_line<'a, 'rest>(
             state.pending_space = false;
         }
 
-        FormatElement::LineSuffix(_) => {
-            state.has_line_suffix = true;
-        }
-
         FormatElement::LineSuffixBoundary => {
             if state.has_line_suffix {
                 return Fits::No;
             }
         }
 
-        FormatElement::Comment(content) => queue.extend(content.iter(), args),
-
-        FormatElement::Verbatim(verbatim) => queue.extend(verbatim.content.iter(), args),
-        FormatElement::BestFitting(best_fitting) => {
-            let content = match args.mode {
-                PrintMode::Flat => best_fitting.most_flat(),
-                PrintMode::Expanded => best_fitting.most_expanded(),
-            };
-
-            queue.enqueue(PrintElementCall::new(content, args))
-        }
         FormatElement::ExpandParent => {
-            if args.mode.is_flat() {
+            if args.mode().is_flat() {
                 return Fits::No;
             }
         }
-        FormatElement::Interned(content) => queue.enqueue(PrintElementCall::new(content, args)),
-        FormatElement::Label(label) => queue.extend(label.content.iter(), args),
+
+        FormatElement::Interned(content) => queue.extend_back(content),
+
+        FormatElement::Signal(Signal::StartIndent) => {
+            stack.push(
+                SignalKind::Indent,
+                args.increment_indent_level(options.indent_style()),
+            );
+        }
+        FormatElement::Signal(Signal::EndIndent) => {
+            stack.pop(SignalKind::Indent);
+        }
+
+        FormatElement::Signal(Signal::StartDedent(mode)) => {
+            let args = match mode {
+                DedentMode::Level => args.decrement_indent(),
+                DedentMode::Root => args.reset_indent(),
+            };
+            stack.push(SignalKind::Dedent, args);
+        }
+        FormatElement::Signal(Signal::EndDedent) => {
+            stack.pop(SignalKind::Dedent);
+        }
+
+        FormatElement::Signal(Signal::StartAlign(align)) => {
+            stack.push(SignalKind::Align, args.set_indent_align(align.count()));
+        }
+        FormatElement::Signal(Signal::EndAlign) => {
+            stack.pop(SignalKind::Align);
+        }
+
+        FormatElement::Signal(Signal::StartGroup(id)) => {
+            stack.push(SignalKind::Group, args);
+
+            if let Some(id) = id {
+                state.group_modes.insert_print_mode(*id, args.mode());
+            }
+        }
+        FormatElement::Signal(Signal::EndGroup) => {
+            stack.pop(SignalKind::Group);
+        }
+
+        FormatElement::Signal(Signal::StartConditionalContent(condition)) => {
+            let group_mode = match condition.group_id {
+                None => args.mode(),
+                Some(group_id) => state
+                    .group_modes
+                    .get_print_mode(group_id)
+                    .unwrap_or(args.mode()),
+            };
+
+            if group_mode != condition.mode {
+                queue.skip_content(SignalKind::ConditionalContent);
+            } else {
+                stack.push(SignalKind::ConditionalContent, args);
+            }
+        }
+        FormatElement::Signal(Signal::EndConditionalContent) => {
+            stack.pop(SignalKind::ConditionalContent);
+        }
+
+        FormatElement::Signal(Signal::StartIndentIfGroupBreaks(id)) => {
+            let group_mode = state.group_modes.get_print_mode(*id).unwrap_or(args.mode());
+
+            match group_mode {
+                PrintMode::Flat => {
+                    stack.push(SignalKind::IndentIfGroupBreaks, args);
+                }
+                PrintMode::Expanded => {
+                    stack.push(
+                        SignalKind::IndentIfGroupBreaks,
+                        args.increment_indent_level(options.indent_style()),
+                    );
+                }
+            }
+        }
+        FormatElement::Signal(Signal::EndIndentIfGroupBreaks) => {
+            stack.pop(SignalKind::IndentIfGroupBreaks);
+        }
+
+        FormatElement::Signal(Signal::StartLineSuffix) => {
+            queue.skip_content(SignalKind::LineSuffix);
+            state.has_line_suffix = true;
+        }
+        FormatElement::Signal(Signal::EndLineSuffix) => {
+            panic!("End LineSuffix Signal without corresponding StartLineSuffix signal");
+        }
+
+        FormatElement::Signal(Signal::StartBestFitting) => {
+            match args.mode() {
+                PrintMode::Flat => {
+                    match all_fit(OneEntryQueueFilter::default(), state, queue, stack, options) {
+                        result @ Fits::Yes | result @ Fits::No => return result,
+                        Fits::Maybe => {
+                            // Need to see if the rest of the queue fits. Skip over the other variants of best fitting
+                            queue.skip_content(SignalKind::BestFitting);
+                        }
+                    }
+                }
+                PrintMode::Expanded => {
+                    stack.push(SignalKind::BestFitting, args);
+
+                    while let Some(FormatElement::Signal(Signal::StartEntry)) = queue.top() {
+                        queue.pop();
+                        queue.skip_content(SignalKind::Entry);
+                    }
+
+                    assert_eq!(
+                        queue.top(),
+                        Some(&FormatElement::Signal(Signal::StartMostExpandedEntry))
+                    );
+                }
+            }
+        }
+        FormatElement::Signal(Signal::EndBestFitting) => {
+            stack.pop(SignalKind::BestFitting);
+        }
+
+        FormatElement::Signal(
+            signal @ (Signal::StartFill
+            | Signal::StartComment
+            | Signal::StartVerbatim(_)
+            | Signal::StartLabelled(_)
+            | Signal::StartEntry
+            | Signal::StartMostExpandedEntry),
+        ) => {
+            stack.push(signal.kind(), args);
+        }
+        FormatElement::Signal(
+            signal @ (Signal::EndFill
+            | Signal::EndComment
+            | Signal::EndVerbatim
+            | Signal::EndLabelled
+            | Signal::EndEntry),
+        ) => {
+            stack.pop(signal.kind());
+        }
     }
 
     Fits::Maybe
@@ -1072,7 +1074,7 @@ impl From<bool> for Fits {
 
 /// State used when measuring if a group fits on a single line
 #[derive(Debug)]
-struct MeasureState<'group> {
+struct FitsState<'group> {
     pending_indent: Indention,
     pending_space: bool,
     has_line_suffix: bool,
@@ -1080,77 +1082,11 @@ struct MeasureState<'group> {
     group_modes: &'group mut GroupModes,
 }
 
-#[derive(Debug)]
-struct MeasureQueue<'a, 'rest> {
-    /// Queue that holds the elements that the `fits` operation inspects.
-    /// Normally, these all the elements belonging to the group that is tested if it fits
-    queue: ElementCallQueue<'a>,
-    /// Queue that contains the remaining elements in the documents.
-    rest_queue: Rev<std::slice::Iter<'rest, PrintElementCall<'a>>>,
-}
-
-impl<'a, 'rest> MeasureQueue<'a, 'rest> {
-    fn new() -> Self {
-        Self {
-            rest_queue: [].iter().rev(),
-            queue: ElementCallQueue::default(),
-        }
-    }
-
-    fn with_rest(mut self, rest_queue: &'rest ElementCallQueue<'a>) -> Self {
-        // Last element in the vector is the first element in the queue
-        self.rest_queue = rest_queue.0.as_slice().iter().rev();
-        self
-    }
-
-    fn with_queue(mut self, queue: ElementCallQueue<'a>) -> Self {
-        debug_assert!(queue.is_empty());
-        self.queue = queue;
-        self
-    }
-
-    fn enqueue(&mut self, call: PrintElementCall<'a>) {
-        self.queue.enqueue(call);
-    }
-
-    fn extend<T>(&mut self, elements: T, args: PrintElementArgs)
-    where
-        T: IntoIterator<Item = &'a FormatElement>,
-        T::IntoIter: DoubleEndedIterator,
-    {
-        // Reverse the calls because elements are removed from the back of the vec
-        // in reversed insertion order
-        self.queue.0.extend(
-            elements
-                .into_iter()
-                .rev()
-                .map(|element| PrintElementCall::new(element, args)),
-        );
-    }
-
-    fn dequeue(&mut self) -> Option<(&'a FormatElement, PrintElementArgs)> {
-        let next = match self.queue.dequeue() {
-            Some(call) => (call.element, call.args),
-            None => {
-                let rest_item = self.rest_queue.next()?;
-
-                (rest_item.element, rest_item.args)
-            }
-        };
-
-        Some(next)
-    }
-
-    fn into_vec(self) -> Vec<PrintElementCall<'a>> {
-        self.queue.into_vec()
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use crate::prelude::*;
     use crate::printer::{LineEnding, PrintWidth, Printer, PrinterOptions};
-    use crate::{format_args, write, FormatState, IndentStyle, Printed, VecBuffer};
+    use crate::{format_args, write, Document, FormatState, IndentStyle, Printed, VecBuffer};
 
     fn format(root: &dyn Format<()>) -> Printed {
         format_with_options(
@@ -1168,7 +1104,7 @@ mod tests {
 
         write!(&mut buffer, [root]).unwrap();
 
-        Printer::new(options).print(&dbg!(buffer.into_element()))
+        Printer::new(options).print(&Document::from(buffer.into_vec()))
     }
 
     #[test]
@@ -1400,7 +1336,7 @@ two lines`,
             .finish()
             .unwrap();
 
-        let document = buffer.into_element();
+        let document = Document::from(buffer.into_vec());
 
         let printed = Printer::new(PrinterOptions::default().with_print_width(PrintWidth::new(10)))
             .print(&document);

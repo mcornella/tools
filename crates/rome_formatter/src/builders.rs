@@ -1,15 +1,17 @@
+use crate::format_element::signal::{Condition, Signal};
+use crate::prelude::signal::{DedentMode, LabelId};
 use crate::prelude::*;
+use crate::Buffer;
 use crate::{
-    format_element, write, Argument, Arguments, BufferSnapshot, FormatState, GroupId,
-    PreambleBuffer, TextRange, TextSize,
+    write, Argument, Arguments, BufferSnapshot, FormatState, GroupId, PreambleBuffer, TextRange,
+    TextSize,
 };
-use crate::{Buffer, VecBuffer};
 use rome_rowan::{Language, SyntaxNode, SyntaxToken, SyntaxTokenText, TextLen};
 use std::borrow::Cow;
 use std::cell::Cell;
 use std::marker::PhantomData;
 use std::num::NonZeroU8;
-use std::ops::Deref;
+use Signal::*;
 
 /// A line break that only gets printed if the enclosing `Group` doesn't fit on a single line.
 /// It's omitted if the enclosing `Group` fits on a single line.
@@ -407,11 +409,9 @@ pub struct LineSuffix<'a, Context> {
 
 impl<Context> Format<Context> for LineSuffix<'_, Context> {
     fn fmt(&self, f: &mut Formatter<Context>) -> FormatResult<()> {
-        let mut buffer = VecBuffer::new(f.state_mut());
-        buffer.write_fmt(Arguments::from(&self.content))?;
-
-        let content = buffer.into_vec();
-        f.write_element(FormatElement::LineSuffix(content.into_boxed_slice()))
+        f.write_element(FormatElement::Signal(StartLineSuffix))?;
+        Arguments::from(&self.content).fmt(f)?;
+        f.write_element(FormatElement::Signal(EndLineSuffix))
     }
 }
 
@@ -509,12 +509,9 @@ pub struct FormatComment<'a, Context> {
 
 impl<Context> Format<Context> for FormatComment<'_, Context> {
     fn fmt(&self, f: &mut Formatter<Context>) -> FormatResult<()> {
-        let mut buffer = VecBuffer::new(f.state_mut());
-
-        buffer.write_fmt(Arguments::from(&self.content))?;
-        let content = buffer.into_vec();
-
-        f.write_element(FormatElement::Comment(content.into_boxed_slice()))
+        f.write_element(FormatElement::Signal(StartComment))?;
+        Arguments::from(&self.content).fmt(f)?;
+        f.write_element(FormatElement::Signal(EndComment))
     }
 }
 
@@ -550,14 +547,9 @@ pub struct FormatLabelled<'a, Context> {
 
 impl<Context> Format<Context> for FormatLabelled<'_, Context> {
     fn fmt(&self, f: &mut Formatter<Context>) -> FormatResult<()> {
-        let mut buffer = VecBuffer::new(f.state_mut());
-
-        buffer.write_fmt(Arguments::from(&self.content))?;
-        let content = buffer.into_vec();
-
-        let label = Label::new(self.label_id, content);
-
-        f.write_element(FormatElement::Label(label))
+        f.write_element(FormatElement::Signal(StartLabelled(self.label_id)))?;
+        Arguments::from(&self.content).fmt(f)?;
+        f.write_element(FormatElement::Signal(EndLabelled))
     }
 }
 
@@ -646,16 +638,9 @@ pub struct Indent<'a, Context> {
 
 impl<Context> Format<Context> for Indent<'_, Context> {
     fn fmt(&self, f: &mut Formatter<Context>) -> FormatResult<()> {
-        let mut buffer = VecBuffer::new(f.state_mut());
-
-        buffer.write_fmt(Arguments::from(&self.content))?;
-
-        if buffer.is_empty() {
-            return Ok(());
-        }
-
-        let content = buffer.into_vec();
-        f.write_element(FormatElement::Indent(content.into_boxed_slice()))
+        f.write_element(FormatElement::Signal(StartIndent))?;
+        Arguments::from(&self.content).fmt(f)?;
+        f.write_element(FormatElement::Signal(EndIndent))
     }
 }
 
@@ -721,19 +706,9 @@ pub struct Dedent<'a, Context> {
 
 impl<Context> Format<Context> for Dedent<'_, Context> {
     fn fmt(&self, f: &mut Formatter<Context>) -> FormatResult<()> {
-        let mut buffer = VecBuffer::new(f.state_mut());
-
-        buffer.write_fmt(Arguments::from(&self.content))?;
-
-        if buffer.is_empty() {
-            return Ok(());
-        }
-
-        let content = buffer.into_vec();
-        f.write_element(FormatElement::Dedent {
-            content: content.into_boxed_slice(),
-            mode: self.mode,
-        })
+        f.write_element(FormatElement::Signal(StartDedent(self.mode)))?;
+        Arguments::from(&self.content).fmt(f)?;
+        f.write_element(FormatElement::Signal(EndDedent))
     }
 }
 
@@ -907,19 +882,9 @@ pub struct Align<'a, Context> {
 
 impl<Context> Format<Context> for Align<'_, Context> {
     fn fmt(&self, f: &mut Formatter<Context>) -> FormatResult<()> {
-        let mut buffer = VecBuffer::new(f.state_mut());
-
-        buffer.write_fmt(Arguments::from(&self.content))?;
-
-        if buffer.is_empty() {
-            return Ok(());
-        }
-
-        let content = buffer.into_vec();
-        f.write_element(FormatElement::Align(format_element::Align {
-            content: content.into_boxed_slice(),
-            count: self.count,
-        }))
+        f.write_element(FormatElement::Signal(StartAlign(signal::Align(self.count))))?;
+        Arguments::from(&self.content).fmt(f)?;
+        f.write_element(FormatElement::Signal(EndAlign))
     }
 }
 
@@ -1119,29 +1084,29 @@ enum IndentMode {
 
 impl<Context> Format<Context> for BlockIndent<'_, Context> {
     fn fmt(&self, f: &mut Formatter<Context>) -> FormatResult<()> {
-        let mut buffer = VecBuffer::new(f.state_mut());
+        let mut buffer = PreambleBuffer::new(
+            f,
+            format_with(|f| {
+                f.write_element(FormatElement::Signal(StartIndent))?;
 
-        match self.mode {
-            IndentMode::Soft => write!(buffer, [soft_line_break()])?,
-            IndentMode::Block => write!(buffer, [hard_line_break()])?,
-            IndentMode::SoftLineOrSpace => write!(buffer, [soft_line_break_or_space()])?,
-        };
+                match self.mode {
+                    IndentMode::Soft => write!(f, [soft_line_break()]),
+                    IndentMode::Block => write!(f, [hard_line_break()]),
+                    IndentMode::SoftLineOrSpace => write!(f, [soft_line_break_or_space()]),
+                }
+            }),
+        );
 
         buffer.write_fmt(Arguments::from(&self.content))?;
 
-        // Don't create an indent if the content is empty
-        if buffer.len() == 1 {
-            return Ok(());
-        }
+        if buffer.did_write_preamble() {
+            f.write_element(FormatElement::Signal(EndIndent))?;
 
-        let content = buffer.into_vec();
-
-        f.write_element(FormatElement::Indent(content.into_boxed_slice()))?;
-
-        match self.mode {
-            IndentMode::Soft => write!(f, [soft_line_break()])?,
-            IndentMode::Block => write!(f, [hard_line_break()])?,
-            IndentMode::SoftLineOrSpace => {}
+            match self.mode {
+                IndentMode::Soft => write!(f, [soft_line_break()])?,
+                IndentMode::Block => write!(f, [hard_line_break()])?,
+                IndentMode::SoftLineOrSpace => {}
+            }
         }
 
         Ok(())
@@ -1269,7 +1234,7 @@ impl<Context> Format<Context> for Group<'_, Context> {
             return f.write_fmt(Arguments::from(&self.content));
         }
 
-        let mut buffer = GroupBuffer::new(f);
+        let mut buffer = GroupBuffer::new(f, self.group_id);
 
         buffer.write_fmt(Arguments::from(&self.content))?;
 
@@ -1277,16 +1242,7 @@ impl<Context> Format<Context> for Group<'_, Context> {
             write!(buffer, [expand_parent()])?;
         }
 
-        let content = buffer.into_vec();
-        if content.is_empty() && self.group_id.is_none() {
-            return Ok(());
-        }
-
-        let group = format_element::Group::new(content).with_id(self.group_id);
-
-        f.write_element(FormatElement::Group(group))?;
-
-        Ok(())
+        buffer.finish()
     }
 }
 
@@ -1313,76 +1269,84 @@ impl<Context> std::fmt::Debug for Group<'_, Context> {
 /// The `/* a comment */` belongs to the `[` group token that is part of a group wrapping the whole
 /// `[1]` expression. It's important that the comment `/* a comment */` gets moved out of the group element
 /// to avoid that the `[1]` group expands because of the line break inserted by the comment.
+#[must_use]
 struct GroupBuffer<'inner, Context> {
     inner: &'inner mut dyn Buffer<Context = Context>,
-
-    /// The group inner content
-    content: Vec<FormatElement>,
+    group_id: Option<GroupId>,
+    comments_depth: usize,
+    empty: bool,
 }
 
 impl<'inner, Context> GroupBuffer<'inner, Context> {
-    fn new(inner: &'inner mut dyn Buffer<Context = Context>) -> Self {
+    fn new(inner: &'inner mut dyn Buffer<Context = Context>, group_id: Option<GroupId>) -> Self {
         Self {
             inner,
-            content: Vec::new(),
+            empty: true,
+            comments_depth: 0,
+            group_id,
         }
     }
 
-    fn into_vec(self) -> Vec<FormatElement> {
-        self.content
-    }
-
     fn write_interned(&mut self, interned: Interned) -> FormatResult<()> {
-        debug_assert!(self.content.is_empty());
+        debug_assert!(self.empty);
 
-        match interned.deref() {
-            FormatElement::Comment(_) => {
-                self.inner.write_element(FormatElement::Interned(interned))
-            }
-            FormatElement::List(list) => {
-                let mut content_start = 0;
+        let mut content_start = 0;
 
-                for element in list.iter() {
-                    match element {
-                        element @ FormatElement::Comment(_) => {
-                            content_start += 1;
-                            // Cloning comments should be alright as they are rarely nested
-                            // and the case where all elements of an interned data structure are comments
-                            // are rare
-                            self.inner.write_element(element.clone())?;
-                        }
-                        FormatElement::Interned(interned) => {
-                            self.write_interned(interned.clone())?;
-                            content_start += 1;
+        for element in interned.iter() {
+            match element {
+                element @ FormatElement::Signal(Signal::StartComment) => {
+                    content_start += 1;
+                    self.comments_depth += 1;
+                    self.inner.write_element(element.clone())?;
+                }
+                element @ FormatElement::Signal(Signal::EndComment) => {
+                    content_start += 1;
+                    self.comments_depth -= 1;
+                    self.inner.write_element(element.clone())?;
+                }
+                element if self.comments_depth > 0 => {
+                    content_start += 1;
+                    self.inner.write_element(element.clone())?;
+                }
 
-                            if !self.content.is_empty() {
-                                // Interned struct contained non-comment
-                                break;
-                            }
-                        }
-                        _ => {
-                            // Found the first non-comment / nested interned element
-                            break;
-                        }
+                FormatElement::Interned(interned) => {
+                    self.write_interned(interned.clone())?;
+                    content_start += 1;
+
+                    if !self.empty {
+                        // Interned struct contained non-comment
+                        break;
                     }
                 }
-
-                // No leading comments, this group has no comments
-                if content_start == 0 {
-                    self.content.push(FormatElement::Interned(interned));
-                    return Ok(());
+                _ => {
+                    // Found the first non-comment / nested interned element
+                    break;
                 }
-
-                let content = &list[content_start..];
-
-                // It is necessary to mutate the interned elements, write cloned elements
-                self.write_elements(content.iter().cloned())
             }
-            FormatElement::Interned(interned) => self.write_interned(interned.clone()),
-            _ => {
-                self.content.push(FormatElement::Interned(interned));
-                Ok(())
-            }
+        }
+
+        if self.empty {
+            self.inner
+                .write_element(FormatElement::Signal(StartGroup(self.group_id)))?;
+            self.empty = false;
+        }
+
+        // No leading comments, this group has no comments
+        if content_start == 0 {
+            return self.inner.write_element(FormatElement::Interned(interned));
+        }
+
+        let content = &interned[content_start..];
+
+        // It is necessary to mutate the interned elements, write cloned elements
+        self.write_elements(content.iter().cloned())
+    }
+
+    fn finish(self) -> FormatResult<()> {
+        if !self.empty {
+            self.inner.write_element(FormatElement::Signal(EndGroup))
+        } else {
+            Ok(())
         }
     }
 }
@@ -1391,30 +1355,39 @@ impl<Context> Buffer for GroupBuffer<'_, Context> {
     type Context = Context;
 
     fn write_element(&mut self, element: FormatElement) -> FormatResult<()> {
-        if self.content.is_empty() {
+        if self.empty {
             match element {
-                FormatElement::List(list) => {
-                    self.write_elements(list.into_vec())?;
+                comment @ FormatElement::Signal(Signal::StartComment) => {
+                    self.comments_depth += 1;
+                    self.inner.write_element(comment)
                 }
+                comment @ FormatElement::Signal(Signal::EndComment) => {
+                    self.comments_depth -= 1;
+                    self.inner.write_element(comment)
+                }
+
+                element if self.comments_depth > 0 => self.inner.write_element(element),
+
                 FormatElement::Interned(interned) => match Interned::try_unwrap(interned) {
-                    Ok(owned) => self.write_element(owned)?,
-                    Err(interned) => self.write_interned(interned)?,
+                    Ok(owned) => self.write_elements(owned),
+                    Err(interned) => self.write_interned(interned),
                 },
-                comment @ FormatElement::Comment { .. } => {
-                    self.inner.write_element(comment)?;
+
+                element => {
+                    self.empty = false;
+                    self.inner
+                        .write_element(FormatElement::Signal(StartGroup(self.group_id)))?;
+
+                    self.inner.write_element(element)
                 }
-                element => self.content.push(element),
             }
         } else {
-            match element {
-                FormatElement::List(list) => {
-                    self.content.extend(list.into_vec());
-                }
-                element => self.content.push(element),
-            }
+            self.inner.write_element(element)
         }
+    }
 
-        Ok(())
+    fn reserve(&mut self, additional: usize) {
+        self.inner.reserve(additional)
     }
 
     fn state(&self) -> &FormatState<Self::Context> {
@@ -1428,20 +1401,23 @@ impl<Context> Buffer for GroupBuffer<'_, Context> {
     fn snapshot(&self) -> BufferSnapshot {
         BufferSnapshot::Any(Box::new(GroupElementsBufferSnapshot {
             inner: self.inner.snapshot(),
-            content_len: self.content.len(),
+            empty: self.empty,
+            comments_depth: self.comments_depth,
         }))
     }
 
     fn restore_snapshot(&mut self, snapshot: BufferSnapshot) {
         let snapshot = snapshot.unwrap_any::<GroupElementsBufferSnapshot>();
         self.inner.restore_snapshot(snapshot.inner);
-        self.content.truncate(snapshot.content_len);
+        self.empty = snapshot.empty;
+        self.comments_depth = snapshot.comments_depth;
     }
 }
 
 struct GroupElementsBufferSnapshot {
     inner: BufferSnapshot,
-    content_len: usize,
+    empty: bool,
+    comments_depth: usize,
 }
 
 /// IR element that forces the parent group to print in expanded mode.
@@ -1710,19 +1686,11 @@ impl<Context> IfGroupBreaks<'_, Context> {
 
 impl<Context> Format<Context> for IfGroupBreaks<'_, Context> {
     fn fmt(&self, f: &mut Formatter<Context>) -> FormatResult<()> {
-        let mut buffer = VecBuffer::new(f.state_mut());
-
-        buffer.write_fmt(Arguments::from(&self.content))?;
-
-        if buffer.is_empty() {
-            return Ok(());
-        }
-
-        let content = buffer.into_vec();
-        f.write_element(FormatElement::ConditionalGroupContent(
-            ConditionalGroupContent::new(content.into_boxed_slice(), self.mode)
-                .with_group_id(self.group_id),
-        ))
+        f.write_element(FormatElement::Signal(StartConditionalContent(
+            Condition::new(self.mode).with_group_id(self.group_id),
+        )))?;
+        Arguments::from(&self.content).fmt(f)?;
+        f.write_element(FormatElement::Signal(EndConditionalContent))
     }
 }
 
@@ -1836,18 +1804,11 @@ pub struct IndentIfGroupBreaks<'a, Context> {
 
 impl<Context> Format<Context> for IndentIfGroupBreaks<'_, Context> {
     fn fmt(&self, f: &mut Formatter<Context>) -> FormatResult<()> {
-        let mut buffer = VecBuffer::new(f.state_mut());
-
-        buffer.write_fmt(Arguments::from(&self.content))?;
-
-        if buffer.is_empty() {
-            return Ok(());
-        }
-
-        let content = buffer.into_vec();
-        f.write_element(FormatElement::IndentIfGroupBreaks(
-            format_element::IndentIfGroupBreaks::new(content.into_boxed_slice(), self.group_id),
-        ))
+        f.write_element(FormatElement::Signal(StartIndentIfGroupBreaks(
+            self.group_id,
+        )))?;
+        Arguments::from(&self.content).fmt(f)?;
+        f.write_element(FormatElement::Signal(EndIndentIfGroupBreaks))
     }
 }
 
@@ -2187,15 +2148,17 @@ pub fn get_lines_before<L: Language>(next_node: &SyntaxNode<L>) -> usize {
 pub struct FillBuilder<'fmt, 'buf, Context> {
     result: FormatResult<()>,
     fmt: &'fmt mut Formatter<'buf, Context>,
-    items: Vec<FormatElement>,
+    empty: bool,
 }
 
 impl<'a, 'buf, Context> FillBuilder<'a, 'buf, Context> {
     pub(crate) fn new(fmt: &'a mut Formatter<'buf, Context>) -> Self {
+        let result = fmt.write_element(FormatElement::Signal(StartFill));
+
         Self {
-            result: Ok(()),
+            result,
             fmt,
-            items: vec![],
+            empty: true,
         }
     }
 
@@ -2219,17 +2182,17 @@ impl<'a, 'buf, Context> FillBuilder<'a, 'buf, Context> {
         entry: &dyn Format<Context>,
     ) -> &mut Self {
         self.result = self.result.and_then(|_| {
-            let mut buffer = VecBuffer::new(self.fmt.state_mut());
-
-            if !self.items.is_empty() {
-                write!(buffer, [separator])?;
-                self.items.push(buffer.take_element());
+            if self.empty {
+                self.empty = false;
+            } else {
+                self.fmt.write_element(FormatElement::Signal(StartEntry))?;
+                separator.fmt(self.fmt)?;
+                self.fmt.write_element(FormatElement::Signal(EndEntry))?;
             }
 
-            write!(buffer, [entry])?;
-            self.items.push(buffer.into_element());
-
-            Ok(())
+            self.fmt.write_element(FormatElement::Signal(StartEntry))?;
+            entry.fmt(self.fmt)?;
+            self.fmt.write_element(FormatElement::Signal(EndEntry))
         });
 
         self
@@ -2237,17 +2200,8 @@ impl<'a, 'buf, Context> FillBuilder<'a, 'buf, Context> {
 
     /// Finishes the output and returns any error encountered
     pub fn finish(&mut self) -> FormatResult<()> {
-        self.result.and_then(|_| {
-            let mut items = std::mem::take(&mut self.items);
-
-            match items.len() {
-                0 => Ok(()),
-                1 => self.fmt.write_element(items.pop().unwrap()),
-                _ => self
-                    .fmt
-                    .write_element(FormatElement::Fill(items.into_boxed_slice())),
-            }
-        })
+        self.result
+            .and_then(|_| self.fmt.write_element(FormatElement::Signal(EndFill)))
     }
 }
 
@@ -2279,27 +2233,24 @@ impl<'a, Context> BestFitting<'a, Context> {
 
 impl<Context> Format<Context> for BestFitting<'_, Context> {
     fn fmt(&self, f: &mut Formatter<Context>) -> FormatResult<()> {
-        let mut buffer = VecBuffer::new(f.state_mut());
-        let variants = self.variants.items();
+        f.write_element(FormatElement::Signal(StartBestFitting))?;
 
-        let mut formatted_variants = Vec::with_capacity(variants.len());
+        let (last, flat_variants) = self
+            .variants
+            .items()
+            .split_last()
+            .expect("Best fitting to have at least two variants.");
 
-        for variant in variants {
-            buffer.write_fmt(Arguments::from(variant))?;
-
-            formatted_variants.push(buffer.take_element());
+        for variant in flat_variants {
+            f.write_element(FormatElement::Signal(StartEntry))?;
+            Arguments::from(variant).fmt(f)?;
+            f.write_element(FormatElement::Signal(EndEntry))?;
         }
 
-        // SAFETY: The constructor guarantees that there are always at least two variants. It's, therefore,
-        // safe to call into the unsafe `from_vec_unchecked` function
-        let element = unsafe {
-            FormatElement::BestFitting(format_element::BestFitting::from_vec_unchecked(
-                formatted_variants,
-            ))
-        };
+        f.write_element(FormatElement::Signal(StartMostExpandedEntry))?;
+        Arguments::from(last).fmt(f)?;
+        f.write_element(FormatElement::Signal(EndEntry))?;
 
-        f.write_element(element)?;
-
-        Ok(())
+        f.write_element(FormatElement::Signal(EndBestFitting))
     }
 }

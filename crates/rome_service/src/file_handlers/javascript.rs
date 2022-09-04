@@ -197,7 +197,7 @@ fn debug_formatter_ir(
     let tree = parse.syntax();
     let formatted = format_node(options, &tree)?;
 
-    let root_element = formatted.into_format_element();
+    let root_element = formatted.into_document();
     Ok(root_element.to_string())
 }
 

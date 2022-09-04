@@ -8,6 +8,9 @@ pub use crate::token::{
     format_trailing_trivia, format_trimmed_token,
 };
 
+pub use crate::format_element::document::Document;
+pub use crate::format_element::signal::{LabelId, Signal, SignalKind};
+
 pub use crate::{
     best_fitting, dbg_write, format, format_args, write, Buffer as _, BufferExtensions, Format,
     Format as _, FormatError, FormatResult, FormatRule, FormatWithRule as _, SimpleFormatContext,

@@ -27,7 +27,8 @@ pub(crate) use conditional::{ConditionalJsxChain, JsAnyConditional};
 pub(crate) use member_chain::get_member_chain;
 pub(crate) use object_like::JsObjectLike;
 pub(crate) use object_pattern_like::JsObjectPatternLike;
-use rome_formatter::{format_args, write, Buffer, CommentStyle, VecBuffer};
+use rome_formatter::prelude::signal::{Signal, VerbatimKind};
+use rome_formatter::{format_args, write, Buffer, CommentStyle};
 use rome_js_syntax::{JsAnyExpression, JsAnyStatement, JsInitializerClause, JsLanguage, Modifiers};
 use rome_js_syntax::{JsSyntaxKind, JsSyntaxNode, JsSyntaxToken};
 use rome_rowan::{AstNode, AstNodeList};
@@ -191,18 +192,25 @@ impl<'a> FormatWithSemicolon<'a> {
 
 impl Format<JsFormatContext> for FormatWithSemicolon<'_> {
     fn fmt(&self, f: &mut JsFormatter) -> FormatResult<()> {
-        let mut buffer = VecBuffer::new(f.state_mut());
+        let mut last_verbatim_kind: Option<VerbatimKind> = None;
+        let mut last_is_verbatim = false;
 
-        write!(buffer, [self.content])?;
+        {
+            let mut buffer = f.inspect(|element| match element {
+                FormatElement::Signal(Signal::StartVerbatim(kind)) => {
+                    last_verbatim_kind = Some(*kind)
+                }
+                FormatElement::Signal(Signal::EndVerbatim) => last_is_verbatim = true,
+                _ => last_is_verbatim = false,
+            });
 
-        let content = buffer.into_element();
+            write!(buffer, [self.content])?;
+        }
 
-        let is_unknown = match content.last_element() {
-            Some(FormatElement::Verbatim(elem)) => elem.is_unknown(),
-            _ => false,
-        };
-
-        f.write_element(content)?;
+        let is_unknown = last_is_verbatim
+            && last_verbatim_kind
+                .expect("Expected a `StartVerbatim` for content that ends with `EndVerbatim`.")
+                .is_unknown();
 
         if let Some(semicolon) = self.semicolon {
             write!(f, [semicolon.format()])?;

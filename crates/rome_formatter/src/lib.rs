@@ -21,6 +21,8 @@
 
 #![deny(rustdoc::broken_intra_doc_links)]
 
+extern crate core;
+
 mod arguments;
 mod buffer;
 mod builders;
@@ -43,6 +45,7 @@ use crate::group_id::UniqueGroupIdBuilder;
 use crate::prelude::syntax_token_cow_slice;
 use std::any::TypeId;
 
+use crate::format_element::document::Document;
 #[cfg(debug_assertions)]
 use crate::printed_tokens::PrintedTokens;
 use crate::printer::{Printer, PrinterOptions};
@@ -57,7 +60,7 @@ pub use builders::{
     soft_line_break_or_space, soft_line_indent_or_space, space, text, BestFitting,
 };
 pub use comments::{CommentKind, CommentStyle, Comments, SourceComment};
-pub use format_element::{normalize_newlines, FormatElement, Text, Verbatim, LINE_TERMINATORS};
+pub use format_element::{normalize_newlines, FormatElement, Text, LINE_TERMINATORS};
 pub use group_id::GroupId;
 use indexmap::IndexSet;
 use rome_rowan::{
@@ -310,21 +313,21 @@ pub struct SourceMarker {
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Formatted<Context> {
-    root: FormatElement,
+    document: Document,
     context: Context,
 }
 
 impl<Context> Formatted<Context> {
-    pub fn new(root: FormatElement, context: Context) -> Self {
-        Self { root, context }
+    pub fn new(document: Document, context: Context) -> Self {
+        Self { document, context }
     }
 
     pub fn context(&self) -> &Context {
         &self.context
     }
 
-    pub fn into_format_element(self) -> FormatElement {
-        self.root
+    pub fn into_document(self) -> Document {
+        self.document
     }
 }
 
@@ -335,7 +338,7 @@ where
     pub fn print(&self) -> Printed {
         let print_options = self.context.options().as_print_options();
 
-        let printed = Printer::new(print_options).print(&self.root);
+        let printed = Printer::new(print_options).print(&self.document);
 
         match self.context.source_map() {
             Some(source_map) => source_map.map_printed(printed),
@@ -345,7 +348,7 @@ where
 
     pub fn print_with_indent(&self, indent: u16) -> Printed {
         let print_options = self.context.options().as_print_options();
-        let printed = Printer::new(print_options).print_with_indent(&self.root, indent);
+        let printed = Printer::new(print_options).print_with_indent(&self.document, indent);
 
         match self.context.source_map() {
             Some(source_map) => source_map.map_printed(printed),
@@ -756,7 +759,7 @@ where
 ///
 /// write!(&mut buffer, [format_args!(text("Hello World"))]).unwrap();
 ///
-/// let formatted = Formatted::new(buffer.into_element(), SimpleFormatContext::default());
+/// let formatted = Formatted::new(Document::from(buffer.into_vec()), SimpleFormatContext::default());
 ///
 /// assert_eq!("Hello World", formatted.print().as_code())
 /// ```
@@ -772,7 +775,7 @@ where
 ///
 /// write!(&mut buffer, [text("Hello World")]).unwrap();
 ///
-/// let formatted = Formatted::new(buffer.into_element(), SimpleFormatContext::default());
+/// let formatted = Formatted::new(Document::from(buffer.into_vec()), SimpleFormatContext::default());
 ///
 /// assert_eq!("Hello World", formatted.print().as_code())
 /// ```
@@ -824,7 +827,10 @@ where
 
     buffer.write_fmt(arguments)?;
 
-    Ok(Formatted::new(buffer.into_element(), state.into_context()))
+    Ok(Formatted::new(
+        Document::from(buffer.into_vec()),
+        state.into_context(),
+    ))
 }
 
 /// Entry point for formatting a [SyntaxNode] for a specific language.
@@ -896,7 +902,7 @@ pub fn format_node<L: FormatLanguage>(
 
         write!(buffer, [format_node])?;
 
-        let document = buffer.into_element();
+        let document = Document::from(buffer.into_vec());
 
         state.assert_formatted_all_tokens(&root);
         state
