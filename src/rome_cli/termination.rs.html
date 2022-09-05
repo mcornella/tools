@@ -85,6 +85,12 @@
 <span id="79">79</span>
 <span id="80">80</span>
 <span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_service::RomeError</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">env::current_exe</span>,
@@ -148,6 +154,12 @@
     <span class="doccomment">/// Wrapper for an underlying `std::io` error</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
     <span class="ident">IoError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">std::io::Error</span>),
+
+    <span class="attribute">#[<span class="ident">error</span>(
+        <span class="string">&quot;no running instance of the Rome daemon server was found. Run &#39;{} start&#39; to start a server&quot;</span>,
+        <span class="ident">command_name</span>()
+    )]</span>
+    <span class="ident">ServerNotRunning</span>,
 }
 
 <span class="kw">fn</span> <span class="ident">command_name</span>() -&gt; <span class="ident">String</span> {
