@@ -1,10 +1,9 @@
 use crate::format_element::signal::{Condition, Signal};
 use crate::prelude::signal::{DedentMode, LabelId};
 use crate::prelude::*;
-use crate::Buffer;
+use crate::{format_element, Buffer, VecBuffer};
 use crate::{
-    write, Argument, Arguments, BufferSnapshot, FormatState, GroupId, PreambleBuffer, TextRange,
-    TextSize,
+    write, Argument, Arguments, BufferSnapshot, FormatState, GroupId, TextRange, TextSize,
 };
 use rome_rowan::{Language, SyntaxNode, SyntaxToken, SyntaxTokenText, TextLen};
 use std::borrow::Cow;
@@ -1084,29 +1083,22 @@ enum IndentMode {
 
 impl<Context> Format<Context> for BlockIndent<'_, Context> {
     fn fmt(&self, f: &mut Formatter<Context>) -> FormatResult<()> {
-        let mut buffer = PreambleBuffer::new(
-            f,
-            format_with(|f| {
-                f.write_element(FormatElement::Signal(StartIndent))?;
+        f.write_element(FormatElement::Signal(StartIndent))?;
 
-                match self.mode {
-                    IndentMode::Soft => write!(f, [soft_line_break()]),
-                    IndentMode::Block => write!(f, [hard_line_break()]),
-                    IndentMode::SoftLineOrSpace => write!(f, [soft_line_break_or_space()]),
-                }
-            }),
-        );
+        match self.mode {
+            IndentMode::Soft => write!(f, [soft_line_break()]),
+            IndentMode::Block => write!(f, [hard_line_break()]),
+            IndentMode::SoftLineOrSpace => write!(f, [soft_line_break_or_space()]),
+        }?;
 
-        buffer.write_fmt(Arguments::from(&self.content))?;
+        f.write_fmt(Arguments::from(&self.content))?;
 
-        if buffer.did_write_preamble() {
-            f.write_element(FormatElement::Signal(EndIndent))?;
+        f.write_element(FormatElement::Signal(EndIndent))?;
 
-            match self.mode {
-                IndentMode::Soft => write!(f, [soft_line_break()])?,
-                IndentMode::Block => write!(f, [hard_line_break()])?,
-                IndentMode::SoftLineOrSpace => {}
-            }
+        match self.mode {
+            IndentMode::Soft => write!(f, [soft_line_break()])?,
+            IndentMode::Block => write!(f, [hard_line_break()])?,
+            IndentMode::SoftLineOrSpace => {}
         }
 
         Ok(())
@@ -1234,15 +1226,18 @@ impl<Context> Format<Context> for Group<'_, Context> {
             return f.write_fmt(Arguments::from(&self.content));
         }
 
-        let mut buffer = GroupBuffer::new(f, self.group_id);
-
-        buffer.write_fmt(Arguments::from(&self.content))?;
+        // let mut buffer = GroupBuffer::new(f, self.group_id);
+        //
+        // buffer.write_fmt(Arguments::from(&self.content))?;
+        f.write_element(FormatElement::Signal(Signal::StartGroup(self.group_id)))?;
+        Arguments::from(&self.content).fmt(f)?;
+        f.write_element(FormatElement::Signal(Signal::EndGroup))?;
 
         if self.should_expand {
-            write!(buffer, [expand_parent()])?;
+            write!(f, [expand_parent()])?;
         }
 
-        buffer.finish()
+        Ok(())
     }
 }
 
@@ -1385,6 +1380,10 @@ impl<Context> Buffer for GroupBuffer<'_, Context> {
 
     fn reserve(&mut self, additional: usize) {
         self.inner.reserve(additional)
+    }
+
+    fn slice(&self) -> &[FormatElement] {
+        self.inner.slice()
     }
 
     fn state(&self) -> &FormatState<Self::Context> {
@@ -2080,26 +2079,16 @@ where
     /// that appear before the node in the input source.
     pub fn entry<L: Language>(&mut self, node: &SyntaxNode<L>, content: &dyn Format<Context>) {
         self.result = self.result.and_then(|_| {
-            let mut buffer = PreambleBuffer::new(
-                self.fmt,
-                format_with(|f| {
-                    if self.has_elements {
-                        if get_lines_before(node) > 1 {
-                            write!(f, [empty_line()])?;
-                        } else {
-                            self.separator.fmt(f)?;
-                        }
-                    }
+            if self.has_elements {
+                if get_lines_before(node) > 1 {
+                    write!(self.fmt, [empty_line()])?;
+                } else {
+                    self.separator.fmt(self.fmt)?;
+                }
+            }
 
-                    Ok(())
-                }),
-            );
-
-            write!(buffer, [content])?;
-
-            self.has_elements = self.has_elements || buffer.did_write_preamble();
-
-            Ok(())
+            self.has_elements = true;
+            write!(self.fmt, [content])
         });
     }
 
@@ -2230,24 +2219,27 @@ impl<'a, Context> BestFitting<'a, Context> {
 
 impl<Context> Format<Context> for BestFitting<'_, Context> {
     fn fmt(&self, f: &mut Formatter<Context>) -> FormatResult<()> {
-        f.write_element(FormatElement::Signal(StartBestFitting))?;
+        let mut buffer = VecBuffer::new(f.state_mut());
+        let variants = self.variants.items();
 
-        let (last, flat_variants) = self
-            .variants
-            .items()
-            .split_last()
-            .expect("Best fitting to have at least two variants.");
+        let mut formatted_variants = Vec::with_capacity(variants.len());
 
-        for variant in flat_variants {
-            f.write_element(FormatElement::Signal(StartEntry))?;
-            Arguments::from(variant).fmt(f)?;
-            f.write_element(FormatElement::Signal(EndEntry))?;
+        for variant in variants {
+            buffer.write_element(FormatElement::Signal(StartEntry))?;
+            buffer.write_fmt(Arguments::from(variant))?;
+            buffer.write_element(FormatElement::Signal(EndEntry))?;
+
+            formatted_variants.push(buffer.take_vec().into_boxed_slice());
         }
 
-        f.write_element(FormatElement::Signal(StartMostExpandedEntry))?;
-        Arguments::from(last).fmt(f)?;
-        f.write_element(FormatElement::Signal(EndEntry))?;
+        // SAFETY: The constructor guarantees that there are always at least two variants. It's, therefore,
+        // safe to call into the unsafe `from_vec_unchecked` function
+        let element = unsafe {
+            FormatElement::BestFitting(format_element::BestFitting::from_vec_unchecked(
+                formatted_variants,
+            ))
+        };
 
-        f.write_element(FormatElement::Signal(EndBestFitting))
+        f.write_element(element)
     }
 }

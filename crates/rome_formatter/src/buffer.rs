@@ -34,6 +34,8 @@ pub trait Buffer {
     /// May reserve space for the specified additional elements.
     fn reserve(&mut self, _additional: usize);
 
+    fn slice(&self) -> &[FormatElement];
+
     /// Glue for usage of the [`write!`] macro with implementors of this trait.
     ///
     /// This method should generally not be invoked manually, but rather through the [`write!`] macro itself.
@@ -140,6 +142,10 @@ impl<W: Buffer<Context = Context> + ?Sized, Context> Buffer for &mut W {
         (**self).reserve(additional)
     }
 
+    fn slice(&self) -> &[FormatElement] {
+        (**self).slice()
+    }
+
     fn write_fmt(&mut self, args: Arguments<Context>) -> FormatResult<()> {
         (**self).write_fmt(args)
     }
@@ -223,6 +229,10 @@ impl<Context> Buffer for VecBuffer<'_, Context> {
 
     fn reserve(&mut self, additional: usize) {
         self.elements.reserve(additional)
+    }
+
+    fn slice(&self) -> &[FormatElement] {
+        &self
     }
 
     fn state(&self) -> &FormatState<Self::Context> {
@@ -349,6 +359,10 @@ where
         self.inner.reserve(additional)
     }
 
+    fn slice(&self) -> &[FormatElement] {
+        self.inner.slice()
+    }
+
     fn state(&self) -> &FormatState<Self::Context> {
         self.inner.state()
     }
@@ -404,6 +418,10 @@ where
         self.inner.reserve(additional)
     }
 
+    fn slice(&self) -> &[FormatElement] {
+        self.inner.slice()
+    }
+
     fn state(&self) -> &FormatState<Self::Context> {
         self.inner.state()
     }
@@ -450,105 +468,6 @@ pub trait BufferExtensions: Buffer + Sized {
 
         Ok(())
     }
-
-    /// It emits a custom buffer called [WillBreakBuffer], which tracks
-    /// it he last element written in the main buffer breaks, it does so by
-    /// checking if their IR emits an [element](FormatElement) that breaks.
-    ///
-    /// This functionality can be used only one element and only after the element
-    /// is written in the buffer.
-    ///
-    /// ## Examples
-    ///
-    /// ```
-    /// use rome_formatter::{format, format_args, write, LineWidth};
-    /// use rome_formatter::prelude::*;
-    ///
-    /// let formatted = format!(SimpleFormatContext::default(), [format_with(|f| {
-    ///
-    ///     let element = format_with(|f| {
-    ///         write!(f, [
-    ///             text("hello"),
-    ///             hard_line_break(),
-    ///             text("world!")
-    ///         ])
-    ///     });
-    ///     let mut buffer = f.inspect_will_break();
-    ///     write!(buffer, [element])?;
-    ///     let does_element_break = buffer.will_break();
-    ///
-    ///     if does_element_break {
-    ///         write!(f, [hard_line_break(), text("break")])
-    ///     } else {
-    ///         write!(f, [text("did not break")])
-    ///     }
-    ///
-    /// })]).unwrap();
-    ///
-    /// assert_eq!(
-    ///     "hello\nworld!\nbreak",
-    ///     formatted.print().as_code()
-    /// );
-    /// ```
-    ///
-    /// ## Alternatives
-    ///
-    /// Use `Memoized.inspect(f)?.will_break()` if you need to know if some content breaks that should
-    /// only be written later.
-    fn inspect_will_break(&mut self) -> WillBreakBuffer<Self::Context> {
-        WillBreakBuffer::new(self)
-    }
-
-    /// Wraps the current buffer in a [HasLabelBuffer], which tracks
-    /// labelled elements written in the main buffer, it does so by
-    /// checking if [element](FormatElement) is a [label](FormatElement::Label)
-    /// with the expected [label_id](LabelId).
-    ///
-    /// This functionality can be used only on one element and only after the element
-    /// is written in the buffer.
-    ///
-    /// ## Examples
-    ///
-    /// ```rust
-    /// use rome_formatter::prelude::*;
-    /// use rome_formatter::{format, write, LineWidth};
-    ///
-    /// enum SomeLabelId {}
-    ///
-    /// let formatted = format!(
-    ///     SimpleFormatContext::default(),
-    ///     [format_with(|f| {
-    ///         let mut buffer = f.inspect_is_labelled::<SomeLabelId>();
-    ///
-    ///         write!(buffer, [
-    ///             labelled(
-    ///                 LabelId::of::<SomeLabelId>(),
-    ///                 &text("'I have a label'")
-    ///             )
-    ///         ])?;
-    ///
-    ///         let is_labelled = buffer.has_label();
-    ///
-    ///         if is_labelled {
-    ///             write!(f, [text(" has label SomeLabelId")])
-    ///         } else {
-    ///             write!(f, [text(" doesn't have label SomeLabelId")])
-    ///         }
-    ///     })]
-    /// )
-    /// .unwrap();
-    ///
-    /// assert_eq!("'I have a label' has label SomeLabelId", formatted.print().as_code());
-    /// ```
-    ///
-    /// /// ## Alternatives
-    ///
-    /// Use `Memoized.inspect(f)?.has_label(LabelId::of::<SomeLabelId>()` if you need to know if some content breaks that should
-    /// only be written later.
-    fn inspect_is_labelled<T: ?Sized + 'static>(&mut self) -> HasLabelBuffer<Self::Context> {
-        let label_id = LabelId::of::<T>();
-        HasLabelBuffer::new(self, label_id)
-    }
 }
 
 impl<T> BufferExtensions for T where T: Buffer {}
@@ -585,6 +504,10 @@ impl<Context> Buffer for HasLabelBuffer<'_, Context> {
 
     fn reserve(&mut self, additional: usize) {
         self.inner.reserve(additional)
+    }
+
+    fn slice(&self) -> &[FormatElement] {
+        self.inner.slice()
     }
 
     fn state(&self) -> &FormatState<Self::Context> {
@@ -643,6 +566,10 @@ impl<Context> Buffer for WillBreakBuffer<'_, Context> {
 
     fn reserve(&mut self, additional: usize) {
         self.inner.reserve(additional)
+    }
+
+    fn slice(&self) -> &[FormatElement] {
+        self.inner.slice()
     }
 
     fn state(&self) -> &FormatState<Self::Context> {

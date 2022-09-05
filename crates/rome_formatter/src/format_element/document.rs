@@ -38,12 +38,12 @@ impl FormatElements for [FormatElement] {
 
         for element in self {
             match element {
-                // Line suffix and best fitting act as boundaries
+                // Line suffix
                 // Ignore if any of its content breaks
-                FormatElement::Signal(StartLineSuffix | StartBestFitting) => {
+                FormatElement::Signal(StartLineSuffix) => {
                     ignore_depth += 1;
                 }
-                FormatElement::Signal(EndLineSuffix | EndBestFitting) => {
+                FormatElement::Signal(EndLineSuffix) => {
                     ignore_depth -= 1;
                 }
                 FormatElement::Interned(interned) if ignore_depth == 0 => {
@@ -51,6 +51,7 @@ impl FormatElements for [FormatElement] {
                         return true;
                     }
                 }
+
                 element if ignore_depth == 0 && element.will_break() => {
                     return true;
                 }
@@ -87,14 +88,27 @@ impl FormatElements for [FormatElement] {
         let mut stack = Vec::new();
 
         while let Some((index, element)) = iterator.next() {
-            if let FormatElement::Signal(signal) = element {
-                if signal.is_start() {
-                    stack.push((index, signal.kind()));
-                } else {
-                    match stack.pop() {
-                        Some((start, start_kind)) => {
-                            if start_kind != signal.kind() {
-                                panic_with_context(
+            match element {
+                FormatElement::BestFitting(best_fitting) => {
+                    for variant in best_fitting.variants() {
+                        assert_eq!(
+                            variant.first(),
+                            Some(&FormatElement::Signal(Signal::StartEntry))
+                        );
+                        assert_eq!(
+                            variant.last(),
+                            Some(&FormatElement::Signal(Signal::EndEntry))
+                        );
+                    }
+                }
+                FormatElement::Signal(signal) => {
+                    if signal.is_start() {
+                        stack.push((index, signal.kind()));
+                    } else {
+                        match stack.pop() {
+                            Some((start, start_kind)) => {
+                                if start_kind != signal.kind() {
+                                    panic_with_context(
                                     start,
                                     index,
                                     &std::format!(
@@ -102,68 +116,63 @@ impl FormatElements for [FormatElement] {
                                         start_kind.end_signal().kind(),
                                     ),
                                 )
+                                }
                             }
-                        }
-                        None => panic_with_context(
-                            0,
-                            index,
-                            &std::format!(
+                            None => panic_with_context(
+                                0,
+                                index,
+                                &std::format!(
                                 "Unexpected end signal {signal:?} without matching start signal."
                             ),
-                        ),
+                            ),
+                        }
                     }
-                }
 
-                match signal {
-                    Signal::StartBestFitting | Signal::StartFill => {
-                        match iterator.peek() {
-                            Some((_, FormatElement::Signal(Signal::StartEntry))) => {
-                                // OK
-                            }
-                            _ => {
-                                panic_with_context(
-                                    index,
-                                    index + 1,
-                                    &std::format!(
+                    match signal {
+                        Signal::StartFill => {
+                            match iterator.peek() {
+                                Some((_, FormatElement::Signal(Signal::StartEntry))) => {
+                                    // OK
+                                }
+                                _ => {
+                                    panic_with_context(
+                                        index,
+                                        index + 1,
+                                        &std::format!(
                                         "{signal:?} must be directly followed by a {:?} signal.",
                                         Signal::StartEntry
                                     ),
-                                );
+                                    );
+                                }
                             }
                         }
-                    }
-                    Signal::EndEntry => {
-                        match iterator.peek() {
-                            Some((
-                                _,
-                                FormatElement::Signal(
-                                    Signal::StartEntry
-                                    | Signal::StartMostExpandedEntry
-                                    | Signal::EndFill
-                                    | Signal::EndBestFitting,
-                                ),
-                            )) => {
-                                // OK
-                            }
-                            _ => {
-                                panic_with_context(
+                        Signal::EndEntry => {
+                            match iterator.peek() {
+                                Some((
+                                    _,
+                                    FormatElement::Signal(Signal::StartEntry | Signal::EndFill),
+                                )) => {
+                                    // OK
+                                }
+                                _ => {
+                                    panic_with_context(
                                     index,
                                     index + 1,
                                     &std::format!(
-                                        "{signal:?} must be directly followed by a {:?}, {:?}, {:?}, or {:?} signal.",
+                                        "{signal:?} must be directly followed by a {:?}, or {:?} signal.",
                                         Signal::StartEntry,
-                                        Signal::StartMostExpandedEntry,
                                         Signal::EndFill,
-                                        Signal::EndBestFitting
                                     ),
                                 );
+                                }
                             }
                         }
-                    }
-                    _ => {
-                        // OK
+                        _ => {
+                            // OK
+                        }
                     }
                 }
+                _ => {}
             }
         }
     }
@@ -464,14 +473,26 @@ impl Format<IrFormatContext> for &[FormatElement] {
                 }
 
                 // Don't write anything for entry as the outer loop will print `[` and `]` around the content
-                FormatElement::Signal(StartEntry | StartMostExpandedEntry) => {}
+                FormatElement::Signal(StartEntry) => {}
                 FormatElement::Signal(EndEntry) => {}
 
-                FormatElement::Signal(StartBestFitting) => {
-                    write!(f, [text("best_fitting(")])?;
-                }
-                FormatElement::Signal(EndBestFitting) => {
-                    write!(f, [text(")")])?;
+                FormatElement::BestFitting(best_fitting) => {
+                    write!(f, [text("best_fitting([")])?;
+                    f.write_elements([
+                        FormatElement::Signal(StartIndent),
+                        FormatElement::Line(LineMode::Hard),
+                    ])?;
+
+                    for variant in best_fitting.variants() {
+                        write!(f, [variant.deref(), hard_line_break()])?;
+                    }
+
+                    f.write_elements([
+                        FormatElement::Signal(EndIndent),
+                        FormatElement::Line(LineMode::Hard),
+                    ])?;
+
+                    write!(f, [text("])")])?;
                 }
 
                 FormatElement::Interned(interned) => {

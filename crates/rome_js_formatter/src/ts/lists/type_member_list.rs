@@ -32,19 +32,13 @@ struct TsTypeMemberItem {
 impl Format<JsFormatContext> for TsTypeMemberItem {
     fn fmt(&self, f: &mut JsFormatter) -> FormatResult<()> {
         f.write_element(FormatElement::Signal(Signal::StartGroup(None)))?;
+        write!(f, [self.member.format()])?;
 
-        let mut last_is_verbatim = false;
-
-        {
-            let mut buffer = f.inspect(|element| match element {
-                FormatElement::Signal(Signal::EndVerbatim) => {
-                    last_is_verbatim = true;
-                }
-                _ => last_is_verbatim = false,
-            });
-
-            write!(buffer, [self.member.format()])?;
-        }
+        // Ugh, Interned elements make this hard. Create a DcoumentRev iterator?
+        let last_is_verbatim = matches!(
+            f.slice().last(),
+            Some(&FormatElement::Signal(Signal::EndVerbatim))
+        );
 
         f.write_element(FormatElement::Signal(Signal::EndGroup))?;
 

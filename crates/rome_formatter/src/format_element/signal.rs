@@ -49,7 +49,6 @@ pub enum Signal {
 
     /// Entry inside of a [Signal::StartFill]
     StartEntry,
-    StartMostExpandedEntry,
     EndEntry,
 
     /// Delay the printing of its content until the next line break
@@ -66,11 +65,6 @@ pub enum Signal {
     /// A token that tracks tokens/nodes that are printed as verbatim.
     StartVerbatim(VerbatimKind),
     EndVerbatim,
-
-    /// A list of different variants representing the same content. The printer picks the best fitting content.
-    /// Line breaks inside of a best fitting don't propagate to parent groups.
-    StartBestFitting,
-    EndBestFitting,
 
     /// Special semantic element marking the content with a label.
     /// This does not directly influence how the content will be printed.
@@ -91,11 +85,9 @@ impl Signal {
             | Signal::StartIndentIfGroupBreaks(_)
             | Signal::StartFill
             | Signal::StartEntry
-            | Signal::StartMostExpandedEntry
             | Signal::StartLineSuffix
             | Signal::StartComment
             | Signal::StartVerbatim(_)
-            | Signal::StartBestFitting
             | Signal::StartLabelled(_)
             | Signal::EndLabelled => true,
             _ => false,
@@ -117,11 +109,10 @@ impl Signal {
             StartConditionalContent(_) | EndConditionalContent => SignalKind::ConditionalContent,
             StartIndentIfGroupBreaks(_) | EndIndentIfGroupBreaks => SignalKind::IndentIfGroupBreaks,
             StartFill | EndFill => SignalKind::Fill,
-            StartEntry | StartMostExpandedEntry | EndEntry => SignalKind::Entry,
+            StartEntry | EndEntry => SignalKind::Entry,
             StartLineSuffix | EndLineSuffix => SignalKind::LineSuffix,
             StartComment | EndComment => SignalKind::Comment,
             StartVerbatim(_) | EndVerbatim => SignalKind::Verbatim,
-            StartBestFitting | EndBestFitting => SignalKind::BestFitting,
             StartLabelled(_) | EndLabelled => SignalKind::Labelled,
         }
     }
@@ -144,7 +135,6 @@ pub enum SignalKind {
     LineSuffix,
     Comment,
     Verbatim,
-    BestFitting,
     Labelled,
 }
 
@@ -164,7 +154,6 @@ impl SignalKind {
             SignalKind::LineSuffix => EndLineSuffix,
             SignalKind::Comment => EndComment,
             SignalKind::Verbatim => EndVerbatim,
-            SignalKind::BestFitting => EndBestFitting,
             SignalKind::Labelled => EndLabelled,
         }
     }

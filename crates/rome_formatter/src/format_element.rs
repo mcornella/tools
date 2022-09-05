@@ -37,6 +37,10 @@ pub enum FormatElement {
     /// deep cloning the IR when using the `best_fitting!` macro or `if_group_fits_on_line` and `if_group_breaks`.
     Interned(Interned),
 
+    /// A list of different variants representing the same content. The printer picks the best fitting content.
+    /// Line breaks inside of a best fitting don't propagate to parent groups.
+    BestFitting(BestFitting),
+
     Signal(Signal),
 }
 
@@ -48,6 +52,9 @@ impl std::fmt::Debug for FormatElement {
             FormatElement::ExpandParent => write!(fmt, "ExpandParent"),
             FormatElement::Text(text) => text.fmt(fmt),
             FormatElement::LineSuffixBoundary => write!(fmt, "LineSuffixBoundary"),
+            FormatElement::BestFitting(best_fitting) => {
+                fmt.debug_tuple("BestFitting").field(&best_fitting).finish()
+            }
             FormatElement::Interned(interned) => {
                 fmt.debug_list().entries(interned.deref()).finish()
             }
@@ -268,9 +275,10 @@ impl FormatElements for FormatElement {
             FormatElement::Line(line_mode) => matches!(line_mode, LineMode::Hard | LineMode::Empty),
             FormatElement::Text(text) => text.contains('\n'),
             FormatElement::Interned(interned) => interned.will_break(),
-            FormatElement::LineSuffixBoundary | FormatElement::Space | FormatElement::Signal(_) => {
-                false
-            }
+            FormatElement::LineSuffixBoundary
+            | FormatElement::Space
+            | FormatElement::Signal(_)
+            | FormatElement::BestFitting(_) => false,
         }
     }
 
@@ -292,6 +300,64 @@ impl FormatElements for FormatElement {
 impl From<Text> for FormatElement {
     fn from(token: Text) -> Self {
         FormatElement::Text(token)
+    }
+}
+
+/// Provides the printer with different representations for the same element so that the printer
+/// can pick the best fitting variant.
+///
+/// Best fitting is defined as the variant that takes the most horizontal space but fits on the line.
+#[derive(Clone, Eq, PartialEq)]
+pub struct BestFitting {
+    /// The different variants for this element.
+    /// The first element is the one that takes up the most space horizontally (the most flat),
+    /// The last element takes up the least space horizontally (but most horizontal space).
+    variants: Box<[Box<[FormatElement]>]>,
+}
+
+impl BestFitting {
+    /// Creates a new best fitting IR with the given variants. The method itself isn't unsafe
+    /// but it is to discourage people from using it because the printer will panic if
+    /// the slice doesn't contain at least the least and most expanded variants.
+    ///
+    /// You're looking for a way to create a `BestFitting` object, use the `best_fitting![least_expanded, most_expanded]` macro.
+    ///
+    /// ## Safety
+    /// The slice must contain at least two variants.
+    #[doc(hidden)]
+    pub(crate) unsafe fn from_vec_unchecked(variants: Vec<Box<[FormatElement]>>) -> Self {
+        debug_assert!(
+            variants.len() >= 2,
+            "Requires at least the least expanded and most expanded variants"
+        );
+
+        Self {
+            variants: variants.into_boxed_slice(),
+        }
+    }
+
+    /// Returns the most expanded variant
+    pub fn most_expanded(&self) -> &[FormatElement] {
+        self.variants.last().expect(
+            "Most contain at least two elements, as guaranteed by the best fitting builder.",
+        )
+    }
+
+    pub fn variants(&self) -> &[Box<[FormatElement]>] {
+        &self.variants
+    }
+
+    /// Returns the least expanded variant
+    pub fn most_flat(&self) -> &[FormatElement] {
+        self.variants.first().expect(
+            "Most contain at least two elements, as guaranteed by the best fitting builder.",
+        )
+    }
+}
+
+impl std::fmt::Debug for BestFitting {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_list().entries(&*self.variants).finish()
     }
 }
 

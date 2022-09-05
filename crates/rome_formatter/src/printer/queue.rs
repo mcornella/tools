@@ -82,6 +82,11 @@ pub(super) trait Queue<'a> {
         }
     }
 
+    fn pop_slice(&mut self) -> Option<&'a [FormatElement]> {
+        self.set_top_index(0);
+        self.stack_mut().pop()
+    }
+
     fn skip_content(&mut self, kind: SignalKind)
     where
         Self: Sized,
@@ -314,72 +319,6 @@ pub(super) struct TakeAllFitsFilter;
 impl FitsFilter for TakeAllFitsFilter {
     fn filter(&mut self, _element: &FormatElement) -> FitsFilterSignal {
         FitsFilterSignal::Visit
-    }
-}
-
-#[derive(Debug, Clone)]
-pub(super) struct BestFittingVariantFilter {
-    entry_depth: usize,
-    first_entry: bool,
-    past_best_fitting: bool,
-}
-
-impl Default for BestFittingVariantFilter {
-    fn default() -> Self {
-        Self {
-            entry_depth: 0,
-            first_entry: true,
-            past_best_fitting: false,
-        }
-    }
-}
-
-impl FitsFilter for BestFittingVariantFilter {
-    fn filter(&mut self, element: &FormatElement) -> FitsFilterSignal {
-        if self.past_best_fitting {
-            FitsFilterSignal::Visit
-        } else if self.first_entry {
-            // If this is the entry of the first variant, take all elements until we reach the end of the variant
-            match element {
-                FormatElement::Signal(Signal::StartEntry | Signal::StartMostExpandedEntry) => {
-                    self.entry_depth += 1;
-                }
-                FormatElement::Signal(Signal::EndEntry) => {
-                    self.entry_depth -= 1;
-
-                    if self.entry_depth == 0 {
-                        // We're now past the first entry and should now start ignoring the content of all other elements
-                        self.first_entry = false;
-                    }
-                }
-                _ => {
-                    // Fall through
-                }
-            };
-
-            FitsFilterSignal::Visit
-        } else {
-            // We're now in a variant that isn't the first of best fitting. Ignore all content EXCEPT the
-            // EndBestFitting marker
-            match element {
-                FormatElement::Signal(Signal::EndBestFitting) => {
-                    if self.entry_depth == 0 {
-                        self.past_best_fitting = true;
-                        return FitsFilterSignal::Visit;
-                    }
-                }
-                FormatElement::Signal(Signal::StartEntry | Signal::StartMostExpandedEntry) => {
-                    self.entry_depth += 1;
-                }
-                FormatElement::Signal(Signal::EndEntry) => {
-                    self.entry_depth -= 1;
-                }
-                _ => {
-                    // Fall through
-                }
-            }
-            FitsFilterSignal::Skip
-        }
     }
 }
 

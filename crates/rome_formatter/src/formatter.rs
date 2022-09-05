@@ -227,6 +227,10 @@ impl<Context> Buffer for Formatter<'_, Context> {
         self.buffer.reserve(additional)
     }
 
+    fn slice(&self) -> &[FormatElement] {
+        self.buffer.slice()
+    }
+
     #[inline(always)]
     fn write_fmt(&mut self, arguments: Arguments<Self::Context>) -> FormatResult<()> {
         for argument in arguments.items() {

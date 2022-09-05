@@ -6,7 +6,7 @@ mod stack;
 
 pub use printer_options::*;
 
-use crate::format_element::{FormatElements, LineMode, PrintMode};
+use crate::format_element::{BestFitting, FormatElements, LineMode, PrintMode};
 use crate::{FormatElement, GroupId, IndentStyle, Printed, SourceMarker, TextRange};
 
 use crate::format_element::document::Document;
@@ -17,11 +17,12 @@ use crate::printer::call_stack::{
 };
 use crate::printer::line_suffixes::LineSuffixes;
 use crate::printer::queue::{
-    BestFittingVariantFilter, FillSeparatorItemPair, FitsFilter, FitsFilterSignal, FitsQueue,
-    OneEntryQueueFilter, PrintQueue, Queue, TakeAllFitsFilter,
+    FillSeparatorItemPair, FitsFilter, FitsFilterSignal, FitsQueue, OneEntryQueueFilter,
+    PrintQueue, Queue, TakeAllFitsFilter,
 };
 use rome_rowan::{TextLen, TextSize};
 use std::num::NonZeroU8;
+use std::ops::Deref;
 
 /// Prints the format elements into a string
 #[derive(Debug, Default)]
@@ -192,6 +193,10 @@ impl<'a> Printer<'a> {
                 self.queue_line_suffixes(HARD_BREAK, args, queue);
             }
 
+            FormatElement::BestFitting(best_fitting) => {
+                self.print_best_fitting(best_fitting, queue, stack);
+            }
+
             FormatElement::Interned(content) => {
                 queue.extend_back(content);
             }
@@ -326,18 +331,8 @@ impl<'a> Printer<'a> {
                 stack.pop(SignalKind::Verbatim);
             }
 
-            FormatElement::Signal(Signal::StartBestFitting) => {
-                self.print_best_fitting(queue, stack);
-            }
-            FormatElement::Signal(Signal::EndBestFitting) => {
-                // Best fitting doesn't print a stack frame, nothing todo
-            }
-
             FormatElement::Signal(
-                signal @ (Signal::StartLabelled(_)
-                | Signal::StartComment
-                | Signal::StartEntry
-                | Signal::StartMostExpandedEntry),
+                signal @ (Signal::StartLabelled(_) | Signal::StartComment | Signal::StartEntry),
             ) => {
                 stack.push(signal.kind(), args);
             }
@@ -381,62 +376,60 @@ impl<'a> Printer<'a> {
         }
     }
 
-    fn print_best_fitting(&mut self, queue: &mut PrintQueue<'a>, stack: &mut PrintCallStack) {
+    fn print_best_fitting(
+        &mut self,
+        best_fitting: &'a BestFitting,
+        queue: &mut PrintQueue<'a>,
+        stack: &mut PrintCallStack,
+    ) {
         let args = stack.top();
 
         match args.mode() {
             PrintMode::Flat if self.state.measured_group_fits => {
-                // Print the most flat version
-                self.print_entry(queue, stack, args);
-
-                // Skip all other entries.
-                queue.skip_content(SignalKind::BestFitting);
+                queue.extend_back(best_fitting.most_flat());
             }
             _ => {
-                let mut first = true;
-                while let Some(FormatElement::Signal(Signal::StartEntry)) = queue.top() {
+                let normal_variants = &best_fitting.variants()[..best_fitting.variants().len() - 1];
+
+                for (index, variant) in normal_variants.iter().enumerate() {
                     // Test if this variant fits and if so, use it. Otherwise try the next
                     // variant.
 
                     // Try to fit only the first variant on a single line
-                    let mode = if first {
-                        first = false;
+                    let mode = if index == 0 {
                         PrintMode::Flat
                     } else {
                         PrintMode::Expanded
                     };
 
-                    stack.push(SignalKind::BestFitting, args.with_print_mode(mode));
-                    let variant_fits =
-                        fits_on_line(BestFittingVariantFilter::default(), queue, stack, self);
-                    stack.pop(SignalKind::BestFitting);
+                    queue.extend_back(variant);
+                    assert_eq!(
+                        queue.pop(),
+                        Some(&FormatElement::Signal(Signal::StartEntry))
+                    );
+
+                    stack.push(SignalKind::Entry, args.with_print_mode(mode));
+                    let variant_fits = fits_on_line(TakeAllFitsFilter, queue, stack, self);
+                    stack.pop(SignalKind::Entry);
+                    assert_eq!(queue.pop_slice(), Some(variant.deref()));
 
                     if variant_fits {
                         self.state.measured_group_fits = true;
+                        queue.extend_back(variant);
                         self.print_entry(queue, stack, args.with_print_mode(mode));
-                        // Skip other variants
-                        queue.skip_content(SignalKind::BestFitting);
                         return;
-                    } else {
-                        // Pop the head of the entry
-                        queue.pop_queue_interned();
-                        // Skip over the variants content
-                        queue.skip_content(SignalKind::Entry);
                     }
                 }
 
-                // No variant fits, print the last variant in expanded mode
-                assert_eq!(
-                    queue.top(),
-                    Some(&FormatElement::Signal(Signal::StartMostExpandedEntry))
-                );
-
-                self.print_entry(queue, stack, args.with_print_mode(PrintMode::Expanded));
+                // No variant fits, take the last (most expanded) as fallback
+                queue.extend_back(best_fitting.most_expanded());
 
                 assert_eq!(
-                    queue.pop_queue_interned(),
-                    Some(&FormatElement::Signal(Signal::EndBestFitting))
+                    queue.pop(),
+                    Some(&FormatElement::Signal(Signal::StartEntry))
                 );
+                // Use most expanded variant
+                stack.push(SignalKind::Entry, args.with_print_mode(PrintMode::Expanded));
             }
         }
     }
@@ -539,11 +532,11 @@ impl<'a> Printer<'a> {
         let start_entry = queue.pop_queue_interned();
 
         assert!(
-            matches!(start_entry,
-            Some(&FormatElement::Signal(
-                Signal::StartEntry | Signal::StartMostExpandedEntry
-            ))),
-            "Expected a StartEntry or StartMostExpandedEntry Signal but queue is at {start_entry:?}"
+            matches!(
+                start_entry,
+                Some(&FormatElement::Signal(Signal::StartEntry))
+            ),
+            "Expected a StartEntry but queue is at {start_entry:?}"
         );
 
         stack.push(SignalKind::Entry, args);
@@ -554,7 +547,7 @@ impl<'a> Printer<'a> {
             self.print_element(stack, queue, element);
 
             match element {
-                FormatElement::Signal(Signal::StartEntry | Signal::StartMostExpandedEntry) => {
+                FormatElement::Signal(Signal::StartEntry) => {
                     depth += 1;
                 }
                 FormatElement::Signal(Signal::EndEntry) => {
@@ -912,6 +905,13 @@ fn fits_element_on_line<'a, 'rest>(
             }
         }
 
+        FormatElement::BestFitting(best_fitting) => match args.mode() {
+            PrintMode::Flat => {
+                queue.extend_back(best_fitting.most_flat());
+            }
+            PrintMode::Expanded => queue.extend_back(best_fitting.most_expanded()),
+        },
+
         FormatElement::Interned(content) => queue.extend_back(content),
 
         FormatElement::Signal(Signal::StartIndent) => {
@@ -999,43 +999,12 @@ fn fits_element_on_line<'a, 'rest>(
             panic!("End LineSuffix Signal without corresponding StartLineSuffix signal");
         }
 
-        FormatElement::Signal(Signal::StartBestFitting) => {
-            match args.mode() {
-                PrintMode::Flat => {
-                    match all_fit(OneEntryQueueFilter::default(), state, queue, stack, options) {
-                        result @ Fits::Yes | result @ Fits::No => return result,
-                        Fits::Maybe => {
-                            // Need to see if the rest of the queue fits. Skip over the other variants of best fitting
-                            queue.skip_content(SignalKind::BestFitting);
-                        }
-                    }
-                }
-                PrintMode::Expanded => {
-                    stack.push(SignalKind::BestFitting, args);
-
-                    while let Some(FormatElement::Signal(Signal::StartEntry)) = queue.top() {
-                        queue.pop();
-                        queue.skip_content(SignalKind::Entry);
-                    }
-
-                    assert_eq!(
-                        queue.top(),
-                        Some(&FormatElement::Signal(Signal::StartMostExpandedEntry))
-                    );
-                }
-            }
-        }
-        FormatElement::Signal(Signal::EndBestFitting) => {
-            stack.pop(SignalKind::BestFitting);
-        }
-
         FormatElement::Signal(
             signal @ (Signal::StartFill
             | Signal::StartComment
             | Signal::StartVerbatim(_)
             | Signal::StartLabelled(_)
-            | Signal::StartEntry
-            | Signal::StartMostExpandedEntry),
+            | Signal::StartEntry),
         ) => {
             stack.push(signal.kind(), args);
         }

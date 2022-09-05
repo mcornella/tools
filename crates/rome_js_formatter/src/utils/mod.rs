@@ -192,31 +192,28 @@ impl<'a> FormatWithSemicolon<'a> {
 
 impl Format<JsFormatContext> for FormatWithSemicolon<'_> {
     fn fmt(&self, f: &mut JsFormatter) -> FormatResult<()> {
-        let mut last_verbatim_kind: Option<VerbatimKind> = None;
-        let mut last_is_verbatim = false;
+        write!(f, [self.content])?;
 
-        {
-            let mut buffer = f.inspect(|element| match element {
-                FormatElement::Signal(Signal::StartVerbatim(kind)) => {
-                    last_verbatim_kind = Some(*kind)
-                }
-                FormatElement::Signal(Signal::EndVerbatim) => last_is_verbatim = true,
-                _ => last_is_verbatim = false,
+        let is_unknown = if matches!(
+            f.slice().last(),
+            Some(&FormatElement::Signal(Signal::EndVerbatim))
+        ) {
+            let last_verbatim_kind = f.slice().iter().rev().find_map(|element| match element {
+                FormatElement::Signal(Signal::StartVerbatim(kind)) => Some(kind),
+                _ => None,
             });
 
-            write!(buffer, [self.content])?;
-        }
-
-        let is_unknown = last_is_verbatim
-            && last_verbatim_kind
-                .expect("Expected a `StartVerbatim` for content that ends with `EndVerbatim`.")
-                .is_unknown();
+            matches!(last_verbatim_kind, Some(VerbatimKind::Unknown))
+        } else {
+            false
+        };
 
         if let Some(semicolon) = self.semicolon {
             write!(f, [semicolon.format()])?;
         } else if !is_unknown {
             format_inserted(JsSyntaxKind::SEMICOLON).fmt(f)?;
         }
+
         Ok(())
     }
 }
