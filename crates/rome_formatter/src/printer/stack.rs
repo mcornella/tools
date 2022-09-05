@@ -31,69 +31,37 @@ impl<T> Stack<T> for Vec<T> {
     }
 }
 
-#[derive(Debug, Clone)]
-pub(super) struct Restored<T> {
-    pub(super) stack: Vec<T>,
-    pub(super) saved: Vec<T>,
-}
-
 /// A Stack that allows restoring itself to its original state.
 #[derive(Debug, Clone)]
 pub(super) struct RestorableStack<T> {
+    original: Vec<T>,
+    original_top: usize,
     stack: Vec<T>,
-    saved: Vec<T>,
-    original_length: usize,
 }
 
 impl<T> RestorableStack<T> {
     pub(super) fn new(original: Vec<T>) -> Self {
         Self {
-            original_length: original.len(),
-            stack: original,
-            saved: Vec::new(),
+            original_top: original.len(),
+            original,
+            stack: Vec::new(),
         }
     }
 
-    pub(super) fn with_saved(mut self, saved: Vec<T>) -> Self {
-        assert!(self.saved.is_empty());
-        assert!(saved.is_empty());
+    pub(super) fn with_stack(mut self, stack: Vec<T>) -> Self {
+        debug_assert!(stack.is_empty());
 
-        self.saved = saved;
+        self.stack = stack;
         self
     }
 
-    /// Takes the vector storing the saved elements.
-    ///
-    /// # Panics
-    /// If saved is not empty.
-    pub(super) fn take_saved(&mut self) -> Vec<T> {
-        assert!(self.saved.is_empty());
-        std::mem::take(&mut self.saved)
+    pub(super) fn take_vec(&mut self) -> Vec<T> {
+        std::mem::take(&mut self.stack)
     }
 
     /// Restores the stack to its original state.
-    pub(super) fn restore(mut self) -> Restored<T> {
-        if self.saved.is_empty() {
-            self.stack.truncate(self.original_length);
-        } else if self.stack.is_empty() {
-            self.saved.reverse();
-            std::mem::swap(&mut self.stack, &mut self.saved);
-        } else {
-            self.stack.truncate(self.original_length - self.saved.len());
-            let saved = std::mem::take(&mut self.saved);
-            self.stack.extend(saved.into_iter().rev());
-        }
-
-        assert_eq!(self.original_length, self.stack.len());
-
-        Restored {
-            stack: self.stack,
-            saved: self.saved,
-        }
-    }
-
-    pub(super) fn into_vec(self) -> Vec<T> {
-        self.stack
+    pub(super) fn finish(self) -> Vec<T> {
+        self.original
     }
 }
 
@@ -102,18 +70,14 @@ where
     T: Copy,
 {
     fn pop(&mut self) -> Option<T> {
-        let needs_saving = self.stack.len() == self.original_length - self.saved.len();
-
-        match self.stack.pop() {
-            Some(element) => {
-                if needs_saving {
-                    self.saved.push(element);
-                }
-
-                Some(element)
+        self.stack.pop().or_else(|| {
+            if self.original_top == 0 {
+                None
+            } else {
+                self.original_top -= 1;
+                Some(self.original[self.original_top])
             }
-            None => None,
-        }
+        })
     }
 
     fn push(&mut self, value: T) {
@@ -121,11 +85,17 @@ where
     }
 
     fn top(&self) -> Option<&T> {
-        self.stack.last()
+        self.stack.last().or_else(|| {
+            if self.original_top == 0 {
+                None
+            } else {
+                Some(&self.original[self.original_top - 1])
+            }
+        })
     }
 
     fn is_empty(&self) -> bool {
-        self.stack.is_empty()
+        self.original_top == 0 && self.stack.is_empty()
     }
 }
 
@@ -146,9 +116,9 @@ mod tests {
         assert_eq!(restorable.pop(), Some(1));
         assert_eq!(restorable.pop(), None);
 
-        let restored = restorable.restore();
+        let restored = restorable.finish();
 
-        assert_eq!(restored.stack, vec![1, 2, 3]);
+        assert_eq!(restored, vec![1, 2, 3]);
     }
 
     #[test]
@@ -165,9 +135,9 @@ mod tests {
         restorable.push(6);
         restorable.push(7);
 
-        let restored = restorable.restore();
+        let restored = restorable.finish();
 
-        assert_eq!(restored.stack, vec![1, 2, 3]);
+        assert_eq!(restored, vec![1, 2, 3]);
     }
 
     #[test]
@@ -184,8 +154,8 @@ mod tests {
         assert_eq!(restorable.pop(), Some(6));
         assert_eq!(restorable.pop(), Some(5));
 
-        let restored = restorable.restore();
+        let restored = restorable.finish();
 
-        assert_eq!(restored.stack, vec![1, 2, 3]);
+        assert_eq!(restored, vec![1, 2, 3]);
     }
 }

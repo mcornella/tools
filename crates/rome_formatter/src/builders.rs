@@ -1368,10 +1368,7 @@ impl<Context> Buffer for GroupBuffer<'_, Context> {
 
                 element if self.comments_depth > 0 => self.inner.write_element(element),
 
-                FormatElement::Interned(interned) => match Interned::try_unwrap(interned) {
-                    Ok(owned) => self.write_elements(owned),
-                    Err(interned) => self.write_interned(interned),
-                },
+                FormatElement::Interned(interned) => self.write_interned(interned),
 
                 element => {
                     self.empty = false;

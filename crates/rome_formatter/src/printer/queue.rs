@@ -172,7 +172,7 @@ impl<'a, 'print> FitsQueue<'a, 'print> {
         saved: Vec<&'a [FormatElement]>,
     ) -> Self {
         let slices = std::mem::take(&mut print_queue.slices);
-        let stack = RestorableStack::new(slices).with_saved(saved);
+        let stack = RestorableStack::new(slices).with_stack(saved);
 
         Self {
             stack,
@@ -183,10 +183,11 @@ impl<'a, 'print> FitsQueue<'a, 'print> {
     }
 
     pub(super) fn finish(mut self) -> Vec<&'a [FormatElement]> {
-        let restored = self.stack.restore();
+        let mut stack = self.stack.take_vec();
+        stack.clear();
 
-        self.print_queue.slices = restored.stack;
-        restored.saved
+        self.print_queue.slices = self.stack.finish();
+        stack
     }
 }
 

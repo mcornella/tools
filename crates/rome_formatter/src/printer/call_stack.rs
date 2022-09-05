@@ -153,16 +153,17 @@ pub(super) struct FitsCallStack<'print> {
 impl<'print> FitsCallStack<'print> {
     pub(super) fn new(print: &'print mut PrintCallStack, saved: Vec<StackFrame>) -> Self {
         let frames = std::mem::take(&mut print.0);
-        let stack = RestorableStack::new(frames).with_saved(saved);
+        let stack = RestorableStack::new(frames).with_stack(saved);
 
         Self { stack, print }
     }
 
     pub(super) fn finish(mut self) -> Vec<StackFrame> {
-        let restored = self.stack.restore();
+        let mut stack = self.stack.take_vec();
+        stack.clear();
 
-        self.print.0 = restored.stack;
-        restored.saved
+        self.print.0 = self.stack.finish();
+        stack
     }
 }
 

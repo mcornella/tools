@@ -49,7 +49,7 @@ impl std::fmt::Debug for FormatElement {
             FormatElement::Text(text) => text.fmt(fmt),
             FormatElement::LineSuffixBoundary => write!(fmt, "LineSuffixBoundary"),
             FormatElement::Interned(interned) => {
-                fmt.debug_list().entries(interned.as_slice()).finish()
+                fmt.debug_list().entries(interned.deref()).finish()
             }
             FormatElement::Signal(signal) => fmt.debug_tuple("Signal").field(signal).finish(),
         }
@@ -93,15 +93,11 @@ impl PrintMode {
 }
 
 #[derive(Clone)]
-pub struct Interned(Rc<Vec<FormatElement>>);
+pub struct Interned(Rc<[FormatElement]>);
 
 impl Interned {
     pub(super) fn new(content: Vec<FormatElement>) -> Self {
-        Self(Rc::new(content))
-    }
-
-    pub(crate) fn try_unwrap(this: Interned) -> Result<Vec<FormatElement>, Interned> {
-        Rc::try_unwrap(this.0).map_err(Interned)
+        Self(content.into())
     }
 }
 
@@ -118,7 +114,7 @@ impl Hash for Interned {
     where
         H: Hasher,
     {
-        hasher.write_usize(Rc::as_ptr(&self.0) as usize);
+        hasher.write_usize(Rc::as_ptr(&self.0) as *const usize as usize);
     }
 }
 
@@ -129,7 +125,7 @@ impl std::fmt::Debug for Interned {
 }
 
 impl Deref for Interned {
-    type Target = Vec<FormatElement>;
+    type Target = [FormatElement];
 
     fn deref(&self) -> &Self::Target {
         self.0.deref()

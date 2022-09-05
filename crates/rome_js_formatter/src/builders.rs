@@ -5,7 +5,7 @@ use rome_formatter::prelude::signal::Signal;
 use rome_formatter::token::{FormatInserted, FormatInsertedCloseParen, FormatInsertedOpenParen};
 use rome_formatter::{
     format_args, write, Argument, Arguments, CstFormatContext, FormatContext, GroupId,
-    PreambleBuffer, VecBuffer,
+    PreambleBuffer,
 };
 use rome_js_syntax::{JsLanguage, JsSyntaxKind, JsSyntaxNode, JsSyntaxToken};
 use rome_rowan::{AstNode, Direction, Language, SyntaxElement, SyntaxTriviaPiece, TextRange};
@@ -518,14 +518,15 @@ impl<'t> OpenDelimiter<'t> {
     pub(crate) fn format_trailing_trivia(&self) -> impl Format<JsFormatContext> + 't {
         format_with(|f| {
             // Not really interested in the pre-amble, but want to know if it was written
-            let mut buffer = VecBuffer::new(f.state_mut());
+            let written = {
+                let mut buffer = PreambleBuffer::new(f, format_with(|_| Ok(())));
 
-            write!(buffer, [format_trailing_trivia(self.open_token)])?;
+                write!(buffer, [format_trailing_trivia(self.open_token)])?;
 
-            let trivia = buffer.into_vec();
+                buffer.did_write_preamble()
+            };
 
-            if !trivia.is_empty() {
-                f.write_elements(trivia)?;
+            if written {
                 soft_line_break().fmt(f)?;
             }
 

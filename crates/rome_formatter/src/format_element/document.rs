@@ -47,7 +47,7 @@ impl FormatElements for [FormatElement] {
                     ignore_depth -= 1;
                 }
                 FormatElement::Interned(interned) if ignore_depth == 0 => {
-                    if interned.as_slice().will_break() {
+                    if interned.will_break() {
                         return true;
                     }
                 }
@@ -493,7 +493,7 @@ impl Format<IrFormatContext> for &[FormatElement] {
                                 ]
                             )?;
 
-                            interned.as_slice().fmt(f)?;
+                            interned.deref().fmt(f)?;
                         }
                         Some(reference) => {
                             write!(
@@ -583,19 +583,12 @@ impl<'a> Iterator for DocumentIterator<'a> {
                     }
 
                     if let FormatElement::Interned(interned) = element {
-                        match interned.as_slice() {
-                            [] => {
-                                // skip
-                            }
-                            slice => {
-                                if let Some(top) = self.stack.pop() {
-                                    self.stack.push(&top[self.current_index..]);
-                                }
-
-                                self.stack.push(slice);
-                                self.current_index = 0;
-                            }
+                        if let Some(top) = self.stack.pop() {
+                            self.stack.push(&top[self.current_index..]);
                         }
+
+                        self.stack.push(interned.deref());
+                        self.current_index = 0;
 
                         continue;
                     }

@@ -486,17 +486,18 @@ impl MultilineBuilder {
 
     fn finish(self) -> impl Format<JsFormatContext> {
         format_once(move |f| {
-            let elements = self.result?;
-            let elements = f.intern_vec(elements);
-
-            match self.layout {
-                MultilineLayout::Fill => f.write_elements([
-                    FormatElement::Signal(Signal::StartFill),
-                    elements,
-                    FormatElement::Signal(Signal::EndFill),
-                ]),
-                MultilineLayout::NoFill => f.write_element(elements),
+            if let Some(elements) = f.intern_vec(self.result?) {
+                match self.layout {
+                    MultilineLayout::Fill => f.write_elements([
+                        FormatElement::Signal(Signal::StartFill),
+                        elements,
+                        FormatElement::Signal(Signal::EndFill),
+                    ])?,
+                    MultilineLayout::NoFill => f.write_element(elements)?,
+                };
             }
+
+            Ok(())
         })
     }
 }
@@ -539,9 +540,10 @@ impl FlatBuilder {
         format_once(move |f| {
             assert!(!self.disabled, "The flat builder has been disabled and thus, does no longer store any elements. Make sure you don't call disable if you later intend to format the flat content.");
 
-            let elements = self.result?;
-            let elements = f.intern_vec(elements);
-            f.write_element(elements)?;
+            if let Some(elements) = f.intern_vec(self.result?) {
+                f.write_element(elements)?;
+            }
+
             Ok(())
         })
     }

@@ -142,7 +142,7 @@ impl<T, Context> MemoizeFormat<Context> for T where T: Format<Context> {}
 #[derive(Debug)]
 pub struct Memoized<F, Context> {
     inner: F,
-    memory: RefCell<Option<FormatResult<FormatElement>>>,
+    memory: RefCell<Option<FormatResult<Option<FormatElement>>>>,
     options: PhantomData<Context>,
 }
 
@@ -218,8 +218,9 @@ where
             .get_or_insert_with(|| f.intern(&self.inner));
 
         match result.as_ref() {
-            Ok(FormatElement::Interned(interned)) => Ok(interned.deref()),
-            Ok(other) => Ok(std::slice::from_ref(other)),
+            Ok(Some(FormatElement::Interned(interned))) => Ok(interned.deref()),
+            Ok(Some(other)) => Ok(std::slice::from_ref(other)),
+            Ok(None) => Ok(&[]),
             Err(error) => Err(*error),
         }
     }
@@ -234,11 +235,12 @@ where
         let result = memory.get_or_insert_with(|| f.intern(&self.inner));
 
         match result {
-            Ok(elements) => {
+            Ok(Some(elements)) => {
                 f.write_element(elements.clone())?;
 
                 Ok(())
             }
+            Ok(None) => Ok(()),
             Err(err) => Err(*err),
         }
     }
