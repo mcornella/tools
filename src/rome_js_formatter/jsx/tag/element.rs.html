@@ -180,7 +180,6 @@
 <span id="174">174</span>
 <span id="175">175</span>
 <span id="176">176</span>
-<span id="177">177</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::jsx::lists::child_list::JsxChildListLayout</span>;
@@ -221,9 +220,9 @@
             }
 
             <span class="ident">ElementLayout::Default</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">format_opening</span> <span class="op">=</span> <span class="ident">format_opening</span>.<span class="ident">memoized</span>();
-
-                <span class="kw">let</span> <span class="ident">opening_breaks</span> <span class="op">=</span> <span class="ident">format_opening</span>.<span class="ident">inspect</span>(<span class="ident">f</span>)<span class="question-mark">?</span>.<span class="ident">will_break</span>();
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">recording</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">start_recording</span>();
+                <span class="macro">write!</span>(<span class="ident">recording</span>, [<span class="ident">format_opening</span>])<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">opening_breaks</span> <span class="op">=</span> <span class="ident">recording</span>.<span class="ident">stop</span>().<span class="ident">iter</span>().<span class="ident">any</span>(<span class="ident">FormatElement::will_break</span>);
 
                 <span class="kw">let</span> <span class="ident">multiple_attributes</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
                     <span class="ident">JsxAnyTagWithChildren::JsxElement</span>(<span class="ident">element</span>) =&gt; {
@@ -241,7 +240,6 @@
                 <span class="macro">write!</span>(
                     <span class="ident">f</span>,
                     [
-                        <span class="ident">format_opening</span>,
                         <span class="self">self</span>.<span class="ident">children</span>().<span class="ident">format</span>().<span class="ident">with_options</span>(<span class="ident">list_layout</span>),
                         <span class="ident">format_closing</span>
                     ]
