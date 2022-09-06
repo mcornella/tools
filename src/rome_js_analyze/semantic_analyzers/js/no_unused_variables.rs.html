@@ -243,6 +243,17 @@
 <span id="237">237</span>
 <span id="238">238</span>
 <span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::semantic_services::Semantic</span>;
 <span class="kw">use</span> <span class="ident">rome_analyze</span>::{<span class="ident">context::RuleContext</span>, <span class="ident">declare_rule</span>, <span class="ident">Rule</span>, <span class="ident">RuleCategory</span>, <span class="ident">RuleDiagnostic</span>};
 <span class="kw">use</span> <span class="ident">rome_console::markup</span>;
@@ -256,6 +267,17 @@
 
 <span class="macro">declare_rule!</span> {
     <span class="doccomment">/// Disallow unused variables.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// There are two exceptions to this rule:</span>
+    <span class="doccomment">/// 1. variables that starts with underscore, ex: `let _something;`</span>
+    <span class="doccomment">/// 2. the `React` variable;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The pattern of having an underscore as prefix of a name of variable is a very diffuse</span>
+    <span class="doccomment">/// pattern among programmers, and Rome decided to follow it.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Importing the `React` variable was a mandatory pattern until some time ago:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// For the time being this rule will ignore it, but this **might change in the future releases**.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ## Examples</span>
     <span class="doccomment">///</span>
