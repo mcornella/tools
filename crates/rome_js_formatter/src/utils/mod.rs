@@ -16,7 +16,6 @@ mod typescript;
 
 pub(crate) use crate::parentheses::resolve_left_most_expression;
 use crate::prelude::*;
-use crate::JsCommentStyle;
 pub(crate) use assignment_like::{
     with_assignment_layout, AssignmentLikeLayout, JsAnyAssignmentLike,
 };
@@ -27,9 +26,9 @@ pub(crate) use conditional::{ConditionalJsxChain, JsAnyConditional};
 pub(crate) use member_chain::get_member_chain;
 pub(crate) use object_like::JsObjectLike;
 pub(crate) use object_pattern_like::JsObjectPatternLike;
-use rome_formatter::{format_args, write, Buffer, CommentStyle};
+use rome_formatter::{format_args, write, Buffer};
 use rome_js_syntax::{JsAnyExpression, JsAnyStatement, JsInitializerClause, JsLanguage, Modifiers};
-use rome_js_syntax::{JsSyntaxKind, JsSyntaxNode, JsSyntaxToken};
+use rome_js_syntax::{JsSyntaxNode, JsSyntaxToken};
 use rome_rowan::{AstNode, AstNodeList};
 pub(crate) use string_utils::*;
 pub(crate) use typescript::should_hug_type;
@@ -205,7 +204,7 @@ impl Format<JsFormatContext> for FormatWithSemicolon<'_> {
         if let Some(semicolon) = self.semicolon {
             write!(f, [semicolon.format()])?;
         } else if !is_unknown {
-            format_inserted(JsSyntaxKind::SEMICOLON).fmt(f)?;
+            text(";").fmt(f)?;
         }
         Ok(())
     }
@@ -247,17 +246,4 @@ where
     }
 
     join_with.finish()
-}
-
-pub(crate) fn has_trailing_line_comment(node: &JsSyntaxNode) -> bool {
-    node.last_token()
-        .map_or(false, |token| has_token_trailing_line_comment(&token))
-}
-
-pub(crate) fn has_token_trailing_line_comment(token: &JsSyntaxToken) -> bool {
-    token
-        .trailing_trivia()
-        .pieces()
-        .filter_map(|piece| piece.as_comments())
-        .any(|comment| JsCommentStyle.get_comment_kind(&comment).is_line())
 }

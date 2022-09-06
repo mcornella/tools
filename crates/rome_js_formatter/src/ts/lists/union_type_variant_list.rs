@@ -1,6 +1,6 @@
 use crate::prelude::*;
 use rome_formatter::write;
-use rome_js_syntax::{JsLanguage, JsSyntaxKind, TsType, TsUnionTypeVariantList};
+use rome_js_syntax::{JsLanguage, TsType, TsUnionTypeVariantList};
 use rome_rowan::{AstSeparatedElement, AstSeparatedList};
 
 #[derive(Debug, Clone, Default)]
@@ -46,14 +46,7 @@ impl Format<JsFormatContext> for FormatTypeVariant {
             }
             None => {
                 if !self.last {
-                    write![
-                        f,
-                        [
-                            soft_line_break_or_space(),
-                            format_inserted(JsSyntaxKind::PIPE),
-                            space()
-                        ]
-                    ]?;
+                    write![f, [soft_line_break_or_space(), text("|"), space()]]?;
                 }
             }
         }

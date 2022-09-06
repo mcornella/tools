@@ -36,7 +36,7 @@ impl FormatNodeRule<TsIntersectionType> for FormatTsIntersectionType {
 }
 
 pub struct FormatTypeSetLeadingSeparator<'a> {
-    pub(crate) separator: JsSyntaxKind,
+    pub(crate) separator: &'static str,
     pub(crate) leading_separator: Option<&'a JsSyntaxToken>,
 }
 
@@ -49,7 +49,7 @@ impl Format<JsFormatContext> for FormatTypeSetLeadingSeparator<'_> {
             None => write!(
                 f,
                 [if_group_breaks(&format_args![
-                    format_inserted(self.separator),
+                    text(self.separator),
                     space()
                 ])]
             ),
