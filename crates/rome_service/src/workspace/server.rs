@@ -10,11 +10,11 @@ use crate::workspace::SupportsFeatureResult;
 use crate::{
     file_handlers::Features,
     settings::{SettingsHandle, WorkspaceSettings},
-    MatchOptions, Matcher, RomeError, Workspace,
+    RomeError, Workspace,
 };
 use dashmap::{mapref::entry::Entry, DashMap};
 use indexmap::IndexSet;
-use rome_analyze::{AnalysisFilter, RuleCategories, RuleFilter};
+use rome_analyze::{AnalysisFilter, RuleFilter};
 use rome_diagnostics::{Diagnostic, Severity};
 use rome_formatter::Printed;
 use rome_fs::RomePath;
@@ -142,7 +142,7 @@ impl WorkspaceServer {
     /// Returns and error if no file exists in the workspace with this path or
     /// if the language associated with the file has no parser capability
     fn get_parse(&self, rome_path: RomePath, feature: FeatureName) -> Result<AnyParse, RomeError> {
-        let ignored = self.is_file_ignored(&rome_path, feature);
+        let ignored = self.is_file_ignored(&rome_path, &feature);
 
         if ignored {
             return Err(RomeError::FileIgnored(rome_path.to_path_buf()));
@@ -171,7 +171,7 @@ impl WorkspaceServer {
     /// a list of paths to match against.
     ///
     /// If the file path matches, than `true` is returned and it should be considered ignored.
-    fn is_file_ignored(&self, rome_path: &RomePath, feature: FeatureName) -> bool {
+    fn is_file_ignored(&self, rome_path: &RomePath, feature: &FeatureName) -> bool {
         let settings = self.settings();
         match feature {
             FeatureName::Format => settings
@@ -192,15 +192,29 @@ impl Workspace for WorkspaceServer {
     fn supports_feature(&self, params: SupportsFeatureParams) -> SupportsFeatureResult {
         let capabilities = self.get_capabilities(&params.path);
         let settings = self.settings.read().unwrap();
-        let is_ignored = matches!(self.is_file_ignored(&params.path, params.feature), true);
+        let is_ignored = matches!(self.is_file_ignored(&params.path, &params.feature), true);
         if is_ignored {
-            SupportsFeatureResult::ignored()
-        } else if capabilities.formatter.format.is_none() {
-            SupportsFeatureResult::file_not_supported()
-        } else if !settings.formatter().enabled {
-            SupportsFeatureResult::disabled()
-        } else {
-            SupportsFeatureResult { reason: None }
+            return SupportsFeatureResult::ignored();
+        }
+        match params.feature {
+            FeatureName::Format => {
+                if capabilities.formatter.format.is_none() {
+                    SupportsFeatureResult::file_not_supported()
+                } else if !settings.formatter().enabled {
+                    SupportsFeatureResult::disabled()
+                } else {
+                    SupportsFeatureResult { reason: None }
+                }
+            }
+            FeatureName::Lint => {
+                if capabilities.analyzer.lint.is_none() {
+                    SupportsFeatureResult::file_not_supported()
+                } else if !settings.linter().enabled {
+                    SupportsFeatureResult::disabled()
+                } else {
+                    SupportsFeatureResult { reason: None }
+                }
+            }
         }
     }
 
