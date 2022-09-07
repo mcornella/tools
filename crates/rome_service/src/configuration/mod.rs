@@ -78,6 +78,9 @@ pub enum ConfigurationError {
     /// - incorrect fields
     /// - incorrect values
     DeserializationError(String),
+
+    /// Thrown when the pattern inside the `ignore` field errors
+    InvalidIgnorePattern(String, String),
 }
 
 impl Debug for ConfigurationError {
@@ -85,8 +88,8 @@ impl Debug for ConfigurationError {
         match self {
             ConfigurationError::SerializationError => std::fmt::Display::fmt(self, f),
             ConfigurationError::DeserializationError(_) => std::fmt::Display::fmt(self, f),
-
             ConfigurationError::ConfigAlreadyExists => std::fmt::Display::fmt(self, f),
+            ConfigurationError::InvalidIgnorePattern(_, _) => std::fmt::Display::fmt(self, f),
         }
     }
 }
@@ -109,6 +112,9 @@ impl Display for ConfigurationError {
             }
             ConfigurationError::ConfigAlreadyExists => {
                 write!(f, "it seems that a configuration file already exists")
+            }
+            ConfigurationError::InvalidIgnorePattern(pattern, reason) => {
+                write!(f, "couldn't parse the pattern {pattern}, reason: {reason}")
             }
         }
     }
