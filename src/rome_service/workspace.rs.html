@@ -491,7 +491,7 @@
 <span class="kw">use</span> <span class="ident">rome_text_edit::Indel</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">panic::RefUnwindSafe</span>, <span class="ident">sync::Arc</span>};
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::client</span>::{<span class="ident">WorkspaceClient</span>, <span class="ident">WorkspaceTransport</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::client</span>::{<span class="ident">TransportRequest</span>, <span class="ident">WorkspaceClient</span>, <span class="ident">WorkspaceTransport</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::file_handlers::Language</span>;
 
 <span class="kw">mod</span> <span class="ident">client</span>;
@@ -687,7 +687,7 @@
     <span class="doccomment">/// Checks whether a certain feature is supported. There are different conditions:</span>
     <span class="doccomment">/// - Rome doesn&#39;t recognize a file, so it can provide the feature;</span>
     <span class="doccomment">/// - the feature is disabled inside the configuration;</span>
-    <span class="kw">fn</span> <span class="ident">supports_feature</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">SupportsFeatureParams</span>) -&gt; <span class="ident">bool</span>;
+    <span class="kw">fn</span> <span class="ident">supports_feature</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">SupportsFeatureParams</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">RomeError</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Update the global settings for this workspace</span>
     <span class="kw">fn</span> <span class="ident">update_settings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">UpdateSettingsParams</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">RomeError</span><span class="op">&gt;</span>;

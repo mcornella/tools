@@ -178,6 +178,9 @@
 <span id="172">172</span>
 <span id="173">173</span>
 <span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">convert::Infallible</span>,
     <span class="ident">env</span>, <span class="ident">fs</span>,
@@ -188,8 +191,11 @@
 
 <span class="kw">use</span> <span class="ident">rome_lsp</span>::{<span class="ident">ServerConnection</span>, <span class="ident">ServerFactory</span>};
 <span class="kw">use</span> <span class="ident">tokio</span>::{
-    <span class="ident">io</span>::{<span class="ident">split</span>, <span class="ident">Interest</span>},
-    <span class="ident">net</span>::{<span class="ident">UnixListener</span>, <span class="ident">UnixStream</span>},
+    <span class="ident">io::Interest</span>,
+    <span class="ident">net</span>::{
+        <span class="ident">unix</span>::{<span class="ident">OwnedReadHalf</span>, <span class="ident">OwnedWriteHalf</span>},
+        <span class="ident">UnixListener</span>, <span class="ident">UnixStream</span>,
+    },
     <span class="ident">process</span>::{<span class="ident">Child</span>, <span class="ident">Command</span>},
     <span class="ident">time</span>,
 };
@@ -241,9 +247,9 @@
 
 <span class="doccomment">/// Open a connection to the daemon server process, returning [None] if the</span>
 <span class="doccomment">/// server is not running</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">open_socket</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UnixStream</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">open_socket</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">OwnedReadHalf</span>, <span class="ident">OwnedWriteHalf</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">try_connect</span>().<span class="kw">await</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">socket</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">socket</span>)),
+        <span class="prelude-val">Ok</span>(<span class="ident">socket</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">socket</span>.<span class="ident">into_split</span>())),
         <span class="prelude-val">Err</span>(<span class="ident">err</span>)
             <span class="comment">// The OS will return `ConnectionRefused` if the socket file exists</span>
             <span class="comment">// but no server process is listening on it</span>
@@ -349,7 +355,7 @@
 
 <span class="doccomment">/// Async task driving a single client connection</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run_server</span>(<span class="ident">connection</span>: <span class="ident">ServerConnection</span>, <span class="ident">stream</span>: <span class="ident">UnixStream</span>) {
-    <span class="kw">let</span> (<span class="ident">read</span>, <span class="ident">write</span>) <span class="op">=</span> <span class="ident">split</span>(<span class="ident">stream</span>);
+    <span class="kw">let</span> (<span class="ident">read</span>, <span class="ident">write</span>) <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">into_split</span>();
     <span class="ident">connection</span>.<span class="ident">accept</span>(<span class="ident">read</span>, <span class="ident">write</span>).<span class="kw">await</span>;
 }
 </code></pre></div>

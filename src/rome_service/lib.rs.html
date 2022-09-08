@@ -280,7 +280,6 @@
 <span id="274">274</span>
 <span id="275">275</span>
 <span id="276">276</span>
-<span id="277">277</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_console</span>::{<span class="ident">Console</span>, <span class="ident">EnvConsole</span>};
 <span class="kw">use</span> <span class="ident">rome_formatter::FormatError</span>;
 <span class="kw">use</span> <span class="ident">rome_fs</span>::{<span class="ident">FileSystem</span>, <span class="ident">OsFileSystem</span>, <span class="ident">RomePath</span>};
@@ -457,6 +456,8 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TransportError</span> {
     <span class="doccomment">/// Error emitted by the transport layer if the connection was lost due to an I/O error</span>
     <span class="ident">ChannelClosed</span>,
+    <span class="doccomment">/// Error emitted by the transport layer if a request timed out</span>
+    <span class="ident">Timeout</span>,
     <span class="doccomment">/// Error caused by a serialization or deserialization issue</span>
     <span class="ident">SerdeError</span>(<span class="ident">String</span>),
     <span class="doccomment">/// Generic error type for RPC errors that can&#39;t be deserialized into RomeError</span>
@@ -472,14 +473,11 @@
             <span class="ident">TransportError::ChannelClosed</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(
                 <span class="string">&quot;a request to the remote workspace failed because the connection was interrupted&quot;</span>,
             ),
+            <span class="ident">TransportError::Timeout</span> =&gt; {
+                <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;the request to the remote workspace timed out&quot;</span>)
+            }
             <span class="ident">TransportError::RPCError</span>(<span class="ident">err</span>) =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="ident">err</span>),
         }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">serde_json::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TransportError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">serde_json::Error</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">TransportError::SerdeError</span>(<span class="ident">err</span>.<span class="ident">to_string</span>())
     }
 }
 

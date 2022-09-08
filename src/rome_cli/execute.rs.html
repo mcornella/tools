@@ -298,7 +298,7 @@
             <span class="kw">let</span> <span class="ident">can_format</span> <span class="op">=</span> <span class="ident">workspace</span>.<span class="ident">supports_feature</span>(<span class="ident">SupportsFeatureParams</span> {
                 <span class="ident">path</span>: <span class="ident">rome_path</span>.<span class="ident">clone</span>(),
                 <span class="ident">feature</span>: <span class="ident">FeatureName::Format</span>,
-            });
+            })<span class="question-mark">?</span>;
             <span class="kw">if</span> <span class="ident">can_format</span> {
                 <span class="ident">workspace</span>.<span class="ident">open_file</span>(<span class="ident">OpenFileParams</span> {
                     <span class="ident">path</span>: <span class="ident">rome_path</span>.<span class="ident">clone</span>(),
