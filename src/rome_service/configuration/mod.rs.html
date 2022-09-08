@@ -196,15 +196,11 @@
 <span id="190">190</span>
 <span id="191">191</span>
 <span id="192">192</span>
-<span id="193">193</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module contains the configuration of `rome.json`</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The configuration is divided by &quot;tool&quot;, and then it&#39;s possible to further customise it</span>
 <span class="doccomment">//! by language. The language might further options divided by tool.</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::configuration::formatter::FormatterConfiguration</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::configuration::javascript::JavascriptConfiguration</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::configuration::linter::LinterConfiguration</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">DynRef</span>, <span class="ident">RomeError</span>};
 <span class="kw">use</span> <span class="ident">rome_fs</span>::{<span class="ident">FileSystem</span>, <span class="ident">OpenOptions</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
@@ -217,7 +213,9 @@
 <span class="kw">mod</span> <span class="ident">javascript</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">linter</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">linter</span>::{<span class="ident">RuleConfiguration</span>, <span class="ident">Rules</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">formatter</span>::{<span class="ident">FormatterConfiguration</span>, <span class="ident">PlainIndentStyle</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">javascript</span>::{<span class="ident">JavascriptConfiguration</span>, <span class="ident">JavascriptFormatter</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">linter</span>::{<span class="ident">LinterConfiguration</span>, <span class="ident">RuleConfiguration</span>, <span class="ident">Rules</span>};
 
 <span class="doccomment">/// The configuration that is contained inside the file `rome.json`</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
