@@ -796,6 +796,9 @@
 <span id="790">790</span>
 <span id="791">791</span>
 <span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Rome&#39;s official JavaScript formatter.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Implement the formatter</span>
@@ -1548,9 +1551,12 @@ function() {
     <span class="comment">// use this test check if your snippet prints as you wish, without using a snapshot</span>
     <span class="kw">fn</span> <span class="ident">quick_test</span>() {
         <span class="kw">let</span> <span class="ident">src</span> <span class="op">=</span> <span class="string">r#&quot;
-const obj1 = conditionIsTruthy
-           ? { some: &quot;long&quot;, object: &quot;with&quot;, lots: &quot;of&quot;, stuff }
-           : shortThing;
+type Example = {
+  [A in B]: T;
+} &amp; {
+  [A in B]: T;
+};
+
 &quot;#</span>;
         <span class="kw">let</span> <span class="ident">syntax</span> <span class="op">=</span> <span class="ident">SourceType::tsx</span>();
         <span class="kw">let</span> <span class="ident">tree</span> <span class="op">=</span> <span class="ident">parse</span>(<span class="ident">src</span>, <span class="number">0</span>, <span class="ident">syntax</span>);
@@ -1568,7 +1574,7 @@ const obj1 = conditionIsTruthy
         });
         <span class="macro">assert_eq!</span>(
             <span class="ident">result</span>.<span class="ident">as_code</span>(),
-            <span class="string">&quot;type B8 = /*1*/ (C);\ntype B9 = (/*1*/ C);\ntype B10 = /*1*/ /*2*/ C;\n&quot;</span>
+            <span class="string">&quot;type Example = {\n\t[A in B]: T;\n} &amp; {\n\t[A in B]: T;\n};\n&quot;</span>
         );
     }
 
