@@ -155,10 +155,6 @@
 <span id="149">149</span>
 <span id="150">150</span>
 <span id="151">151</span>
-<span id="152">152</span>
-<span id="153">153</span>
-<span id="154">154</span>
-<span id="155">155</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">rome_formatter::IndentStyle</span>;
 <span class="kw">use</span> <span class="ident">rome_service::configuration</span>::{
     <span class="ident">FormatterConfiguration</span>, <span class="ident">JavascriptConfiguration</span>, <span class="ident">JavascriptFormatter</span>, <span class="ident">PlainIndentStyle</span>,
@@ -232,15 +228,11 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">configuration</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">configuration</span>) <span class="op">=</span> <span class="ident">configuration</span> {
         <span class="ident">configuration</span>
     } <span class="kw">else</span> {
-        <span class="ident">Configuration</span> {
-            <span class="ident">formatter</span>: <span class="prelude-val">Some</span>(<span class="ident">FormatterConfiguration::default</span>()),
-            <span class="ident">javascript</span>: <span class="prelude-val">Some</span>(<span class="ident">JavascriptConfiguration</span> {
-                <span class="ident">formatter</span>: <span class="prelude-val">Some</span>(<span class="ident">JavascriptFormatter::default</span>()),
-                <span class="ident">globals</span>: <span class="prelude-val">None</span>,
-            }),
-            ..<span class="ident">Configuration::default</span>()
-        }
+        <span class="ident">Configuration::default</span>()
     };
+    <span class="kw">let</span> <span class="ident">formatter</span> <span class="op">=</span> <span class="ident">configuration</span>
+        .<span class="ident">formatter</span>
+        .<span class="ident">get_or_insert_with</span>(<span class="ident">FormatterConfiguration::default</span>);
 
     <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">session</span>
         .<span class="ident">args</span>
@@ -266,21 +258,19 @@
             <span class="ident">source</span>,
         })<span class="question-mark">?</span>;
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">formatter</span>) <span class="op">=</span> <span class="ident">configuration</span>.<span class="ident">formatter</span>.<span class="ident">as_mut</span>() {
-        <span class="kw">match</span> <span class="ident">indent_style</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">IndentStyle::Tab</span>) =&gt; {
-                <span class="ident">formatter</span>.<span class="ident">indent_style</span> <span class="op">=</span> <span class="ident">PlainIndentStyle::Tab</span>;
-            }
-            <span class="prelude-val">Some</span>(<span class="ident">IndentStyle::Space</span>(<span class="ident">default_size</span>)) =&gt; {
-                <span class="ident">formatter</span>.<span class="ident">indent_style</span> <span class="op">=</span> <span class="ident">PlainIndentStyle::Space</span>;
-                <span class="ident">formatter</span>.<span class="ident">indent_size</span> <span class="op">=</span> <span class="ident">size</span>.<span class="ident">unwrap_or</span>(<span class="ident">default_size</span>);
-            }
-            <span class="prelude-val">None</span> =&gt; {}
+    <span class="kw">match</span> <span class="ident">indent_style</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">IndentStyle::Tab</span>) =&gt; {
+            <span class="ident">formatter</span>.<span class="ident">indent_style</span> <span class="op">=</span> <span class="ident">PlainIndentStyle::Tab</span>;
         }
+        <span class="prelude-val">Some</span>(<span class="ident">IndentStyle::Space</span>(<span class="ident">default_size</span>)) =&gt; {
+            <span class="ident">formatter</span>.<span class="ident">indent_style</span> <span class="op">=</span> <span class="ident">PlainIndentStyle::Space</span>;
+            <span class="ident">formatter</span>.<span class="ident">indent_size</span> <span class="op">=</span> <span class="ident">size</span>.<span class="ident">unwrap_or</span>(<span class="ident">default_size</span>);
+        }
+        <span class="prelude-val">None</span> =&gt; {}
+    }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">line_width</span>) <span class="op">=</span> <span class="ident">line_width</span> {
-            <span class="ident">formatter</span>.<span class="ident">line_width</span> <span class="op">=</span> <span class="ident">line_width</span>;
-        }
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">line_width</span>) <span class="op">=</span> <span class="ident">line_width</span> {
+        <span class="ident">formatter</span>.<span class="ident">line_width</span> <span class="op">=</span> <span class="ident">line_width</span>;
     }
 
     <span class="kw">let</span> <span class="ident">quote_properties</span> <span class="op">=</span> <span class="ident">session</span>
@@ -298,18 +288,20 @@
             <span class="ident">argument</span>: <span class="string">&quot;--quote-style&quot;</span>,
             <span class="ident">source</span>,
         })<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">javascript</span>) <span class="op">=</span> <span class="ident">configuration</span>
-        .<span class="ident">javascript</span>
-        .<span class="ident">as_mut</span>()
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">j</span><span class="op">|</span> <span class="ident">j</span>.<span class="ident">formatter</span>.<span class="ident">as_mut</span>())
-    {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">quote_properties</span>) <span class="op">=</span> <span class="ident">quote_properties</span> {
-            <span class="ident">javascript</span>.<span class="ident">quote_properties</span> <span class="op">=</span> <span class="ident">quote_properties</span>;
-        }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">quote_style</span>) <span class="op">=</span> <span class="ident">quote_style</span> {
-            <span class="ident">javascript</span>.<span class="ident">quote_style</span> <span class="op">=</span> <span class="ident">quote_style</span>;
-        }
+    <span class="kw">let</span> <span class="ident">javascript</span> <span class="op">=</span> <span class="ident">configuration</span>
+        .<span class="ident">javascript</span>
+        .<span class="ident">get_or_insert_with</span>(<span class="ident">JavascriptConfiguration::default</span>);
+    <span class="kw">let</span> <span class="ident">javascript_formatter</span> <span class="op">=</span> <span class="ident">javascript</span>
+        .<span class="ident">formatter</span>
+        .<span class="ident">get_or_insert_with</span>(<span class="ident">JavascriptFormatter::default</span>);
+
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">quote_properties</span>) <span class="op">=</span> <span class="ident">quote_properties</span> {
+        <span class="ident">javascript_formatter</span>.<span class="ident">quote_properties</span> <span class="op">=</span> <span class="ident">quote_properties</span>;
+    }
+
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">quote_style</span>) <span class="op">=</span> <span class="ident">quote_style</span> {
+        <span class="ident">javascript_formatter</span>.<span class="ident">quote_style</span> <span class="op">=</span> <span class="ident">quote_style</span>;
     }
 
     <span class="prelude-val">Ok</span>(<span class="ident">configuration</span>)
